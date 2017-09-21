@@ -39,6 +39,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 			scrollPane = new JScrollPane(jTree);
 
 			panel.add(scrollPane, "grow");
+
 		});
 	}
 }
