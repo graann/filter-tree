@@ -62,6 +62,7 @@ public class TreeLoader {
 	}
 
 	private static DefaultMutableTreeNode read() {
+		DefaultMutableTreeNode root = null;
 		DefaultMutableTreeNode prev = null;
 
 		try {
@@ -71,10 +72,10 @@ public class TreeLoader {
 
 			for (String line; (line = bufferedReader.readLine()) != null; ) {
 				int level = getLevel(line);
-				String value = line.substring(level + 1);
+				String value = line.substring(level);
 				DefaultMutableTreeNode node = new DefaultMutableTreeNode(value);
 				if (prev == null) {
-					prev = node;
+					root = node;
 				} else {
 					if (level > prev.getLevel()) {
 						prev.add(node);
@@ -82,20 +83,19 @@ public class TreeLoader {
 						prev = (DefaultMutableTreeNode) prev.getParent();
 						prev.add(node);
 					} else {
-						while (level < prev.getDepth()) {
+						while (level < prev.getLevel()) {
 							prev = (DefaultMutableTreeNode) prev.getParent();
 						}
-						prev = (DefaultMutableTreeNode) prev.getParent();
 						prev.add(node);
 					}
-
 				}
+				prev = node;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return prev;
+		return root;
 	}
 
 	private static int getLevel(String string) {
