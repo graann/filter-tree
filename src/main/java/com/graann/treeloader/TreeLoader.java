@@ -1,13 +1,18 @@
 package com.graann.treeloader;
 
+import com.graann.App;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -22,16 +27,18 @@ import java.util.stream.Stream;
  */
 public class TreeLoader {
 	private static BehaviorSubject<List<String>> listBehaviorSubject;
+	private static BehaviorSubject<DefaultMutableTreeNode> treeBehaviorSubject;
 
-	public static Observable<List<String>> loadTree() {
+	public static Observable<List<String>> loadFromZDB() {
 		if(listBehaviorSubject != null) {
 			return listBehaviorSubject;
 		}
 
 		listBehaviorSubject = BehaviorSubject.create();
 		Observable.<List<String>>create(subscriber -> {
-			ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-			try (Stream<String> stream = Files.lines(Paths.get(classloader.getResource("zdb-win.txt").toURI()))) {
+
+			try (Stream<String> stream = Files.lines(Paths.get("tree.txt"))) {
+
 				subscriber.onNext(stream.filter(s -> !s.isEmpty()).map(String::trim).collect(Collectors.toList()));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -40,6 +47,70 @@ public class TreeLoader {
 		}).observeOn(Schedulers.io()).first().subscribe(strings -> listBehaviorSubject.onNext(strings));
 		return listBehaviorSubject;
 	}
+
+
+	public static Observable<DefaultMutableTreeNode> loadTree() {
+		if(treeBehaviorSubject != null) {
+			return treeBehaviorSubject;
+		}
+
+		treeBehaviorSubject = BehaviorSubject.create();
+		Observable.<DefaultMutableTreeNode>create(subscriber -> {
+			subscriber.onNext(read());
+		}).observeOn(Schedulers.io()).first().subscribe(strings -> treeBehaviorSubject.onNext(strings));
+		return treeBehaviorSubject;
+	}
+
+	private static DefaultMutableTreeNode read() {
+		String file = App.class.getResource("tree.txt").getFile();
+		DefaultMutableTreeNode prev = null;
+
+		try {
+			BufferedReader bufferedReader = new BufferedReader(
+					new InputStreamReader(
+							new FileInputStream(file), "UTF8"));
+
+
+			for (String line; (line = bufferedReader.readLine()) != null; ) {
+				int level = getLevel(line);
+				String value = line.substring(level + 1);
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(value);
+
+				if (prev == null) {
+					DefaultMutableTreeNode root = node;
+					prev = root;
+				} else {
+					if (level > prev.getLevel()) {
+						prev.add(node);
+					} else if (level == prev.getLevel()) {
+						((DefaultMutableTreeNode) prev.getParent()).add(node);
+						if (prev.getParent() instanceof DefaultMutableTreeNode) {
+							((DefaultMutableTreeNode) prev.getParent()).add(node);
+						}
+					} else {
+						while (level < prev.getDepth()) {
+							prev = (DefaultMutableTreeNode) prev.getParent();
+						}
+						((DefaultMutableTreeNode) prev.getParent()).add(node);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return prev;
+	}
+
+	private static int getLevel(String string) {
+		int level = 0;
+		while (string.charAt(level) == '+') {
+			level++;
+		}
+
+		return level;
+	}
+
 
 	public static void saveStructure() {
 		listBehaviorSubject.subscribeOn(Schedulers.io()).subscribe(strings -> {
@@ -66,7 +137,6 @@ public class TreeLoader {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
 		});
 	}
 
@@ -105,5 +175,4 @@ public class TreeLoader {
 		stringMap.put(level, s);
 		return s;
 	}
-
 }

@@ -35,7 +35,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		panel.add(jTextField);
 
 		TreeLoader.loadTree().subscribeOn(Schedulers.from(SwingUtilities::invokeLater)).subscribe(strings -> {
-			jTree = new JTree(strings.toArray());
+			jTree = new JTree(strings);
 			scrollPane = new JScrollPane(jTree);
 
 			panel.add(scrollPane, "grow");
