@@ -1,19 +1,11 @@
 package com.graann.treeloader;
 
-import com.graann.App;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -83,7 +75,7 @@ public class TreeLoader {
 						prev = (DefaultMutableTreeNode) prev.getParent();
 						prev.add(node);
 					} else {
-						while (level < prev.getLevel()) {
+						while (level <= prev.getLevel()) {
 							prev = (DefaultMutableTreeNode) prev.getParent();
 						}
 						prev.add(node);
