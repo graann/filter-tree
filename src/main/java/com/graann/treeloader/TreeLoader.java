@@ -27,7 +27,6 @@ public class TreeLoader {
 
 		listBehaviorSubject = BehaviorSubject.create();
 		Observable.<List<String>>create(subscriber -> {
-			List<String> list = new ArrayList<>();
 			ClassLoader classloader = Thread.currentThread().getContextClassLoader();
 			try (Stream<String> stream = Files.lines(Paths.get(classloader.getResource("zdb-win.txt").toURI()))) {
 				subscriber.onNext(stream.filter(s -> !s.isEmpty()).map(String::trim).collect(Collectors.toList()));
