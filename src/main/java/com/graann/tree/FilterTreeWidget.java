@@ -8,6 +8,7 @@ import rx.Observable;
 import rx.schedulers.Schedulers;
 
 import javax.swing.*;
+import javax.swing.plaf.TreeUI;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -62,12 +63,12 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
     public void expandAllNodes() {
         TreeNode root = (TreeNode) tree.getModel().getRoot();
-/*        TreeUI ui = tree.getUI();
-        tree.setUI(new BasicTreeUI());*/
+        TreeUI ui = tree.getUI();
+        tree.setUI(null);
 
         expandAll(tree, new TreePath(root));
 
-       // tree.setUI(ui);
+        tree.setUI(ui);
     }
 
     private void expandAll(JTree tree, TreePath parent) {
