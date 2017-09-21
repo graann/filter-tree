@@ -5,6 +5,8 @@ import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,7 +21,7 @@ import java.util.stream.Stream;
  */
 public class TreeLoader {
 	private static BehaviorSubject<List<String>> listBehaviorSubject;
-	private static BehaviorSubject<DefaultMutableTreeNode> treeBehaviorSubject;
+	private static BehaviorSubject<TreeModel> treeBehaviorSubject;
 
 	public static Observable<List<String>> loadFromZDB() {
 		if(listBehaviorSubject != null) {
@@ -41,19 +43,19 @@ public class TreeLoader {
 	}
 
 
-	public static Observable<DefaultMutableTreeNode> loadTree() {
+	public static Observable<TreeModel> loadTree() {
 		if(treeBehaviorSubject != null) {
 			return treeBehaviorSubject;
 		}
 
 		treeBehaviorSubject = BehaviorSubject.create();
-		Observable.<DefaultMutableTreeNode>create(subscriber -> {
+		Observable.<TreeModel>create(subscriber -> {
 			subscriber.onNext(read());
 		}).observeOn(Schedulers.io()).first().subscribe(strings -> treeBehaviorSubject.onNext(strings));
 		return treeBehaviorSubject;
 	}
 
-	private static DefaultMutableTreeNode read() {
+	private static TreeModel read() {
 		DefaultMutableTreeNode root = null;
 		DefaultMutableTreeNode prev = null;
 
@@ -87,7 +89,7 @@ public class TreeLoader {
 			e.printStackTrace();
 		}
 
-		return root;
+		return new DefaultTreeModel(root);
 	}
 
 	private static int getLevel(String string) {
