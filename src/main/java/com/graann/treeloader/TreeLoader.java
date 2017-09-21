@@ -62,37 +62,33 @@ public class TreeLoader {
 	}
 
 	private static DefaultMutableTreeNode read() {
-		String file = App.class.getResource("tree.txt").getFile();
 		DefaultMutableTreeNode prev = null;
 
 		try {
 			BufferedReader bufferedReader = new BufferedReader(
 					new InputStreamReader(
-							new FileInputStream(file), "UTF8"));
-
+							new FileInputStream("tree.txt"), "UTF8"));
 
 			for (String line; (line = bufferedReader.readLine()) != null; ) {
 				int level = getLevel(line);
 				String value = line.substring(level + 1);
 				DefaultMutableTreeNode node = new DefaultMutableTreeNode(value);
-
 				if (prev == null) {
-					DefaultMutableTreeNode root = node;
-					prev = root;
+					prev = node;
 				} else {
 					if (level > prev.getLevel()) {
 						prev.add(node);
 					} else if (level == prev.getLevel()) {
-						((DefaultMutableTreeNode) prev.getParent()).add(node);
-						if (prev.getParent() instanceof DefaultMutableTreeNode) {
-							((DefaultMutableTreeNode) prev.getParent()).add(node);
-						}
+						prev = (DefaultMutableTreeNode) prev.getParent();
+						prev.add(node);
 					} else {
 						while (level < prev.getDepth()) {
 							prev = (DefaultMutableTreeNode) prev.getParent();
 						}
-						((DefaultMutableTreeNode) prev.getParent()).add(node);
+						prev = (DefaultMutableTreeNode) prev.getParent();
+						prev.add(node);
 					}
+
 				}
 			}
 		} catch (Exception e) {
