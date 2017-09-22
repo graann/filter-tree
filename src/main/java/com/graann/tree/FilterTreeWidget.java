@@ -7,19 +7,23 @@ import net.miginfocom.swing.MigLayout;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JTree;
+import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 import javax.swing.plaf.TreeUI;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author gromova on 20.09.17.
@@ -53,52 +57,50 @@ public class FilterTreeWidget implements Viewable<JComponent> {
             jTextField.addActionListener(e -> subscriber.onNext(jTextField.getText()));
         });
 
-        button.addActionListener(e -> expandAllNodes());
+        button.addActionListener(e -> expandNodes());
         panel.add(button);
 
         TreeLoader.loadTree()
                 .subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
                 .subscribe(model -> {
                     TreeModel filterTreeModel = factory.wrap(model, filterObservable);
-
                     tree = new JTree(filterTreeModel);
-                    expandAllNodes();
+                    tree.setExpandsSelectedPaths(true);
+                    //  tree.setSelectionPath(new TreePath(nodes));
+
+
                     scrollPane = new JScrollPane(tree);
                     panel.add(scrollPane, "grow, span 2");
                 });
     }
 
-    public void expandAllNodes() {
-        TreeUI ui = tree.getUI();
-//        tree.setUI(null);
-
-        expandAll(tree);
-
-  //      tree.setUI(ui);
+    public void expandNodes() {
+        expandVisible(tree);
     }
 
+    private void expandVisible(JTree tree) {
 
-    private static void expandAll(JTree tree)
-    {
+        JViewport viewport = scrollPane.getViewport();
+        Point point = viewport.getViewPosition();
 
-        TreeNode root = (TreeNode) tree.getModel().getRoot();
-        List<TreeNode> allLeafNodes = getAllLeafNodes(root);
+        TreePath firstPath = tree.getClosestPathForLocation(point.x, point.y);
+        int firstIndex = tree.getRowForPath(firstPath);
 
-        List<TreePath> leafNodes = allLeafNodes.stream().map(FilterTreeWidget::getPath).collect(Collectors.toList());
+        TreePath lastPath = tree.getClosestPathForLocation(point.x, point.y + viewport.getWidth());
+        int lastIndex = tree.getRowForPath(lastPath);
 
-        for (TreePath leafNode : leafNodes) {
-            tree.expandPath(leafNode);
-        }
-
-/*
-        int r = 0;
-        while (r < tree.getRowCount())
-        {
-            tree.expandRow(r);
-            r++;
-        }
-*/
+        expandNodes(tree, firstIndex, lastIndex);
     }
+
+    private static void expandNodes(JTree tree, int startingIndex, int stopIndex) {
+        for (int i = startingIndex; i <= stopIndex; i++) {
+            tree.expandRow(i);
+        }
+    }
+
+    /**
+     * TODO move to model
+     */
 
     public static TreePath getPath(TreeNode treeNode) {
         List<Object> nodes = new ArrayList<>();
@@ -114,7 +116,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
         return nodes.isEmpty() ? null : new TreePath(nodes.toArray());
     }
 
-    private static List<TreeNode> getAllLeafNodes(TreeNode node) {
+    private static List<TreeNode> getAllFinalNode(TreeNode node) {
         List<TreeNode> leafNodes = new ArrayList<>();
 
         if (node.isLeaf()) {
@@ -122,7 +124,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
         } else {
             Enumeration children = node.children();
             while(children.hasMoreElements()) {
-                leafNodes.addAll(getAllLeafNodes((TreeNode) children.nextElement()));
+                leafNodes.addAll(getAllFinalNode((TreeNode) children.nextElement()));
             }
         }
         return leafNodes;
