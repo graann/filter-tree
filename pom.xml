@@ -28,6 +28,12 @@
 			<version>1.1.1</version>
 		</dependency>
 
+		<dependency>
+			<groupId>net.java.dev.nimbus</groupId>
+			<artifactId>nimbus</artifactId>
+			<version>weekly-080113</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

@@ -12,7 +12,6 @@ import javax.swing.tree.TreePath;
 public class FilterTreeModel implements TreeModel {
 	private Observable<String> filterObservable;
 	private TreeModel treeModel;
-	private String filter = "";
 
 	public void setFilterObservable(Observable<String> filterObservable) {
 		this.filterObservable = filterObservable;
@@ -23,20 +22,7 @@ public class FilterTreeModel implements TreeModel {
 	}
 
 	public void initialize(){
-		filterObservable.subscribe(s -> filter = s);
-	}
-
-	private boolean recursiveMatch(final Object node, final String filter) {
-
-		boolean matches = node.toString().contains(filter);
-
-		int childCount = treeModel.getChildCount(node);
-		for (int i = 0; i < childCount; i++) {
-			Object child = treeModel.getChild(node, i);
-			matches |= recursiveMatch(child, filter);
-		}
-
-		return matches;
+		//filterObservable.subscribe(s -> )
 	}
 
 	@Override
@@ -45,66 +31,39 @@ public class FilterTreeModel implements TreeModel {
 	}
 
 	@Override
-	public Object getChild(final Object parent, final int index) {
-		int count = 0;
-		int childCount = treeModel.getChildCount(parent);
-		for (int i = 0; i < childCount; i++) {
-			Object child = treeModel.getChild(parent, i);
-			if (recursiveMatch(child, filter)) {
-				if (count == index) {
-					return child;
-				}
-				count++;
-			}
-		}
-		return null;
+	public Object getChild(Object parent, int index) {
+		return treeModel.getChild(parent, index);
 	}
 
 	@Override
-	public int getChildCount(final Object parent) {
-		int count = 0;
-		int childCount = treeModel.getChildCount(parent);
-		for (int i = 0; i < childCount; i++) {
-			Object child = treeModel.getChild(parent, i);
-			if (recursiveMatch(child, filter)) {
-				count++;
-			}
-		}
-		return count;
+	public int getChildCount(Object parent) {
+		return treeModel.getChildCount(parent);
 	}
 
 	@Override
-	public boolean isLeaf(final Object node) {
+	public boolean isLeaf(Object node) {
 		return treeModel.isLeaf(node);
 	}
 
 	@Override
-	public void valueForPathChanged(final TreePath path, final Object newValue) {
+	public void valueForPathChanged(TreePath path, Object newValue) {
 		treeModel.valueForPathChanged(path, newValue);
 	}
 
 	@Override
-	public int getIndexOfChild(final Object parent, final Object childToFind) {
-		int childCount = treeModel.getChildCount(parent);
-		for (int i = 0; i < childCount; i++) {
-			Object child = treeModel.getChild(parent, i);
-			if (recursiveMatch(child, filter)) {
-				if (childToFind.equals(child)) {
-					return i;
-				}
-			}
-		}
-		return -1;
+	public int getIndexOfChild(Object parent, Object child) {
+		return treeModel.getIndexOfChild(parent, child);
 	}
 
 	@Override
-	public void addTreeModelListener(final TreeModelListener l) {
+	public void addTreeModelListener(TreeModelListener l) {
 		treeModel.addTreeModelListener(l);
 	}
 
 	@Override
-	public void removeTreeModelListener(final TreeModelListener l) {
+	public void removeTreeModelListener(TreeModelListener l) {
 		treeModel.removeTreeModelListener(l);
 	}
+
 
 }
