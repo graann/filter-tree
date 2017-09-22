@@ -13,7 +13,7 @@ public class FilterTreeModel implements TreeModel {
 	private Observable<String> filterObservable;
 	private TreeModel treeModel;
 
-	public void setFilterObservable(Observable<String> filterObservable) {
+	public void setFilterKeyObservable(Observable<String> filterObservable) {
 		this.filterObservable = filterObservable;
 	}
 

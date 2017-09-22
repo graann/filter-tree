@@ -27,7 +27,15 @@ public class BluntFilterTreeModel implements TreeModel {
 	}
 
 	private boolean recursiveMatch(final Object node, final String filter) {
-		return true;
+		boolean matches = node.toString().contains(filter);
+
+		int childCount = treeModel.getChildCount(node);
+		for (int i = 0; i < childCount; i++) {
+			Object child = treeModel.getChild(node, i);
+			matches |= recursiveMatch(child, filter);
+		}
+
+		return matches;
 	}
 
 	@Override

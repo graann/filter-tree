@@ -5,4 +5,5 @@ package com.graann.common;
  */
 public interface Viewable<T> {
 	T getView();
+	void destroy();
 }

@@ -5,6 +5,7 @@ import com.graann.tree.model.FilterTreeModelWrapper;
 import com.graann.treeloader.TreeLoader;
 import net.miginfocom.swing.MigLayout;
 import rx.Observable;
+import rx.Subscription;
 import rx.schedulers.Schedulers;
 
 import javax.swing.JButton;
@@ -15,6 +16,7 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -28,6 +30,8 @@ import java.util.List;
  * @author gromova on 20.09.17.
  */
 public class FilterTreeWidget implements Viewable<JComponent> {
+	private Subscription subscribe;
+
 	private JPanel panel;
 	private JTree tree;
 	private JScrollPane scrollPane;
@@ -36,6 +40,12 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 	private JButton button = new JButton("expand");
 
 	private FilterTreeModelWrapper factory;
+
+	private TreeLoader loader;
+
+	public void setLoader(TreeLoader loader) {
+		this.loader = loader;
+	}
 
 	public void setModelWrapper(FilterTreeModelWrapper factory) {
 		this.factory = factory;
@@ -52,24 +62,33 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		panel.setPreferredSize(new Dimension(800, 600));
 		panel.add(jTextField, "wmin 100");
 
-		Observable<String> filterObservable = Observable.create(subscriber -> {
+		Observable<String> filterKeyObservable = Observable.create(subscriber -> {
 			jTextField.addActionListener(e -> subscriber.onNext(jTextField.getText()));
 		});
+
+
 
 		button.addActionListener(e -> expandNodes());
 		panel.add(button);
 
-		TreeLoader.loadTree()
+		subscribe = loader.loadTreeStructure()
 				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
-				.subscribe(model -> {
-					TreeModel filterTreeModel = factory.wrap(model, filterObservable);
+				.subscribe(structure -> {
+					TreeModel filterTreeModel = factory.wrap(new DefaultTreeModel(structure.getRoot()), filterKeyObservable);
+
 					tree = new JTree(filterTreeModel);
 					tree.setExpandsSelectedPaths(true);
-					//  tree.setSelectionPath(new TreePath(nodes));
 
 					scrollPane = new JScrollPane(tree);
 					panel.add(scrollPane, "grow, span 2");
 				});
+	}
+
+	@Override
+	public void destroy() {
+		if(subscribe != null && !subscribe.isUnsubscribed()) {
+			subscribe.unsubscribe();
+		}
 	}
 
 	public void expandNodes() {
