@@ -2,27 +2,66 @@ package com.graann.tree.model;
 
 import rx.Observable;
 
+import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author gromova on 21.09.17.
  */
 public class FilterTreeModel implements TreeModel {
-	private Observable<String> filterObservable;
-	private TreeModel treeModel;
+	private List<TreeModelListener> listeners = new ArrayList<>();
+	private TreeModelListener listener = new TreeModelListener() {
+		@Override
+		public void treeNodesChanged(TreeModelEvent e) {
+			for (TreeModelListener listener : listeners) {
+				listener.treeNodesChanged(e);
+			}
+		}
 
-	public void setFilterKeyObservable(Observable<String> filterObservable) {
-		this.filterObservable = filterObservable;
-	}
+		@Override
+		public void treeNodesInserted(TreeModelEvent e) {
+			for (TreeModelListener listener : listeners) {
+				listener.treeNodesInserted(e);
+			}
+		}
+
+		@Override
+		public void treeNodesRemoved(TreeModelEvent e) {
+			for (TreeModelListener listener : listeners) {
+				listener.treeNodesRemoved(e);
+			}
+		}
+
+		@Override
+		public void treeStructureChanged(TreeModelEvent e) {
+			for (TreeModelListener listener : listeners) {
+				listener.treeStructureChanged(e);
+			}
+
+		}
+	};
+
+	private TreeModel treeModel;
+	private Observable<TreeModel> modelObservable;
 
 	public FilterTreeModel(TreeModel treeModel) {
 		this.treeModel = treeModel;
 	}
 
-	public void initialize(){
-		//filterObservable.subscribe(s -> )
+	public void setModelObservable(Observable<TreeModel> modelObservable) {
+		this.modelObservable = modelObservable;
+	}
+
+	public void initialize() {
+		modelObservable.subscribe(model -> {
+			treeModel.removeTreeModelListener(listener);
+			treeModel = model;
+			treeModel.addTreeModelListener(listener);
+		});
 	}
 
 	@Override
@@ -57,12 +96,12 @@ public class FilterTreeModel implements TreeModel {
 
 	@Override
 	public void addTreeModelListener(TreeModelListener l) {
-		treeModel.addTreeModelListener(l);
+		listeners.add(l);
 	}
 
 	@Override
 	public void removeTreeModelListener(TreeModelListener l) {
-		treeModel.removeTreeModelListener(l);
+		listeners.remove(l);
 	}
 
 

@@ -6,10 +6,9 @@ import javax.swing.tree.TreeModel;
 
 public class FilterTreeModelWrapper {
 
-    public TreeModel wrap(TreeModel model, Observable<String> filterKeyObservable) {
-        FilterTreeModel wrapper = new FilterTreeModel(model);
-        wrapper.setFilterKeyObservable(filterKeyObservable);
-        wrapper.initialize();
-        return wrapper;
-    }
+	public TreeModel wrap(Observable<TreeModel> modelObservable, TreeModel model) {
+		FilterTreeModel wrapper = new FilterTreeModel(model);
+		wrapper.setModelObservable(modelObservable);
+		return wrapper;
+	}
 }

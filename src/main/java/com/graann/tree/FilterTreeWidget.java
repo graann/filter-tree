@@ -1,27 +1,21 @@
 package com.graann.tree;
 
 import com.graann.common.Viewable;
+import com.graann.filter.Filtrator;
 import com.graann.tree.model.FilterTreeModelWrapper;
 import com.graann.treeloader.TreeLoader;
 import net.miginfocom.swing.MigLayout;
 import rx.Observable;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
+import rx.subjects.BehaviorSubject;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.JTree;
-import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.Dimension;
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -62,19 +56,28 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		panel.setPreferredSize(new Dimension(800, 600));
 		panel.add(jTextField, "wmin 100");
 
-		Observable<String> filterKeyObservable = Observable.create(subscriber -> {
-			jTextField.addActionListener(e -> subscriber.onNext(jTextField.getText()));
-		});
+		BehaviorSubject<String> patternObservable = BehaviorSubject.create();
 
+		jTextField.addActionListener(e -> {
+			patternObservable.onNext(jTextField.getText());
+		});
 
 
 		button.addActionListener(e -> expandNodes());
 		panel.add(button);
 
+
 		subscribe = loader.loadTreeStructure()
 				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(structure -> {
-					TreeModel filterTreeModel = factory.wrap(new DefaultTreeModel(structure.getRoot()), filterKeyObservable);
+
+					Filtrator filtrator = new Filtrator();
+					filtrator.setMap(structure.getTreemap());
+					filtrator.setRoot(structure.getRoot());
+					filtrator.setPatternObservable(patternObservable);
+					Observable<TreeModel> model = filtrator.getModel();
+
+					TreeModel filterTreeModel = factory.wrap(model, new DefaultTreeModel(structure.getRoot()));
 
 					tree = new JTree(filterTreeModel);
 					tree.setExpandsSelectedPaths(true);
@@ -86,7 +89,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 	@Override
 	public void destroy() {
-		if(subscribe != null && !subscribe.isUnsubscribed()) {
+		if (subscribe != null && !subscribe.isUnsubscribed()) {
 			subscribe.unsubscribe();
 		}
 	}
