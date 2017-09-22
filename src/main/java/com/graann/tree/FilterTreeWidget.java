@@ -28,105 +28,104 @@ import java.util.List;
  * @author gromova on 20.09.17.
  */
 public class FilterTreeWidget implements Viewable<JComponent> {
-    private JPanel panel;
-    private JTree tree;
-    private JScrollPane scrollPane;
+	private JPanel panel;
+	private JTree tree;
+	private JScrollPane scrollPane;
 
-    private JTextField jTextField = new JTextField();
-    private JButton button = new JButton("expand");
+	private JTextField jTextField = new JTextField();
+	private JButton button = new JButton("expand");
 
-    private FilterTreeModelWrapper factory;
+	private FilterTreeModelWrapper factory;
 
-    public void setModelWrapper(FilterTreeModelWrapper factory) {
-        this.factory = factory;
-    }
+	public void setModelWrapper(FilterTreeModelWrapper factory) {
+		this.factory = factory;
+	}
 
-    public JComponent getView() {
-        return panel;
-    }
+	public JComponent getView() {
+		return panel;
+	}
 
-    public void initialize() {
+	public void initialize() {
 
-        panel = new JPanel(new MigLayout("fill, wrap 2", "[min!][]", "[min!][]"));
+		panel = new JPanel(new MigLayout("fill, wrap 2", "[min!][]", "[min!][]"));
 
-        panel.setPreferredSize(new Dimension(800, 600));
-        panel.add(jTextField, "wmin 100");
+		panel.setPreferredSize(new Dimension(800, 600));
+		panel.add(jTextField, "wmin 100");
 
-        Observable<String> filterObservable = Observable.create(subscriber -> {
-            jTextField.addActionListener(e -> subscriber.onNext(jTextField.getText()));
-        });
+		Observable<String> filterObservable = Observable.create(subscriber -> {
+			jTextField.addActionListener(e -> subscriber.onNext(jTextField.getText()));
+		});
 
-        button.addActionListener(e -> expandNodes());
-        panel.add(button);
+		button.addActionListener(e -> expandNodes());
+		panel.add(button);
 
-        TreeLoader.loadTree()
-                .subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
-                .subscribe(model -> {
-                    TreeModel filterTreeModel = factory.wrap(model, filterObservable);
-                    tree = new JTree(filterTreeModel);
-                    tree.setExpandsSelectedPaths(true);
-                    //  tree.setSelectionPath(new TreePath(nodes));
+		TreeLoader.loadTree()
+				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
+				.subscribe(model -> {
+					TreeModel filterTreeModel = factory.wrap(model, filterObservable);
+					tree = new JTree(filterTreeModel);
+					tree.setExpandsSelectedPaths(true);
+					//  tree.setSelectionPath(new TreePath(nodes));
 
+					scrollPane = new JScrollPane(tree);
+					panel.add(scrollPane, "grow, span 2");
+				});
+	}
 
-                    scrollPane = new JScrollPane(tree);
-                    panel.add(scrollPane, "grow, span 2");
-                });
-    }
+	public void expandNodes() {
+		expandVisible(tree);
+	}
 
-    public void expandNodes() {
-        expandVisible(tree);
-    }
+	private void expandVisible(JTree tree) {
 
-    private void expandVisible(JTree tree) {
+		JViewport viewport = scrollPane.getViewport();
+		Point point = viewport.getViewPosition();
 
-        JViewport viewport = scrollPane.getViewport();
-        Point point = viewport.getViewPosition();
+		TreePath firstPath = tree.getClosestPathForLocation(point.x, point.y);
+		int firstIndex = tree.getRowForPath(firstPath);
 
-        TreePath firstPath = tree.getClosestPathForLocation(point.x, point.y);
-        int firstIndex = tree.getRowForPath(firstPath);
+		TreePath lastPath = tree.getClosestPathForLocation(point.x, point.y + viewport.getWidth());
+		int lastIndex = tree.getRowForPath(lastPath);
 
-        TreePath lastPath = tree.getClosestPathForLocation(point.x, point.y + viewport.getWidth());
-        int lastIndex = tree.getRowForPath(lastPath);
+		expandNodes(tree, firstIndex, lastIndex);
+	}
 
-        expandNodes(tree, firstIndex, lastIndex);
-    }
+	private static void expandNodes(JTree tree, int startingIndex, int stopIndex) {
+		for (int i = startingIndex; i <= stopIndex; i++) {
+			tree.expandRow(i);
+		}
+	}
 
-    private static void expandNodes(JTree tree, int startingIndex, int stopIndex) {
-        for (int i = startingIndex; i <= stopIndex; i++) {
-            tree.expandRow(i);
-        }
-    }
+	/**
+	 * TODO move to model
+	 */
 
-    /**
-     * TODO move to model
-     */
+	public static TreePath getPath(TreeNode treeNode) {
+		List<Object> nodes = new ArrayList<>();
+		if (treeNode != null) {
+			nodes.add(treeNode);
+			treeNode = treeNode.getParent();
+			while (treeNode != null) {
+				nodes.add(0, treeNode);
+				treeNode = treeNode.getParent();
+			}
+		}
 
-    public static TreePath getPath(TreeNode treeNode) {
-        List<Object> nodes = new ArrayList<>();
-        if (treeNode != null) {
-            nodes.add(treeNode);
-            treeNode = treeNode.getParent();
-            while (treeNode != null) {
-                nodes.add(0, treeNode);
-                treeNode = treeNode.getParent();
-            }
-        }
+		return nodes.isEmpty() ? null : new TreePath(nodes.toArray());
+	}
 
-        return nodes.isEmpty() ? null : new TreePath(nodes.toArray());
-    }
+	private static List<TreeNode> getAllFinalNode(TreeNode node) {
+		List<TreeNode> leafNodes = new ArrayList<>();
 
-    private static List<TreeNode> getAllFinalNode(TreeNode node) {
-        List<TreeNode> leafNodes = new ArrayList<>();
-
-        if (node.isLeaf()) {
-            leafNodes.add(node.getParent());
-        } else {
-            Enumeration children = node.children();
-            while(children.hasMoreElements()) {
-                leafNodes.addAll(getAllFinalNode((TreeNode) children.nextElement()));
-            }
-        }
-        return leafNodes;
-    }
+		if (node.isLeaf()) {
+			leafNodes.add(node.getParent());
+		} else {
+			Enumeration children = node.children();
+			while (children.hasMoreElements()) {
+				leafNodes.addAll(getAllFinalNode((TreeNode) children.nextElement()));
+			}
+		}
+		return leafNodes;
+	}
 }
 
