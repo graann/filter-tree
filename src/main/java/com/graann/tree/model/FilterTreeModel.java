@@ -64,4 +64,6 @@ public class FilterTreeModel implements TreeModel {
 	public void removeTreeModelListener(TreeModelListener l) {
 		treeModel.removeTreeModelListener(l);
 	}
+
+
 }

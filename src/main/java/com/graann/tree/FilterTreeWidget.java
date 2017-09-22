@@ -12,8 +12,14 @@ import javax.swing.plaf.TreeUI;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author gromova on 20.09.17.
@@ -56,32 +62,70 @@ public class FilterTreeWidget implements Viewable<JComponent> {
                     TreeModel filterTreeModel = factory.wrap(model, filterObservable);
 
                     tree = new JTree(filterTreeModel);
+                    expandAllNodes();
                     scrollPane = new JScrollPane(tree);
                     panel.add(scrollPane, "grow, span 2");
                 });
     }
 
     public void expandAllNodes() {
-        TreeNode root = (TreeNode) tree.getModel().getRoot();
         TreeUI ui = tree.getUI();
-        tree.setUI(null);
+//        tree.setUI(null);
 
-        expandAll(tree, new TreePath(root));
+        expandAll(tree);
 
-        tree.setUI(ui);
+  //      tree.setUI(ui);
     }
 
-    private void expandAll(JTree tree, TreePath parent) {
-        TreeNode node = (TreeNode) parent.getLastPathComponent();
-        if (node.getChildCount() >= 0) {
-            for (Enumeration e = node.children(); e.hasMoreElements(); ) {
-                TreeNode n = (TreeNode) e.nextElement();
-                TreePath path = parent.pathByAddingChild(n);
-                expandAll(tree, path);
+
+    private static void expandAll(JTree tree)
+    {
+
+        TreeNode root = (TreeNode) tree.getModel().getRoot();
+        List<TreeNode> allLeafNodes = getAllLeafNodes(root);
+
+        List<TreePath> leafNodes = allLeafNodes.stream().map(FilterTreeWidget::getPath).collect(Collectors.toList());
+
+        for (TreePath leafNode : leafNodes) {
+            tree.expandPath(leafNode);
+        }
+
+/*
+        int r = 0;
+        while (r < tree.getRowCount())
+        {
+            tree.expandRow(r);
+            r++;
+        }
+*/
+    }
+
+    public static TreePath getPath(TreeNode treeNode) {
+        List<Object> nodes = new ArrayList<>();
+        if (treeNode != null) {
+            nodes.add(treeNode);
+            treeNode = treeNode.getParent();
+            while (treeNode != null) {
+                nodes.add(0, treeNode);
+                treeNode = treeNode.getParent();
             }
         }
-        tree.expandPath(parent);
-        // tree.collapsePath(parent);
+
+        return nodes.isEmpty() ? null : new TreePath(nodes.toArray());
+    }
+
+    private static List<TreeNode> getAllLeafNodes(TreeNode node) {
+        List<TreeNode> leafNodes = new ArrayList<>();
+
+        if (node.isLeaf()) {
+            leafNodes.add(node.getParent());
+        } else {
+            Enumeration children = node.children();
+            while(children.hasMoreElements()) {
+                leafNodes.addAll(getAllLeafNodes((TreeNode) children.nextElement()));
+            }
+        }
+        return leafNodes;
     }
 }
 
