@@ -1,15 +1,17 @@
 package com.graann.tree;
 
 import com.graann.common.Viewable;
-import com.graann.filter.Filtrator;
-import com.graann.tree.model.FilterTreeModelWrapper;
+import com.graann.filter.Filter;
+import com.graann.filter.FilterFactory;
 import com.graann.treeloader.TreeLoader;
 import net.miginfocom.swing.MigLayout;
+import rx.Observable;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -23,6 +25,9 @@ import java.util.List;
 public class FilterTreeWidget implements Viewable<JComponent> {
 	private Subscription subscribe;
 
+	private FilterFactory filterFactory;
+	private TreeLoader loader;
+
 	private JPanel panel;
 	private JTree tree;
 	private JScrollPane scrollPane;
@@ -30,16 +35,13 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 	private JTextField jTextField = new JTextField();
 	private JButton button = new JButton("expand");
 
-	private FilterTreeModelWrapper factory;
 
-	private TreeLoader loader;
+	public void setFilterFactory(FilterFactory filterFactory) {
+		this.filterFactory = filterFactory;
+	}
 
 	public void setLoader(TreeLoader loader) {
 		this.loader = loader;
-	}
-
-	public void setModelWrapper(FilterTreeModelWrapper factory) {
-		this.factory = factory;
 	}
 
 	public JComponent getView() {
@@ -60,20 +62,21 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 			patternObservable.onNext(text);
 		});
 
-
 		button.addActionListener(e -> expandNodes());
 		panel.add(button);
 
 		subscribe = loader.loadTreeStructure()
 				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(structure -> {
+					Filter filter = filterFactory.create(patternObservable);
 
-					Filtrator filtrator = new Filtrator();
-					filtrator.setTreeStructure(structure);
-					filtrator.setPatternObservable(patternObservable);
-					filtrator.initialize();
+					DefaultTreeModel model = new DefaultTreeModel(structure.getRoot());
+					Observable<TreeNode> treeNodeObservable = filter.rootObservable(structure);
+					treeNodeObservable
+							.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
+							.subscribe(model::setRoot);
 
-					tree = new JTree(filtrator.getModel());
+					tree = new JTree(model);
 					tree.setExpandsSelectedPaths(true);
 
 					scrollPane = new JScrollPane(tree);

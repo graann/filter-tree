@@ -6,42 +6,32 @@ import org.apache.commons.collections4.trie.PatriciaTrie;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
-import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class Filtrator {
-	private DefaultTreeModel treeModel;
-	private TreeStructure treeStructure;
-
+public class TrigramFilter implements Filter {
 	private Observable<String> patternObservable;
 
 	public void setPatternObservable(Observable<String> patternObservable) {
 		this.patternObservable = patternObservable;
 	}
 
-	public void setTreeStructure(TreeStructure treeStructure) {
-		this.treeStructure = treeStructure;
-	}
-
-	public void initialize() {
-		treeModel = new DefaultTreeModel(treeStructure.getRoot());
-		createTrieObservable()
+	@Override
+	public Observable<TreeNode> rootObservable(TreeStructure treeStructure) {
+		return createTrieObservable(treeStructure)
 				.observeOn(Schedulers.computation())
 				.first()
-				.switchMap(librabyTrie ->
+				.switchMap(libraryTrie ->
 						patternObservable
 								.map((String s) -> {
 									if (s == null || s.isEmpty()) {
 										return treeStructure.getRoot();
 									}
 
-									Set<TreeNode> filtered = librabyTrie.prefixMap(s)
+									Set<TreeNode> filtered = libraryTrie.prefixMap(s)
 											.values()
 											.stream()
 											.flatMap(Collection::stream)
@@ -59,12 +49,11 @@ public class Filtrator {
 									addChildren(treeStructure.getRoot(), node, predicate);
 									return node;
 								})
-				)
-				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
-				.subscribe(root -> treeModel.setRoot(root));
+				);
+
 	}
 
-	private Observable<PatriciaTrie<Set<String>>> createTrieObservable() {
+	private Observable<PatriciaTrie<Set<String>>> createTrieObservable(TreeStructure treeStructure) {
 		return Observable.create(subscriber -> {
 			Map<String, Set<String>> map = new LinkedHashMap<>();
 			treeStructure.getTreemap().forEach((s, treeNode) -> {
@@ -97,11 +86,6 @@ public class Filtrator {
 			available.add(treeNode);
 		}
 		return available;
-	}
-
-	public TreeModel getModel() {
-		return treeModel;
-
 	}
 
 	private void addChildren(TreeNode source, DefaultMutableTreeNode destination, Predicate<TreeNode> predicate) {
