@@ -32,7 +32,6 @@ public class Filtrator {
 		treeModel = new DefaultTreeModel(treeStructure.getRoot());
 		createTrieObservable()
 				.observeOn(Schedulers.computation())
-				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.first()
 				.switchMap(librabyTrie ->
 						patternObservable
@@ -54,6 +53,7 @@ public class Filtrator {
 									return node;
 								})
 				)
+				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(root -> treeModel.setRoot(root));
 	}
 
