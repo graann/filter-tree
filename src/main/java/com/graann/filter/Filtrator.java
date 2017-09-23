@@ -13,6 +13,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Filtrator {
 	private DefaultTreeModel treeModel;
@@ -39,8 +40,14 @@ public class Filtrator {
 									if (s == null || s.isEmpty()) {
 										return treeStructure.getRoot();
 									}
-									SortedMap<String, TreeNode> stringTreeNodeSortedMap = librabyTrie.prefixMap(s);
-									Set<TreeNode> available = getAvailable(stringTreeNodeSortedMap);
+
+									Set<TreeNode> available = librabyTrie.prefixMap(s)
+											.values()
+											.stream()
+											.flatMap(Collection::stream)
+											.distinct()
+											.map(key -> treeStructure.getTreemap().get(key))
+											.collect(Collectors.toSet());
 
 									if (available.isEmpty()) {
 										return null;
@@ -57,24 +64,28 @@ public class Filtrator {
 				.subscribe(root -> treeModel.setRoot(root));
 	}
 
-	private Observable<PatriciaTrie<TreeNode>> createTrieObservable() {
+	private Observable<PatriciaTrie<Set<String>>> createTrieObservable() {
 		return Observable.create(subscriber -> {
-			Map<String, TreeNode> map = new LinkedHashMap<>();
+			Map<String, Set<String>> map = new LinkedHashMap<>();
 			treeStructure.getTreemap().forEach((s, treeNode) -> {
-				map.put(s, treeNode);
-				Set<String> nGrams = Utils.getNGrams(s, 3);
-				for (String nGram : nGrams) {
-					map.put(nGram, treeNode);
-				}
+				add(map, s, s);
+
+				Set<String> nGrams = Utils.getTriGrams(s);
+				nGrams.forEach(nGram -> add(map, nGram, s));
 			});
 			subscriber.onNext(new PatriciaTrie<>(map));
 		});
 	}
 
-	private Set<TreeNode> getAvailable(SortedMap<String, TreeNode> filteredMap) {
+	private void add(Map<String, Set<String>> map, String key, String value) {
+		Set<String> set = map.computeIfAbsent(key, k -> new LinkedHashSet<>());
+		set.add(value);
+	}
+
+	private Set<TreeNode> getAvailable(Set<TreeNode> nods) {
 		HashSet<TreeNode> available = new HashSet<>();
 
-		for (TreeNode treeNode : filteredMap.values()) {
+		for (TreeNode treeNode : nods) {
 			if (treeNode.isLeaf()) {
 				available.add(treeNode);
 				TreeNode parent = treeNode.getParent();

@@ -17,6 +17,11 @@ public class Utils {
 		return set;
 	}
 
+	public static Set<String> getTriGrams(String text) {
+		return getNGrams(text, 3);
+	}
+
+
 	/*	private Set<String> getEdge(char[] chars, int n) {
 		Set<String> set = new HashSet<>();
 		int i = 1;
