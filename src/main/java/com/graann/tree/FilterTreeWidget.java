@@ -5,14 +5,11 @@ import com.graann.filter.Filtrator;
 import com.graann.tree.model.FilterTreeModelWrapper;
 import com.graann.treeloader.TreeLoader;
 import net.miginfocom.swing.MigLayout;
-import rx.Observable;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -80,11 +77,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 					filtrator.setPatternObservable(patternObservable);
 					filtrator.initialize();
 
-					Observable<TreeModel> model = filtrator.getModel();
-
-					TreeModel filterTreeModel = factory.wrap(model, new DefaultTreeModel(structure.getRoot()));
-
-					tree = new JTree(filterTreeModel);
+					tree = new JTree(filtrator.getModel());
 					tree.setExpandsSelectedPaths(true);
 
 					scrollPane = new JScrollPane(tree);

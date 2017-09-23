@@ -4,8 +4,9 @@ import com.graann.treeloader.TreeStructure;
 import org.apache.commons.collections4.Trie;
 import org.apache.commons.collections4.trie.PatriciaTrie;
 import rx.Observable;
-import rx.subjects.BehaviorSubject;
+import rx.schedulers.Schedulers;
 
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
@@ -17,12 +18,11 @@ import java.util.SortedMap;
 import java.util.function.Predicate;
 
 public class Filtrator {
+	private DefaultTreeModel treeModel;
 	private TreeStructure treeStructure;
 
 	private Trie<String, TreeNode> librabyTrie;
 	private Observable<String> patternObservable;
-
-	private BehaviorSubject<TreeModel> behaviorSubject = BehaviorSubject.create();
 
 	public void setPatternObservable(Observable<String> patternObservable) {
 		this.patternObservable = patternObservable;
@@ -33,11 +33,13 @@ public class Filtrator {
 	}
 
 	public void initialize() {
+		treeModel = new DefaultTreeModel(treeStructure.getRoot());
 		librabyTrie = new PatriciaTrie<>(treeStructure.getTreemap());
 		patternObservable
+				.observeOn(Schedulers.computation())
 				.map((String s) -> {
 					if(s == null || s.isEmpty()) {
-						return new DefaultTreeModel(treeStructure.getRoot());
+						return treeStructure.getRoot();
 					}
 
 					SortedMap<String, TreeNode> stringTreeNodeSortedMap = librabyTrie.prefixMap(s);
@@ -52,21 +54,31 @@ public class Filtrator {
 								parent = parent.getParent();
 							}
 						}
+						available.add(treeNode);
 					}
 
 					if (available.isEmpty()) {
-						return new DefaultTreeModel(null);
+						return null;
 					}
 
+					Predicate<TreeNode> predicat = new Predicate<TreeNode>() {
+						@Override
+						public boolean test(TreeNode treeNode) {
+							return available.contains(treeNode);
+						}
+					};
+
 					DefaultMutableTreeNode node = new DefaultMutableTreeNode(((DefaultMutableTreeNode) treeStructure.getRoot()).getUserObject());
-					addChildren(treeStructure.getRoot(), node, treeNode -> available.contains(treeNode));
-					return new DefaultTreeModel(node);
-				}).subscribe(model -> behaviorSubject.onNext(model));
+					addChildren(treeStructure.getRoot(), node, predicat);
+					return node;
+				})
+				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
+				.subscribe(root -> treeModel.setRoot(root));
 
 	}
 
-	public Observable<TreeModel> getModel() {
-		return behaviorSubject;
+	public TreeModel getModel() {
+		return treeModel;
 
 	}
 

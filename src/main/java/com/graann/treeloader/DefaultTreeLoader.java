@@ -11,7 +11,6 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author gromova on 22.09.17.
@@ -51,8 +50,13 @@ public class DefaultTreeLoader implements TreeLoader {
 			for (String line; (line = bufferedReader.readLine()) != null; ) {
 				int level = getLevel(line);
 				String value = line.substring(level);
+
+				/**TODO
+				 * move to structure
+				 */
 				DefaultMutableTreeNode node = new DefaultMutableTreeNode(value);
 				map.put(value, node);
+				//
 
 				if (prev == null) {
 					root = node;
