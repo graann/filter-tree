@@ -59,9 +59,13 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		BehaviorSubject<String> patternObservable = BehaviorSubject.create();
 
 		jTextField.addActionListener(e -> {
-			patternObservable.onNext(jTextField.getText());
+			String text = jTextField.getText();
+			patternObservable.onNext(text);
 		});
 
+
+
+		patternObservable.subscribe(s -> System.out.println(s));
 
 		button.addActionListener(e -> expandNodes());
 		panel.add(button);
@@ -72,9 +76,10 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 				.subscribe(structure -> {
 
 					Filtrator filtrator = new Filtrator();
-					filtrator.setMap(structure.getTreemap());
-					filtrator.setRoot(structure.getRoot());
+					filtrator.setTreeStructure(structure);
 					filtrator.setPatternObservable(patternObservable);
+					filtrator.initialize();
+
 					Observable<TreeModel> model = filtrator.getModel();
 
 					TreeModel filterTreeModel = factory.wrap(model, new DefaultTreeModel(structure.getRoot()));
