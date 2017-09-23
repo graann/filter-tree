@@ -1,5 +1,6 @@
 package com.graann.filter;
 
+import com.graann.common.Utils;
 import com.graann.treeloader.TreeStructure;
 import org.apache.commons.collections4.trie.PatriciaTrie;
 import rx.Observable;
@@ -10,10 +11,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedMap;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class Filtrator {
@@ -35,6 +33,7 @@ public class Filtrator {
 		createTrieObservable()
 				.observeOn(Schedulers.computation())
 				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
+				.first()
 				.switchMap(librabyTrie ->
 						patternObservable
 								.map((String s) -> {
@@ -48,7 +47,6 @@ public class Filtrator {
 										return null;
 									}
 
-
 									Predicate<TreeNode> predicat = available::contains;
 
 									DefaultMutableTreeNode node = new DefaultMutableTreeNode(((DefaultMutableTreeNode) treeStructure.getRoot()).getUserObject());
@@ -61,7 +59,15 @@ public class Filtrator {
 
 	private Observable<PatriciaTrie<TreeNode>> createTrieObservable() {
 		return Observable.create(subscriber -> {
-			subscriber.onNext(new PatriciaTrie<>(treeStructure.getTreemap()));
+			Map<String, TreeNode> map = new LinkedHashMap<>();
+			treeStructure.getTreemap().forEach((s, treeNode) -> {
+				map.put(s, treeNode);
+				Set<String> nGrams = Utils.getNGrams(s, 3);
+				for (String nGram : nGrams) {
+					map.put(nGram, treeNode);
+				}
+			});
+			subscriber.onNext(new PatriciaTrie<>(map));
 		});
 	}
 

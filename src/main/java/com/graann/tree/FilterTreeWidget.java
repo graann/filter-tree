@@ -61,12 +61,8 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		});
 
 
-
-		patternObservable.subscribe(s -> System.out.println(s));
-
 		button.addActionListener(e -> expandNodes());
 		panel.add(button);
-
 
 		subscribe = loader.loadTreeStructure()
 				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
