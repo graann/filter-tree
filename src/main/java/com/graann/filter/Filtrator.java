@@ -41,7 +41,7 @@ public class Filtrator {
 										return treeStructure.getRoot();
 									}
 
-									Set<TreeNode> available = librabyTrie.prefixMap(s)
+									Set<TreeNode> filtered = librabyTrie.prefixMap(s)
 											.values()
 											.stream()
 											.flatMap(Collection::stream)
@@ -49,14 +49,14 @@ public class Filtrator {
 											.map(key -> treeStructure.getTreemap().get(key))
 											.collect(Collectors.toSet());
 
-									if (available.isEmpty()) {
+									if (filtered.isEmpty()) {
 										return null;
 									}
-
-									Predicate<TreeNode> predicat = available::contains;
+									Set<TreeNode> available = addParents(filtered);
+									Predicate<TreeNode> predicate = available::contains;
 
 									DefaultMutableTreeNode node = new DefaultMutableTreeNode(((DefaultMutableTreeNode) treeStructure.getRoot()).getUserObject());
-									addChildren(treeStructure.getRoot(), node, predicat);
+									addChildren(treeStructure.getRoot(), node, predicate);
 									return node;
 								})
 				)
@@ -82,7 +82,7 @@ public class Filtrator {
 		set.add(value);
 	}
 
-	private Set<TreeNode> getAvailable(Set<TreeNode> nods) {
+	private Set<TreeNode> addParents(Set<TreeNode> nods) {
 		HashSet<TreeNode> available = new HashSet<>();
 
 		for (TreeNode treeNode : nods) {
