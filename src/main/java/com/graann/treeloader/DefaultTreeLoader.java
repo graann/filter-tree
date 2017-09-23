@@ -51,12 +51,8 @@ public class DefaultTreeLoader implements TreeLoader {
 				int level = getLevel(line);
 				String value = line.substring(level);
 
-				/**TODO
-				 * move to structure
-				 */
 				DefaultMutableTreeNode node = new DefaultMutableTreeNode(value);
 				map.put(value, node);
-				//
 
 				if (prev == null) {
 					root = node;
