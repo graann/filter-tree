@@ -1,7 +1,6 @@
 package com.graann.filter;
 
 import com.graann.treeloader.TreeStructure;
-import org.apache.commons.collections4.Trie;
 import org.apache.commons.collections4.trie.PatriciaTrie;
 import rx.Observable;
 import rx.schedulers.Schedulers;
@@ -21,7 +20,6 @@ public class Filtrator {
 	private DefaultTreeModel treeModel;
 	private TreeStructure treeStructure;
 
-	private Trie<String, TreeNode> librabyTrie;
 	private Observable<String> patternObservable;
 
 	public void setPatternObservable(Observable<String> patternObservable) {
@@ -34,47 +32,54 @@ public class Filtrator {
 
 	public void initialize() {
 		treeModel = new DefaultTreeModel(treeStructure.getRoot());
-		librabyTrie = new PatriciaTrie<>(treeStructure.getTreemap());
-		patternObservable
+		createTrieObservable()
 				.observeOn(Schedulers.computation())
-				.map((String s) -> {
-					if(s == null || s.isEmpty()) {
-						return treeStructure.getRoot();
-					}
-
-					SortedMap<String, TreeNode> stringTreeNodeSortedMap = librabyTrie.prefixMap(s);
-					Set<TreeNode> available = new HashSet<>();
-
-					for (TreeNode treeNode : stringTreeNodeSortedMap.values()) {
-						if (treeNode.isLeaf()) {
-							available.add(treeNode);
-							TreeNode parent = treeNode.getParent();
-							while (parent != null) {
-								available.add(parent);
-								parent = parent.getParent();
-							}
-						}
-						available.add(treeNode);
-					}
-
-					if (available.isEmpty()) {
-						return null;
-					}
-
-					Predicate<TreeNode> predicat = new Predicate<TreeNode>() {
-						@Override
-						public boolean test(TreeNode treeNode) {
-							return available.contains(treeNode);
-						}
-					};
-
-					DefaultMutableTreeNode node = new DefaultMutableTreeNode(((DefaultMutableTreeNode) treeStructure.getRoot()).getUserObject());
-					addChildren(treeStructure.getRoot(), node, predicat);
-					return node;
-				})
 				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
-				.subscribe(root -> treeModel.setRoot(root));
+				.switchMap(librabyTrie ->
+						patternObservable
+								.map((String s) -> {
+									if (s == null || s.isEmpty()) {
+										return treeStructure.getRoot();
+									}
+									SortedMap<String, TreeNode> stringTreeNodeSortedMap = librabyTrie.prefixMap(s);
+									Set<TreeNode> available = getAvailable(stringTreeNodeSortedMap);
 
+									if (available.isEmpty()) {
+										return null;
+									}
+
+
+									Predicate<TreeNode> predicat = available::contains;
+
+									DefaultMutableTreeNode node = new DefaultMutableTreeNode(((DefaultMutableTreeNode) treeStructure.getRoot()).getUserObject());
+									addChildren(treeStructure.getRoot(), node, predicat);
+									return node;
+								})
+				)
+				.subscribe(root -> treeModel.setRoot(root));
+	}
+
+	private Observable<PatriciaTrie<TreeNode>> createTrieObservable() {
+		return Observable.create(subscriber -> {
+			subscriber.onNext(new PatriciaTrie<>(treeStructure.getTreemap()));
+		});
+	}
+
+	private Set<TreeNode> getAvailable(SortedMap<String, TreeNode> filteredMap) {
+		HashSet<TreeNode> available = new HashSet<>();
+
+		for (TreeNode treeNode : filteredMap.values()) {
+			if (treeNode.isLeaf()) {
+				available.add(treeNode);
+				TreeNode parent = treeNode.getParent();
+				while (parent != null) {
+					available.add(parent);
+					parent = parent.getParent();
+				}
+			}
+			available.add(treeNode);
+		}
+		return available;
 	}
 
 	public TreeModel getModel() {
