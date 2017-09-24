@@ -64,20 +64,22 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 		panel.add(button);
 
+		DefaultTreeModel model = new DefaultTreeModel(null);
+		Viewable<JComponent> treeWidget = treeWidgetFactory.create(model);
+		panel.add(treeWidget.getView(), "grow, span 2");
+
 		subscribe = loader.loadTreeStructure()
 				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(structure -> {
 					Filter filter = filterFactory.create(patternObservable);
 
-					DefaultTreeModel model = new DefaultTreeModel(structure.getRoot());
+					model.setRoot(structure.getRoot());
 					Observable<TreeNode> treeNodeObservable = filter.rootObservable(structure);
 					treeNodeObservable
 							.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
 							.subscribe(model::setRoot);
 
-					Viewable<JComponent> treeWidget = treeWidgetFactory.create(model);
 
-					panel.add(treeWidget.getView(), "grow, span 2");
 				});
 	}
 

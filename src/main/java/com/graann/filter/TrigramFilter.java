@@ -30,6 +30,9 @@ public class TrigramFilter implements Filter {
 				.switchMap(libraryTrie ->
 						patternObservable
 								.map((String pattern) -> {
+									long startTime = System.nanoTime();
+
+
 									if (pattern == null || pattern.isEmpty()) {
 										return treeStructure.getRoot();
 									}
@@ -57,16 +60,20 @@ public class TrigramFilter implements Filter {
 
 									Function<TreeNode, DefaultMutableTreeNode> creator = source -> {
 										String s = source.toString();
-/*										if (filtered.contains(s)) {
+										if (filtered.contains(s)) {
 											String res = "<html>"+s.replace(pattern,"<font color='red'>"+pattern+"</font>")+"</html>";
 											return new DefaultMutableTreeNode(res);
-										}*/
+										}
 
 										return new DefaultMutableTreeNode(s);
 									};
 
 									DefaultMutableTreeNode node = creator.apply(treeStructure.getRoot());
 									addChildren(treeStructure.getRoot(), node, predicate, creator);
+
+									long estimatedTime = System.nanoTime() - startTime;
+									System.out.println("rootObservable: "+estimatedTime);
+
 									return node;
 								})
 				);
