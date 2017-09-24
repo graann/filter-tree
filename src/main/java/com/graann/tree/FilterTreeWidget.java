@@ -1,5 +1,6 @@
 package com.graann.tree;
 
+import com.graann.common.Utils;
 import com.graann.common.Viewable;
 import com.graann.filter.Filter;
 import com.graann.filter.FilterFactory;
@@ -63,6 +64,8 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		});
 
 		panel.add(button);
+
+		Utils.test("колбаса");
 
 		subscribe = loader.loadTreeStructure()
 				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))

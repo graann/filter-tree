@@ -7,10 +7,10 @@ public class Utils {
 	public static Set<String> getNGrams(String text, int n) {
 		char[] chars = text.toCharArray();
 		Set<String> set = new HashSet<>();
-		for (int i = 0; i <= chars.length - n; i++) {
+		for (int i = 0; i < chars.length; i++) {
 			StringBuilder sb = new StringBuilder();
-			for (int j = 0; j < n; j++) {
-				sb.append(chars[i+j]);
+			for (int j = 0; j < n && i + j < chars.length; j++) {
+				sb.append(chars[i + j]);
 			}
 			set.add(sb.toString());
 		}
@@ -19,6 +19,12 @@ public class Utils {
 
 	public static Set<String> getTriGrams(String text) {
 		return getNGrams(text, 3);
+	}
+
+	public static void test(String text) {
+		Set<String> s = getNGrams(text, 3);
+		System.out.println(text);
+		s.forEach(s1 -> System.out.print(s1 + ";"));
 	}
 
 
