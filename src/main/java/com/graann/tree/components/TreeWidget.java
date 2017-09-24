@@ -1,20 +1,22 @@
 package com.graann.tree.components;
 
 import com.graann.common.Viewable;
+import com.graann.tree.model.CustomTreeNode;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 /**
  * @author gromova on 22.09.17.
  */
-public class TreeWidget implements Viewable<JComponent> {
+public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 	private JTree tree;
 	private JScrollPane scrollPane;
 
@@ -33,30 +35,59 @@ public class TreeWidget implements Viewable<JComponent> {
 		tree = new JTree(model);
 		tree.setCellRenderer(new FilterTreeCellRenderer());
 		tree.setExpandsSelectedPaths(true);
+
 		scrollPane = new JScrollPane(tree);
+		scrollPane.getVerticalScrollBar().addAdjustmentListener(this);
+	}
+
+	@Override
+	public void adjustmentValueChanged(AdjustmentEvent e) {
+		updateMarket();
+	}
+
+	private void updateMarket() {
+		List<CustomTreeNode> current = getVisibleNodes();
+
+		current.forEach(customTreeNode -> {
+			boolean b = customTreeNode.markSelection();
+			if (b) {
+				((DefaultTreeModel) tree.getModel()).nodeChanged(customTreeNode);
+			}
+		});
 	}
 
 	@Override
 	public void destroy() {
-
+		scrollPane.getVerticalScrollBar().removeAdjustmentListener(this);
 	}
 
-	public void expandNodes() {
-		expandVisible(tree);
+
+	public List<CustomTreeNode> getVisibleNodes() {
+		final Rectangle visibleRectangle = scrollPane.getViewport().getViewRect();
+		final int firstRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
+		final int lastRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
+		List<CustomTreeNode> resultList = new ArrayList<>();
+
+		if (firstRow < 0 || lastRow < 0) {
+			return resultList;
+		}
+
+		for (int currentRow = firstRow; currentRow <= lastRow; currentRow++) {
+			TreePath currentPath = tree.getPathForRow(currentRow);
+			Object lastPathObject = currentPath.getLastPathComponent();
+			if (lastPathObject instanceof CustomTreeNode) {
+				resultList.add((CustomTreeNode) lastPathObject);
+			}
+		}
+		return resultList;
 	}
 
-	private void expandVisible(JTree tree) {
+	private void expandVisible() {
+		final Rectangle visibleRectangle = scrollPane.getViewport().getViewRect();
+		final int firstRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
+		final int lastRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
 
-		JViewport viewport = scrollPane.getViewport();
-		Point point = viewport.getViewPosition();
-
-		TreePath firstPath = tree.getClosestPathForLocation(point.x, point.y);
-		int firstIndex = tree.getRowForPath(firstPath);
-
-		TreePath lastPath = tree.getClosestPathForLocation(point.x, point.y + viewport.getWidth());
-		int lastIndex = tree.getRowForPath(lastPath);
-
-		expandNodes(tree, firstIndex, lastIndex);
+		expandNodes(tree, firstRow, lastRow);
 	}
 
 	private static void expandNodes(JTree tree, int startingIndex, int stopIndex) {
@@ -64,58 +95,4 @@ public class TreeWidget implements Viewable<JComponent> {
 			tree.expandRow(i);
 		}
 	}
-
-	/**
-	 * TODO move to model
-	 */
-
-	public static TreePath getPath(TreeNode treeNode) {
-		java.util.List<Object> nodes = new ArrayList<>();
-		if (treeNode != null) {
-			nodes.add(treeNode);
-			treeNode = treeNode.getParent();
-			while (treeNode != null) {
-				nodes.add(0, treeNode);
-				treeNode = treeNode.getParent();
-			}
-		}
-
-		return nodes.isEmpty() ? null : new TreePath(nodes.toArray());
-	}
-
-	private static java.util.List<TreeNode> getAllFinalNode(TreeNode node) {
-		List<TreeNode> leafNodes = new ArrayList<>();
-
-		if (node.isLeaf()) {
-			leafNodes.add(node.getParent());
-		} else {
-			Enumeration children = node.children();
-			while (children.hasMoreElements()) {
-				leafNodes.addAll(getAllFinalNode((TreeNode) children.nextElement()));
-			}
-		}
-		return leafNodes;
-	}
-
-	/*	private boolean stopFiering = false;
-
-	@Override
-	public void fireTreeExpanded(TreePath path) {
-		super.fireTreeExpanded(path);
-	}
-
-	@Override
-	public void fireTreeCollapsed(TreePath path) {
-		super.fireTreeCollapsed(path);
-	}
-
-	@Override
-	public void fireTreeWillExpand(TreePath path) throws ExpandVetoException {
-		super.fireTreeWillExpand(path);
-	}
-
-	@Override
-	public void fireTreeWillCollapse(TreePath path) throws ExpandVetoException {
-		super.fireTreeWillCollapse(path);
-	}*/
 }

@@ -1,6 +1,7 @@
 package com.graann.filter;
 
 import com.graann.common.Utils;
+import com.graann.tree.model.CustomTreeNode;
 import com.graann.treeloader.TreeStructure;
 import org.apache.commons.collections4.trie.PatriciaTrie;
 import rx.Observable;
@@ -32,7 +33,6 @@ public class TrigramFilter implements Filter {
 								.map((String pattern) -> {
 									long startTime = System.nanoTime();
 
-
 									if (pattern == null || pattern.isEmpty()) {
 										return treeStructure.getRoot();
 									}
@@ -62,7 +62,7 @@ public class TrigramFilter implements Filter {
 										String s = source.toString();
 										if (filtered.contains(s)) {
 											String res = "<html>"+s.replace(pattern,"<font color='red'>"+pattern+"</font>")+"</html>";
-											return new DefaultMutableTreeNode(res);
+											return new CustomTreeNode(s, res);
 										}
 
 										return new DefaultMutableTreeNode(s);
