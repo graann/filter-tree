@@ -1,22 +1,19 @@
 package com.graann.tree.components;
 
 import com.graann.common.Viewable;
-import com.graann.tree.model.CustomTreeNode;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author gromova on 22.09.17.
  */
-public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
+public class TreeWidget implements Viewable<JComponent> {
 	private JTree tree;
 	private JScrollPane scrollPane;
 
@@ -37,36 +34,18 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 		tree.setExpandsSelectedPaths(true);
 
 		scrollPane = new JScrollPane(tree);
-		scrollPane.getVerticalScrollBar().addAdjustmentListener(this);
-	}
-
-	@Override
-	public void adjustmentValueChanged(AdjustmentEvent e) {
-		updateMarket();
-	}
-
-	private void updateMarket() {
-		List<CustomTreeNode> current = getVisibleNodes();
-
-		current.forEach(customTreeNode -> {
-			boolean b = customTreeNode.markSelection();
-			if (b) {
-				((DefaultTreeModel) tree.getModel()).nodeChanged(customTreeNode);
-			}
-		});
 	}
 
 	@Override
 	public void destroy() {
-		scrollPane.getVerticalScrollBar().removeAdjustmentListener(this);
+
 	}
 
-
-	public List<CustomTreeNode> getVisibleNodes() {
+	public List<TreeNode> getVisibleNodes() {
 		final Rectangle visibleRectangle = scrollPane.getViewport().getViewRect();
 		final int firstRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
 		final int lastRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
-		List<CustomTreeNode> resultList = new ArrayList<>();
+		List<TreeNode> resultList = new ArrayList<>();
 
 		if (firstRow < 0 || lastRow < 0) {
 			return resultList;
@@ -75,8 +54,8 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 		for (int currentRow = firstRow; currentRow <= lastRow; currentRow++) {
 			TreePath currentPath = tree.getPathForRow(currentRow);
 			Object lastPathObject = currentPath.getLastPathComponent();
-			if (lastPathObject instanceof CustomTreeNode) {
-				resultList.add((CustomTreeNode) lastPathObject);
+			if (lastPathObject instanceof TreeNode) {
+				resultList.add((TreeNode) lastPathObject);
 			}
 		}
 		return resultList;

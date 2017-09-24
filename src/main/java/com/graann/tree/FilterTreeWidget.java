@@ -12,6 +12,8 @@ import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import java.awt.*;
@@ -57,9 +59,26 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 		BehaviorSubject<String> patternObservable = BehaviorSubject.create();
 
-		jTextField.addActionListener(e -> {
-			String text = jTextField.getText();
-			patternObservable.onNext(text);
+		jTextField.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				update();
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				update();
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				update();
+			}
+
+			private void update() {
+				String text = jTextField.getText();
+				patternObservable.onNext(text);
+			}
 		});
 
 		panel.add(button);
