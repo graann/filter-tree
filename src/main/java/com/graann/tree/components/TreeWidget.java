@@ -31,6 +31,7 @@ public class TreeWidget implements Viewable<JComponent> {
 
 	public void initialize() {
 		tree = new JTree(model);
+		tree.setCellRenderer(new FilterTreeCellRenderer());
 		tree.setExpandsSelectedPaths(true);
 		scrollPane = new JScrollPane(tree);
 	}
