@@ -17,10 +17,6 @@ public class Utils {
 		return set;
 	}
 
-	public static Set<String> getTriGrams(String text) {
-		return getNGrams(text, 3);
-	}
-
 	public static void test(String text) {
 		Set<String> s = getNGrams(text, 3);
 		System.out.println(text);

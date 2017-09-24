@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class TrigramFilter implements Filter {
+	private final static int N = 3;
 	private Observable<String> patternObservable;
 
 	public void setPatternObservable(Observable<String> patternObservable) {
@@ -26,16 +27,19 @@ public class TrigramFilter implements Filter {
 				.first()
 				.switchMap(libraryTrie ->
 						patternObservable
-								.map((String s) -> {
-									if (s == null || s.isEmpty()) {
+								.map((String pattern) -> {
+									if (pattern == null || pattern.isEmpty()) {
 										return treeStructure.getRoot();
 									}
 
-									Set<TreeNode> filtered = libraryTrie.prefixMap(s)
+									String gramKey = pattern.length() <= N ? pattern : pattern.substring(0, N);
+
+									Set<TreeNode> filtered = libraryTrie.prefixMap(gramKey)
 											.values()
 											.stream()
 											.flatMap(Collection::stream)
 											.distinct()
+											.filter(s -> s.contains(pattern))
 											.map(key -> treeStructure.getTreemap().get(key))
 											.collect(Collectors.toSet());
 
@@ -59,7 +63,7 @@ public class TrigramFilter implements Filter {
 			treeStructure.getTreemap().forEach((s, treeNode) -> {
 				add(map, s, s);
 
-				Set<String> nGrams = Utils.getTriGrams(s);
+				Set<String> nGrams = Utils.getNGrams(s, N);
 				nGrams.forEach(nGram -> add(map, nGram, s));
 			});
 			subscriber.onNext(new PatriciaTrie<>(map));
