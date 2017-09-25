@@ -103,14 +103,19 @@ public class TreeModelController implements Destroyable {
 		lazyMarkSubscription = Observable.interval(10, TimeUnit.MILLISECONDS, Schedulers.from(SwingUtilities::invokeLater))
 				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(aLong -> {
+
+					//int[] indexes = new int
 					int i = 100;
 					while (i > 0 && iterator.hasNext()) {
 						DefaultMutableTreeNode next = iterator.next();
 						String s = next.toString();
 						String res = "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
 						next.setUserObject(res);
+
 						i--;
 					}
+
+				//	model.nodesChanged();
 
 					if (!iterator.hasNext()) {
 						RxUtils.unsubscribe(lazyMarkSubscription);
