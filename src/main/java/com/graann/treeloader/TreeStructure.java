@@ -19,6 +19,10 @@ public final class TreeStructure {
 		return treemap;
 	}
 
+	public Set<String> getStrings() {
+		return treemap.keySet();
+	}
+
 	TreeStructure(TreeNode root, Map<String, Set<TreeNode>> treemap) {
 		this.root = root;
 		this.treemap = treemap;

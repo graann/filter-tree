@@ -1,8 +1,8 @@
 package com.graann.tree;
 
-import com.graann.tree.model.filter.FilterFactory;
-import com.graann.tree.model.filter.TrigramFilterFactory;
 import com.graann.tree.components.TreeWidgetFactory;
+import com.graann.tree.model.filter.DefaultTreeFilter;
+import com.graann.tree.model.filter.TreeFilter;
 import com.graann.treeloader.DefaultTreeLoader;
 import com.graann.treeloader.TreeLoader;
 
@@ -11,12 +11,12 @@ import com.graann.treeloader.TreeLoader;
  */
 public class DefaultFilterTreeWidgetFactory implements FilterTreeWidgetFactory {
 	private TreeLoader loader = new DefaultTreeLoader();
-	private FilterFactory filterFactory = new TrigramFilterFactory();
+	private TreeFilter treeFilter = new DefaultTreeFilter();
 	private TreeWidgetFactory treeWidgetFactory = new TreeWidgetFactory();
 
 	public FilterTreeWidget create() {
 		FilterTreeWidget tree = new FilterTreeWidget();
-		tree.setFilterFactory(filterFactory);
+		tree.setTreeFilter(treeFilter);
 		tree.setLoader(loader);
 		tree.setTreeWidgetFactory(treeWidgetFactory);
 		tree.initialize();

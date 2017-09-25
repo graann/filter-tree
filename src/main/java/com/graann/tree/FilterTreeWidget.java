@@ -1,22 +1,28 @@
 package com.graann.tree;
 
 import com.graann.common.Viewable;
-import com.graann.tree.model.filter.Filter;
-import com.graann.tree.model.filter.FilterFactory;
 import com.graann.tree.components.TreeWidgetFactory;
+import com.graann.tree.model.filter.TreeFilter;
+import com.graann.tree.model.filter.TrigramStringFilter;
 import com.graann.treeloader.TreeLoader;
+import com.graann.treeloader.TreeStructure;
 import net.miginfocom.swing.MigLayout;
-import rx.Observable;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
-import java.awt.*;
+import java.awt.Dimension;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author gromova on 20.09.17.
@@ -24,7 +30,7 @@ import java.awt.*;
 public class FilterTreeWidget implements Viewable<JComponent> {
 	private Subscription subscribe;
 
-	private FilterFactory filterFactory;
+	private TreeFilter treeFilter;
 	private TreeLoader loader;
 	private TreeWidgetFactory treeWidgetFactory;
 
@@ -33,9 +39,8 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 	private JTextField jTextField = new JTextField();
 	private JButton button = new JButton("expand");
 
-
-	public void setFilterFactory(FilterFactory filterFactory) {
-		this.filterFactory = filterFactory;
+	public void setTreeFilter(TreeFilter treeFilter) {
+		this.treeFilter = treeFilter;
 	}
 
 	public void setLoader(TreeLoader loader) {
@@ -84,7 +89,6 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		panel.add(button);
 
 		DefaultTreeModel model = new DefaultTreeModel(null);
-		Filter filter = filterFactory.create(patternObservable);
 
 		Viewable<JComponent> treeWidget = treeWidgetFactory.create(model);
 		panel.add(treeWidget.getView(), "grow, span 2");
@@ -92,11 +96,40 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		subscribe = loader.loadTreeStructure()
 				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(structure -> {
-					model.setRoot(structure.getRoot());
-					Observable<TreeNode> treeNodeObservable = filter.rootObservable(structure);
-					treeNodeObservable
+
+					TrigramStringFilter trigramStringFilter = TrigramStringFilter.create(structure.getStrings());
+					patternObservable
+							.switchMap(trigramStringFilter::appropriateStringObservable)
 							.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
-							.subscribe(model::setRoot);
+							.subscribe(strings -> updateModel(structure, model, strings));
+
+					model.setRoot(structure.getRoot());
+				});
+	}
+
+	private void updateModel(TreeStructure structure, DefaultTreeModel model, Set<String> strings) {
+		if (strings == null) {
+			model.setRoot(structure.getRoot());
+			return;
+		}
+
+		if (strings.isEmpty()) {
+			model.setRoot(null);
+			return;
+		}
+
+		treeFilter.rootObservable(structure, strings)
+				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
+				.subscribe(t2 -> {
+					if (t2 == null) {
+						model.setRoot(null);
+						return;
+					}
+
+					DefaultMutableTreeNode defaultMutableTreeNode = t2._1;
+					List<DefaultMutableTreeNode> defaultMutableTreeNodes = t2._2;
+
+					model.setRoot(defaultMutableTreeNode);
 				});
 	}
 
