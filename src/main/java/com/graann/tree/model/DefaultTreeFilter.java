@@ -1,20 +1,14 @@
-package com.graann.tree.model.filter;
+package com.graann.tree.model;
 
 import com.graann.treeloader.TreeStructure;
 import org.reactfx.util.Tuple2;
 import org.reactfx.util.Tuples;
 import rx.Observable;
-import rx.Scheduler;
 import rx.schedulers.Schedulers;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;

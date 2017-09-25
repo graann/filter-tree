@@ -1,8 +1,7 @@
-package com.graann.tree;
+package com.graann.tree.components;
 
-import com.graann.tree.components.TreeWidgetFactory;
-import com.graann.tree.model.filter.DefaultTreeFilter;
-import com.graann.tree.model.filter.TreeFilter;
+import com.graann.tree.model.DefaultTreeFilter;
+import com.graann.tree.model.TreeFilter;
 import com.graann.treeloader.DefaultTreeLoader;
 import com.graann.treeloader.TreeLoader;
 

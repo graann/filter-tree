@@ -1,27 +1,22 @@
-package com.graann.tree;
+package com.graann.tree.components;
 
 import com.graann.common.RxUtils;
 import com.graann.common.Viewable;
-import com.graann.tree.components.TreeWidgetFactory;
-import com.graann.tree.model.filter.StringFilter;
-import com.graann.tree.model.filter.StringFilterFactory;
-import com.graann.tree.model.filter.TreeFilter;
+import com.graann.tree.model.StringFilter;
+import com.graann.tree.model.StringFilterFactory;
+import com.graann.tree.model.TreeFilter;
 import com.graann.treeloader.TreeLoader;
 import net.miginfocom.swing.MigLayout;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -41,15 +36,15 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 	private JTextField jTextField = new JTextField();
 	private JButton button = new JButton("expand");
 
-	public void setTreeFilter(TreeFilter treeFilter) {
+	void setTreeFilter(TreeFilter treeFilter) {
 		this.treeFilter = treeFilter;
 	}
 
-	public void setLoader(TreeLoader loader) {
+	void setLoader(TreeLoader loader) {
 		this.loader = loader;
 	}
 
-	public void setTreeWidgetFactory(TreeWidgetFactory treeWidgetFactory) {
+	void setTreeWidgetFactory(TreeWidgetFactory treeWidgetFactory) {
 		this.treeWidgetFactory = treeWidgetFactory;
 	}
 
@@ -57,7 +52,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		return panel;
 	}
 
-	public void initialize() {
+	void initialize() {
 
 		panel = new JPanel(new MigLayout("fill, wrap 2", "[min!][]", "[min!][]"));
 

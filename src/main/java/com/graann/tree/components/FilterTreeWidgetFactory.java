@@ -1,4 +1,4 @@
-package com.graann.tree;
+package com.graann.tree.components;
 
 /**
  * @author gromova on 20.09.17.

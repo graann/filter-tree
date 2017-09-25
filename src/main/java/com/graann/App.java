@@ -1,8 +1,8 @@
 package com.graann;
 
 import com.graann.common.Viewable;
-import com.graann.tree.DefaultFilterTreeWidgetFactory;
-import com.graann.tree.FilterTreeWidgetFactory;
+import com.graann.tree.components.DefaultFilterTreeWidgetFactory;
+import com.graann.tree.components.FilterTreeWidgetFactory;
 
 import javax.swing.*;
 

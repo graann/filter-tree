@@ -1,4 +1,4 @@
-package com.graann.tree.model.filter;
+package com.graann.tree.model;
 
 import org.reactfx.util.Tuple2;
 import rx.Observable;

@@ -1,4 +1,4 @@
-package com.graann.tree.model.filter;
+package com.graann.tree.model;
 
 import rx.Observable;
 
