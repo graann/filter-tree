@@ -64,6 +64,7 @@ public class TrigramFilter implements Filter {
 									Set<TreeNode> filteredNodes = filtered
 											.stream()
 											.map(key -> treeStructure.getTreemap().get(key))
+											.flatMap(Collection::stream)
 											.collect(Collectors.toSet());
 
 									if (filteredNodes.isEmpty()) {
@@ -90,7 +91,7 @@ public class TrigramFilter implements Filter {
 
 									long estimatedTime = System.nanoTime() - startTime;
 									System.out.println("rootObservable: " + estimatedTime);
-									Iterator<DefaultMutableTreeNode> iterator = customTreeNodes.iterator();
+/*									Iterator<DefaultMutableTreeNode> iterator = customTreeNodes.iterator();
 
 									Observable.interval(10, TimeUnit.MILLISECONDS, Schedulers.from(SwingUtilities::invokeLater))
 											.subscribe(aLong -> {
@@ -102,7 +103,7 @@ public class TrigramFilter implements Filter {
 													next.setUserObject(res);
 													i--;
 												}
-											});
+											});*/
 
 									return node;
 								})
@@ -113,7 +114,7 @@ public class TrigramFilter implements Filter {
 	private Observable<PatriciaTrie<Set<String>>> createTrieObservable(TreeStructure treeStructure) {
 		return Observable.create(subscriber -> {
 			Map<String, Set<String>> map = new LinkedHashMap<>();
-			treeStructure.getTreemap().forEach((s, treeNode) -> {
+			treeStructure.getTreemap().keySet().forEach(s -> {
 				add(map, s, s);
 
 				Set<String> nGrams = Utils.getNGrams(s, N);

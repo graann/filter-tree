@@ -9,8 +9,10 @@ import javax.swing.tree.TreeNode;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author gromova on 22.09.17.
@@ -37,7 +39,7 @@ public class DefaultTreeLoader implements TreeLoader {
 	}
 
 	private TreeStructure read() {
-		Map<String, TreeNode> map = new LinkedHashMap<>();
+		Map<String, Set<TreeNode>> map = new LinkedHashMap<>();
 
 		DefaultMutableTreeNode root = null;
 		DefaultMutableTreeNode prev = null;
@@ -52,7 +54,9 @@ public class DefaultTreeLoader implements TreeLoader {
 				String value = line.substring(level);
 
 				DefaultMutableTreeNode node = new DefaultMutableTreeNode(value);
-				map.put(value, node);
+				Set<TreeNode> treeNodes = map.computeIfAbsent(value, k -> new HashSet<>());
+
+				treeNodes.add(node);
 
 				if (prev == null) {
 					root = node;
