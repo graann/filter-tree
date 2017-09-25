@@ -1,4 +1,4 @@
-package com.graann.filter;
+package com.graann.tree.model.filter;
 
 import com.graann.common.Utils;
 import com.graann.treeloader.TreeStructure;
@@ -6,10 +6,19 @@ import org.apache.commons.collections4.trie.PatriciaTrie;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -123,13 +132,14 @@ public class TrigramFilter implements Filter {
 		HashSet<TreeNode> available = new HashSet<>();
 
 		for (TreeNode treeNode : nods) {
-			if (treeNode.isLeaf()) {
-				TreeNode parent = treeNode.getParent();
+			TreeNode parent = treeNode.getParent();
+			if (!available.contains(parent)) {
 				while (parent != null) {
 					available.add(parent);
 					parent = parent.getParent();
 				}
 			}
+
 			available.add(treeNode);
 		}
 		return available;

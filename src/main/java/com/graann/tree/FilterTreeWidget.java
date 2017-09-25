@@ -1,8 +1,8 @@
 package com.graann.tree;
 
 import com.graann.common.Viewable;
-import com.graann.filter.Filter;
-import com.graann.filter.FilterFactory;
+import com.graann.tree.model.filter.Filter;
+import com.graann.tree.model.filter.FilterFactory;
 import com.graann.tree.components.TreeWidgetFactory;
 import com.graann.treeloader.TreeLoader;
 import net.miginfocom.swing.MigLayout;

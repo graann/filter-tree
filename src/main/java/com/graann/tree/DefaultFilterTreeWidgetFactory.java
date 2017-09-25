@@ -1,7 +1,7 @@
 package com.graann.tree;
 
-import com.graann.filter.FilterFactory;
-import com.graann.filter.TrigramFilterFactory;
+import com.graann.tree.model.filter.FilterFactory;
+import com.graann.tree.model.filter.TrigramFilterFactory;
 import com.graann.tree.components.TreeWidgetFactory;
 import com.graann.treeloader.DefaultTreeLoader;
 import com.graann.treeloader.TreeLoader;
