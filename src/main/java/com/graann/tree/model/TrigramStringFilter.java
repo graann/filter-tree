@@ -33,6 +33,11 @@ public class TrigramStringFilter implements StringFilter {
 		}).observeOn(Schedulers.computation()).subscribe(setPatriciaTrie -> trieBehaviorSubject.onNext(setPatriciaTrie));
 	}
 
+	@Override
+	public void destroy() {
+
+	}
+
 	public Observable<Set<String>> appropriateStringObservable(String pattern) {
 		if (pattern == null || pattern.isEmpty()) {
 			return Observable.just(null);

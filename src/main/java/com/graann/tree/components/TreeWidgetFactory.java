@@ -1,14 +1,15 @@
 package com.graann.tree.components;
 
-import com.graann.common.Viewable;
-
-import javax.swing.*;
-import javax.swing.tree.TreeModel;
+import com.graann.tree.model.TreeModelControllerFactory;
+import rx.subjects.BehaviorSubject;
 
 public class TreeWidgetFactory {
-	public Viewable<JComponent> create(TreeModel model) {
+	private TreeModelControllerFactory treeModelControllerFactory = new TreeModelControllerFactory();
+
+	public TreeWidget create(BehaviorSubject<String> patternObservable) {
 		TreeWidget widget = new TreeWidget();
-		widget.setModel(model);
+		widget.setModelControllerFactory(treeModelControllerFactory);
+		widget.setPatternObservable(patternObservable);
 		widget.initialize();
 		return widget;
 	}

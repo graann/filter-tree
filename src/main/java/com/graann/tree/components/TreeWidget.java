@@ -1,9 +1,13 @@
 package com.graann.tree.components;
 
 import com.graann.common.Viewable;
+import com.graann.tree.model.TreeModelController;
+import com.graann.tree.model.TreeModelControllerFactory;
+import com.graann.treeloader.TreeStructure;
+import rx.Observable;
 
 import javax.swing.*;
-import javax.swing.tree.TreeModel;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -14,13 +18,21 @@ import java.util.List;
  * @author gromova on 22.09.17.
  */
 public class TreeWidget implements Viewable<JComponent> {
+	private Observable<String> patternObservable;
+	private TreeModelControllerFactory modelControllerFactory;
+
+	private TreeModelController treeModelController;
+
 	private JTree tree;
 	private JScrollPane scrollPane;
+	private DefaultTreeModel model;
 
-	private TreeModel model;
+	public void setModelControllerFactory(TreeModelControllerFactory modelControllerFactory) {
+		this.modelControllerFactory = modelControllerFactory;
+	}
 
-	public void setModel(TreeModel model) {
-		this.model = model;
+	public void setPatternObservable(Observable<String> patternObservable) {
+		this.patternObservable = patternObservable;
 	}
 
 	@Override
@@ -29,6 +41,10 @@ public class TreeWidget implements Viewable<JComponent> {
 	}
 
 	public void initialize() {
+		model = new DefaultTreeModel(null);
+
+		treeModelController = modelControllerFactory.create(model, patternObservable);
+
 		tree = new JTree(model);
 		tree.setCellRenderer(new FilterTreeCellRenderer());
 		tree.setExpandsSelectedPaths(true);
@@ -38,7 +54,12 @@ public class TreeWidget implements Viewable<JComponent> {
 
 	@Override
 	public void destroy() {
+		treeModelController.destroy();
+	}
 
+	public void updateStructure(TreeStructure structure) {
+		model.setRoot(structure.getRoot());
+		treeModelController.updateStructure(structure);
 	}
 
 	public List<TreeNode> getVisibleNodes() {

@@ -50,29 +50,6 @@ public class DefaultTreeFilter implements TreeFilter {
 		}).subscribeOn(Schedulers.computation());
 	}
 
-
-/*
-									Iterator<DefaultMutableTreeNode> iterator = customTreeNodes.iterator();
-
-									Observable.interval(10, TimeUnit.MILLISECONDS, Schedulers.from(SwingUtilities::invokeLater))
-											.subscribe(aLong -> {
-												int i = 100;
-												while(i > 0 && iterator.hasNext()) {
-													DefaultMutableTreeNode next = iterator.next();
-													String s = next.toString();
-													String res = "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
-													next.setUserObject(res);
-													i--;
-												}
-											});
-
-									return node;
-								})
-				);
-
-	}
-*/
-
 	private static Set<TreeNode> addParents(Set<TreeNode> nods) {
 		HashSet<TreeNode> available = new HashSet<>();
 
