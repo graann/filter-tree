@@ -17,16 +17,12 @@ import java.util.stream.Collectors;
 /**
  * @author gromova on 25.09.17.
  */
-public class TrigramStringFilter {
+public class TrigramStringFilter implements StringFilter {
 	private final static int N = 3;
 	private static BehaviorSubject<PatriciaTrie<Set<String>>> trieBehaviorSubject = BehaviorSubject.create();
 
-	private TrigramStringFilter(Set<String> strings) {
+	void setStrings(Set<String> strings) {
 		computeTrie(strings);
-	}
-
-	public static TrigramStringFilter create(Set<String> strings) {
-		return new TrigramStringFilter(strings);
 	}
 
 	private void computeTrie(Set<String> strings) {
@@ -66,7 +62,7 @@ public class TrigramStringFilter {
 		set.add(value);
 	}
 
-	private static Set<String> getNGrams(String text, int n) {
+	static Set<String> getNGrams(String text, int n) {
 		char[] chars = text.toCharArray();
 		Set<String> set = new HashSet<>();
 		for (int i = 0; i < chars.length; i++) {

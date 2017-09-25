@@ -1,11 +1,12 @@
 package com.graann.tree;
 
+import com.graann.common.RxUtils;
 import com.graann.common.Viewable;
 import com.graann.tree.components.TreeWidgetFactory;
+import com.graann.tree.model.filter.StringFilter;
+import com.graann.tree.model.filter.StringFilterFactory;
 import com.graann.tree.model.filter.TreeFilter;
-import com.graann.tree.model.filter.TrigramStringFilter;
 import com.graann.treeloader.TreeLoader;
-import com.graann.treeloader.TreeStructure;
 import net.miginfocom.swing.MigLayout;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
@@ -22,14 +23,15 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.Dimension;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author gromova on 20.09.17.
  */
 public class FilterTreeWidget implements Viewable<JComponent> {
-	private Subscription subscribe;
+	private Subscription loaderSubscriber;
+	private Subscription filterSubscription;
 
+	private StringFilterFactory stringFilterFactory = new StringFilterFactory();
 	private TreeFilter treeFilter;
 	private TreeLoader loader;
 	private TreeWidgetFactory treeWidgetFactory;
@@ -93,51 +95,50 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		Viewable<JComponent> treeWidget = treeWidgetFactory.create(model);
 		panel.add(treeWidget.getView(), "grow, span 2");
 
-		subscribe = loader.loadTreeStructure()
+		loaderSubscriber = loader.loadTreeStructure()
 				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(structure -> {
 
-					TrigramStringFilter trigramStringFilter = TrigramStringFilter.create(structure.getStrings());
-					patternObservable
+					StringFilter trigramStringFilter = stringFilterFactory.create(structure.getStrings());
+
+					filterSubscription = patternObservable
 							.switchMap(trigramStringFilter::appropriateStringObservable)
 							.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
-							.subscribe(strings -> updateModel(structure, model, strings));
+							.subscribe(strings -> {
+								if (strings == null) {
+									model.setRoot(structure.getRoot());
+									return;
+								}
+
+								if (strings.isEmpty()) {
+									model.setRoot(null);
+									return;
+								}
+
+								treeFilter.rootObservable(structure, strings)
+										.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
+										.subscribe(t2 -> {
+											if (t2 == null) {
+												model.setRoot(null);
+												return;
+											}
+
+											DefaultMutableTreeNode defaultMutableTreeNode = t2._1;
+											List<DefaultMutableTreeNode> defaultMutableTreeNodes = t2._2;
+
+											model.setRoot(defaultMutableTreeNode);
+										});
+							});
 
 					model.setRoot(structure.getRoot());
 				});
 	}
 
-	private void updateModel(TreeStructure structure, DefaultTreeModel model, Set<String> strings) {
-		if (strings == null) {
-			model.setRoot(structure.getRoot());
-			return;
-		}
-
-		if (strings.isEmpty()) {
-			model.setRoot(null);
-			return;
-		}
-
-		treeFilter.rootObservable(structure, strings)
-				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
-				.subscribe(t2 -> {
-					if (t2 == null) {
-						model.setRoot(null);
-						return;
-					}
-
-					DefaultMutableTreeNode defaultMutableTreeNode = t2._1;
-					List<DefaultMutableTreeNode> defaultMutableTreeNodes = t2._2;
-
-					model.setRoot(defaultMutableTreeNode);
-				});
-	}
 
 	@Override
 	public void destroy() {
-		if (subscribe != null && !subscribe.isUnsubscribed()) {
-			subscribe.unsubscribe();
-		}
+		RxUtils.unsubscribe(loaderSubscriber);
+		RxUtils.unsubscribe(filterSubscription);
 	}
 }
 
