@@ -1,6 +1,5 @@
 package com.graann.tree.components;
 
-import com.graann.common.RxUtils;
 import com.graann.common.Viewable;
 import com.graann.tree.model.TreeModelController;
 import com.graann.tree.model.TreeModelControllerFactory;
@@ -10,16 +9,20 @@ import rx.Subscription;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Rectangle;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author gromova on 22.09.17.
@@ -36,7 +39,7 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 
 	private Subscription expandVisibleSubscription;
 
-	private BehaviorSubject<AdjustmentEvent> verticalScrollObservable = BehaviorSubject.create();
+	private BehaviorSubject<Boolean> verticalScrollObservable = BehaviorSubject.create();
 
 	void setModelControllerFactory(TreeModelControllerFactory modelControllerFactory) {
 		this.modelControllerFactory = modelControllerFactory;
@@ -61,20 +64,31 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 		scrollPane = new JScrollPane(tree);
 		treeModelController = modelControllerFactory.create(model, patternObservable);
 
-/*
-		scrollPane.getVerticalScrollBar().addAdjustmentListener(e -> verticalScrollObservable.onNext(e));
+		/**
+		 * TODO add scroll button observable
+		 */
 
-		patternObservable.subscribe(s -> {
-			RxUtils.unsubscribe(expandVisibleSubscription);
-			if(s !=null && !s.isEmpty()) {
-				expandVisibleSubscription = verticalScrollObservable
-						.debounce(100, TimeUnit.MILLISECONDS)
-						.subscribe(adjustmentEvent -> expandVisible());
+		scrollPane.getVerticalScrollBar().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				verticalScrollObservable.onNext(true);
 			}
 		});
-*/
 
+		patternObservable.switchMap(s -> {
+			if (s == null || s.isEmpty()) {
+				return Observable.just(false);
+			}
 
+			return treeModelController.getUpdateObservable().switchMap(aVoid -> {
+				expandVisible();
+				return verticalScrollObservable;
+			});
+		}).subscribeOn(Schedulers.from(SwingUtilities::invokeLater)).subscribe(b -> {
+			if (b) {
+				expandVisible();
+			}
+		});
 	}
 
 	@Override
@@ -112,18 +126,11 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 		expandVisible();
 	}
 
-	private boolean lock = false;
-
 	private void expandVisible() {
-		if(lock) return;
-		lock = true;
-		System.out.println("expand");
 		final Rectangle visibleRectangle = scrollPane.getViewport().getViewRect();
 		final int firstRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
-		final int lastRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
-
+		int lastRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
 		expandNodes(tree, firstRow, lastRow);
-		lock = false;
 	}
 
 	private static void expandNodes(JTree tree, int startingIndex, int stopIndex) {

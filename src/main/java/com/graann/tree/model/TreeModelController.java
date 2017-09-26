@@ -6,6 +6,7 @@ import com.graann.treeloader.TreeStructure;
 import rx.Observable;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
+import rx.subjects.BehaviorSubject;
 
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -26,6 +27,8 @@ public class TreeModelController implements Destroyable {
 	private Subscription filterSubscription;
 	private Subscription treeFilterSubscription;
 	private Subscription lazyMarkSubscription;
+
+	private BehaviorSubject<Boolean> updateObservable = BehaviorSubject.create();
 
 	private TreeStructure structure;
 	private String pattern;
@@ -97,9 +100,14 @@ public class TreeModelController implements Destroyable {
 				});
 	}
 
+	public Observable<Boolean> getUpdateObservable() {
+		return updateObservable;
+	}
+
 	private void patternLazyMark(List<DefaultMutableTreeNode> mutableTreeNodes) {
 		Iterator<DefaultMutableTreeNode> iterator = mutableTreeNodes.iterator();
 		patternMark(iterator);
+		updateObservable.onNext(true);
 
 /*		RxUtils.unsubscribe(lazyMarkSubscription);
 		lazyMarkSubscription = Observable.interval(10, TimeUnit.MILLISECONDS, Schedulers.from(SwingUtilities::invokeLater))
