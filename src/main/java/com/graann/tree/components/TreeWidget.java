@@ -1,10 +1,13 @@
 package com.graann.tree.components;
 
+import com.graann.common.RxUtils;
 import com.graann.common.Viewable;
 import com.graann.tree.model.TreeModelController;
 import com.graann.tree.model.TreeModelControllerFactory;
 import com.graann.treeloader.TreeStructure;
 import rx.Observable;
+import rx.Subscription;
+import rx.schedulers.Schedulers;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
@@ -13,6 +16,7 @@ import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author gromova on 22.09.17.
@@ -27,11 +31,13 @@ public class TreeWidget implements Viewable<JComponent> {
 	private JScrollPane scrollPane;
 	private DefaultTreeModel model;
 
-	public void setModelControllerFactory(TreeModelControllerFactory modelControllerFactory) {
+	private Subscription lazyMarkExpand;
+
+	void setModelControllerFactory(TreeModelControllerFactory modelControllerFactory) {
 		this.modelControllerFactory = modelControllerFactory;
 	}
 
-	public void setPatternObservable(Observable<String> patternObservable) {
+	void setPatternObservable(Observable<String> patternObservable) {
 		this.patternObservable = patternObservable;
 	}
 
@@ -40,16 +46,16 @@ public class TreeWidget implements Viewable<JComponent> {
 		return scrollPane;
 	}
 
-	public void initialize() {
+	void initialize() {
 		model = new DefaultTreeModel(null);
-
-		treeModelController = modelControllerFactory.create(model, patternObservable);
 
 		tree = new JTree(model);
 		tree.setCellRenderer(new FilterTreeCellRenderer());
 		tree.setExpandsSelectedPaths(true);
 
 		scrollPane = new JScrollPane(tree);
+
+		treeModelController = modelControllerFactory.create(model, patternObservable, tree);
 	}
 
 	@Override
@@ -57,12 +63,12 @@ public class TreeWidget implements Viewable<JComponent> {
 		treeModelController.destroy();
 	}
 
-	public void updateStructure(TreeStructure structure) {
+	void updateStructure(TreeStructure structure) {
 		model.setRoot(structure.getRoot());
 		treeModelController.updateStructure(structure);
 	}
 
-	public List<TreeNode> getVisibleNodes() {
+	private List<TreeNode> getVisibleNodes() {
 		final Rectangle visibleRectangle = scrollPane.getViewport().getViewRect();
 		final int firstRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
 		final int lastRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);

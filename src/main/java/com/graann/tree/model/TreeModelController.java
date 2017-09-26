@@ -10,10 +10,12 @@ import rx.schedulers.Schedulers;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class TreeModelController implements Destroyable {
 	private Observable<String> patternObservable;
@@ -26,6 +28,7 @@ public class TreeModelController implements Destroyable {
 	private Subscription filterSubscription;
 	private Subscription treeFilterSubscription;
 	private Subscription lazyMarkSubscription;
+	private Subscription lazyExpandSubscription;
 
 	private TreeStructure structure;
 	private String pattern;
@@ -45,6 +48,40 @@ public class TreeModelController implements Destroyable {
 	public void setPatternObservable(Observable<String> patternObservable) {
 		this.patternObservable = patternObservable;
 	}
+
+	/**TODO
+	 * remove ugly huck
+	 */
+	private JTree tree;
+
+	public void setTree(JTree tree) {
+		this.tree = tree;
+	}
+
+	public void lazyExpand(List<DefaultMutableTreeNode> mutableTreeNodes) {
+		List<TreePath> collect = mutableTreeNodes
+				.stream()
+				.map(node -> new TreePath(model.getPathToRoot(node)))
+				.collect(Collectors.toList());
+
+		Iterator<TreePath> iterator = collect.iterator();
+
+		RxUtils.unsubscribe(lazyExpandSubscription);
+		lazyExpandSubscription = Observable.interval(40, TimeUnit.MILLISECONDS, Schedulers.from(SwingUtilities::invokeLater))
+				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
+				.subscribe(aLong -> {
+					int i = 30;
+					while(i > 0 && iterator.hasNext()) {
+						TreePath next = iterator.next();
+						tree.expandPath(next);
+						i--;
+					}
+					if(!iterator.hasNext()) {
+						RxUtils.unsubscribe(lazyExpandSubscription);
+					}
+				});
+	}
+	//============================================================
 
 	public void updateStructure(TreeStructure structure) {
 		this.structure = structure;
@@ -108,8 +145,11 @@ public class TreeModelController implements Destroyable {
 					patternMark(iterator);
 					RxUtils.unsubscribe(lazyMarkSubscription);
 				});*/
+		lazyExpand(mutableTreeNodes);
 
 	}
+
+
 
 	private void patternMark(Iterator<DefaultMutableTreeNode> iterator) {
 		while (iterator.hasNext()) {

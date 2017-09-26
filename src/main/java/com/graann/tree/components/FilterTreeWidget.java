@@ -71,6 +71,8 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		panel.add(button);
 
 		TreeWidget treeWidget = treeWidgetFactory.create(patternObservable);
+
+
 		panel.add(treeWidget.getView(), "grow, span 2");
 
 		loaderSubscriber = loader.loadTreeStructure()

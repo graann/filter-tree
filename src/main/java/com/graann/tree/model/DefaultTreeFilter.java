@@ -14,8 +14,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class DefaultTreeFilter implements TreeFilter {
-	private final static String SELECTION_STYLE = "<html>{0}<font color='yellow'>{1}</font>{2}</html>";
-
 	public Observable<Tuple2<DefaultMutableTreeNode, List<DefaultMutableTreeNode>>> rootObservable(TreeStructure treeStructure, Set<String> filtered) {
 		return Observable.<Tuple2<DefaultMutableTreeNode, List<DefaultMutableTreeNode>>>create(subscriber -> {
 			Set<TreeNode> filteredNodes = filtered
@@ -51,7 +49,7 @@ public class DefaultTreeFilter implements TreeFilter {
 	}
 
 	private static Set<TreeNode> addParents(Set<TreeNode> nods) {
-		HashSet<TreeNode> available = new HashSet<>();
+		Set<TreeNode> available = new LinkedHashSet<>();
 
 		for (TreeNode treeNode : nods) {
 			TreeNode parent = treeNode.getParent();
