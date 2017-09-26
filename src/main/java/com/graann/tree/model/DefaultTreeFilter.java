@@ -11,12 +11,7 @@ import rx.subscriptions.Subscriptions;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -27,7 +22,7 @@ public class DefaultTreeFilter implements TreeFilter {
 
 	public Observable<Tuple2<DefaultMutableTreeNode, List<DefaultMutableTreeNode>>> rootObservable(TreeStructure treeStructure, Set<String> filtered) {
 		return Observable.<Tuple2<DefaultMutableTreeNode, List<DefaultMutableTreeNode>>>create(subscriber -> {
-			LOG.info("rootObservable");
+			LOG.debug("rootObservable");
 			Set<TreeNode> filteredNodes = filtered
 					.stream()
 					.map(key -> treeStructure.getTreemap().get(key))
@@ -35,7 +30,7 @@ public class DefaultTreeFilter implements TreeFilter {
 					.collect(Collectors.toSet());
 
 			if (filteredNodes.isEmpty()) {
-				LOG.info("filteredNodes.isEmpty() return null");
+				LOG.debug("filteredNodes.isEmpty() return null");
 				subscriber.onNext(null);
 				return;
 			}
@@ -44,7 +39,7 @@ public class DefaultTreeFilter implements TreeFilter {
 
 			Set<TreeNode> available = addParents(process, filteredNodes);
 			if (!process.get()) {
-				LOG.info("process false");
+				LOG.debug("process false");
 				return;
 			}
 
@@ -66,11 +61,11 @@ public class DefaultTreeFilter implements TreeFilter {
 			addChildren(process, treeStructure.getRoot(), node, predicate, creator);
 
 			if (!process.get()) {
-				LOG.info("process false");
+				LOG.debug("process false");
 				return;
 			}
 
-			LOG.info("onNext customTreeNodes.size: "+customTreeNodes);
+			LOG.debug("onNext customTreeNodes.size: ");
 			subscriber.onNext(Tuples.t(node, customTreeNodes));
 
 			subscriber.add(Subscriptions.create(() -> process.set(false)));

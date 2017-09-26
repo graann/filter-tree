@@ -4,7 +4,7 @@ import com.graann.tree.model.TreeModelController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.tree.TreeModel;
 
 /**
@@ -21,7 +21,7 @@ public class CustomTree extends JTree {
 	}
 
 	public void setExpandAvailable(boolean expandAvailable) {
-		LOG.info("expandAvailable: "+expandAvailable);
+		LOG.debug("expandAvailable: "+expandAvailable);
 		this.expandAvailable = expandAvailable;
 	}
 

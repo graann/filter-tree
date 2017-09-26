@@ -10,7 +10,7 @@ import rx.Subscription;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.util.Iterator;
@@ -65,7 +65,7 @@ public class TreeModelController implements Destroyable {
 				.distinctUntilChanged()
 				.debounce(200, TimeUnit.MILLISECONDS)
 				.switchMap(s -> {
-					LOG.info("new pattern: '"+s+"'");
+					LOG.debug("new pattern: '"+s+"'");
 
 					pattern = s;
 					RxUtils.unsubscribe(treeFilterSubscription);

@@ -12,11 +12,9 @@ import rx.Subscription;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.util.concurrent.TimeUnit;
@@ -66,7 +64,7 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 
 		//TODO
 		patternObservable.subscribe(s -> {
-			LOG.info("new pattern: '"+s+"'");
+			LOG.debug("new pattern: '"+s+"'");
 			lock = true;
 			tree.setExpandAvailable(false);
 			RxUtils.unsubscribe(expandSubscription);
@@ -77,7 +75,7 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 				.getUpdateObservable()
 				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(aVoid -> {
-					LOG.info("treeModelController subscription");
+					LOG.debug("treeModelController subscription");
 					lock = false;
 					tree.setExpandAvailable(true);
 					expandVisible();
@@ -89,7 +87,7 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 		expandSubscription = verticalScrollObservable
 				.throttleLast(200, TimeUnit.MILLISECONDS)
 				.subscribe(aBoolean -> {
-					LOG.info("expandSubscription");
+					LOG.debug("expandSubscription");
 					expandVisible();
 				});
 	}
