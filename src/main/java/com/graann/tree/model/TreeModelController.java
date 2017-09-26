@@ -3,6 +3,8 @@ package com.graann.tree.model;
 import com.graann.common.Destroyable;
 import com.graann.common.RxUtils;
 import com.graann.treeloader.TreeStructure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
@@ -17,6 +19,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class TreeModelController implements Destroyable {
+	private static final Logger LOG = LoggerFactory.getLogger(TreeModelController.class);
+
 	private Observable<String> patternObservable;
 
 	private StringFilterFactory stringFilterFactory = new StringFilterFactory();
@@ -61,7 +65,12 @@ public class TreeModelController implements Destroyable {
 				.distinctUntilChanged()
 				.debounce(200, TimeUnit.MILLISECONDS)
 				.switchMap(s -> {
+					LOG.info("new pattern: '"+s+"'");
+
 					pattern = s;
+					RxUtils.unsubscribe(treeFilterSubscription);
+					RxUtils.unsubscribe(lazyMarkSubscription);
+
 					return trigramStringFilter.appropriateStringObservable(pattern);
 
 				})
