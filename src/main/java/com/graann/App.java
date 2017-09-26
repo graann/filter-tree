@@ -4,7 +4,10 @@ import com.graann.common.Viewable;
 import com.graann.tree.components.DefaultFilterTreeWidgetFactory;
 import com.graann.tree.components.FilterTreeWidgetFactory;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 
 /**
  * @author gromova on 20.09.17.
@@ -20,9 +23,13 @@ public class App {
 		JFrame frame = new JFrame("Tree");
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		try {
-			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-		} catch (Exception e) {
-			e.printStackTrace();
+			UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
+		} catch (Exception e_) {
+			try {
+				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+			}  catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		Viewable<JComponent> newContentPane = treeFactory.create();
