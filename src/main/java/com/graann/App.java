@@ -22,15 +22,15 @@ public class App {
 	private static void createAndShow() {
 		JFrame frame = new JFrame("Tree");
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		try {
+/*		try {
 			UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
-		} catch (Exception e_) {
+		} catch (Exception e_) {*/
 			try {
 				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 			}  catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
+//		}
 
 		Viewable<JComponent> newContentPane = treeFactory.create();
 		frame.setContentPane(newContentPane.getView());

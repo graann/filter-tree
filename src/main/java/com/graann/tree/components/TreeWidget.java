@@ -1,5 +1,6 @@
 package com.graann.tree.components;
 
+import com.graann.common.RxUtils;
 import com.graann.common.Viewable;
 import com.graann.tree.model.TreeModelController;
 import com.graann.tree.model.TreeModelControllerFactory;
@@ -19,16 +20,17 @@ import javax.swing.tree.TreePath;
 import java.awt.Rectangle;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author gromova on 22.09.17.
  */
 public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 	private Observable<String> patternObservable;
+	private Subscription lockSubscriber;
+
 	private TreeModelControllerFactory modelControllerFactory;
 
 	private TreeModelController treeModelController;
@@ -62,16 +64,7 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 		scrollPane = new JScrollPane(tree);
 		treeModelController = modelControllerFactory.create(model, patternObservable);
 
-		/**
-		 * TODO add scroll button observable
-		 */
-
-		scrollPane.getVerticalScrollBar().addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				verticalScrollObservable.onNext(true);
-			}
-		});
+		scrollPane.getVerticalScrollBar().addAdjustmentListener(e -> verticalScrollObservable.onNext(true));
 
 		patternObservable.switchMap(s -> {
 			if (s == null || s.isEmpty()) {
@@ -80,7 +73,8 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 
 			return treeModelController.getUpdateObservable().switchMap(aVoid -> {
 				expandVisible();
-				return verticalScrollObservable;
+				return verticalScrollObservable
+						.throttleLast(200, TimeUnit.MILLISECONDS);
 			});
 		}).subscribeOn(Schedulers.from(SwingUtilities::invokeLater)).subscribe(b -> {
 			if (b) {
@@ -124,11 +118,25 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 		expandVisible();
 	}
 
+	private boolean lock;
 	private void expandVisible() {
+		if (lock) {
+			return;
+		}
+		RxUtils.unsubscribe(lockSubscriber);
+		lock = true;
+
 		final Rectangle visibleRectangle = scrollPane.getViewport().getViewRect();
 		final int firstRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
 		int lastRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
 		expandNodes(tree, firstRow, lastRow);
+
+		lockSubscriber = Observable.interval(100, TimeUnit.MILLISECONDS).subscribe(aLong -> {
+			if (lock) {
+				lock = false;
+				RxUtils.unsubscribe(lockSubscriber);
+			}
+		});
 	}
 
 	private static void expandNodes(JTree tree, int startingIndex, int stopIndex) {

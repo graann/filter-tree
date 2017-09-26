@@ -96,8 +96,9 @@ public class TreeModelController implements Destroyable {
 					List<DefaultMutableTreeNode> defaultMutableTreeNodes = t2._2;
 
 					model.setRoot(defaultMutableTreeNode);
-					updateObservable.onNext(true);
 					patternLazyMark(defaultMutableTreeNodes);
+					updateObservable.onNext(true);
+
 				});
 	}
 
