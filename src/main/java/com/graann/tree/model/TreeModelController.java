@@ -59,7 +59,7 @@ public class TreeModelController implements Destroyable {
 
 		filterSubscription = patternObservable
 				.distinctUntilChanged()
-				.throttleWithTimeout(70, TimeUnit.MILLISECONDS)
+				.debounce(200, TimeUnit.MILLISECONDS)
 				.switchMap(s -> {
 					pattern = s;
 					return trigramStringFilter.appropriateStringObservable(pattern);
@@ -98,7 +98,6 @@ public class TreeModelController implements Destroyable {
 					model.setRoot(defaultMutableTreeNode);
 					patternLazyMark(defaultMutableTreeNodes);
 					updateObservable.onNext(true);
-
 				});
 	}
 

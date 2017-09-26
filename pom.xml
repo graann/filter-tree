@@ -39,10 +39,20 @@
 			<artifactId>commons-collections4</artifactId>
 			<version>4.1</version>
 		</dependency>
-		<dependency>
+<!--		<dependency>
 			<groupId>com.seaglasslookandfeel</groupId>
 			<artifactId>seaglasslookandfeel</artifactId>
 			<version>0.2.1</version>
+		</dependency>-->
+<!--		<dependency>
+			<groupId>com.jtattoo</groupId>
+			<artifactId>JTattoo</artifactId>
+			<version>1.6.11</version>
+		</dependency>-->
+		<dependency>
+			<groupId>net.java.dev.nimbus</groupId>
+			<artifactId>nimbus</artifactId>
+			<version>weekly-080113</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

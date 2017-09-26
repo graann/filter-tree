@@ -7,6 +7,7 @@ import com.graann.tree.model.TreeModelControllerFactory;
 import com.graann.treeloader.TreeStructure;
 import rx.Observable;
 import rx.Subscription;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
@@ -30,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 	private Observable<String> patternObservable;
 	private Subscription lockSubscriber;
+	private Subscription expandSubscription;
 
 	private TreeModelControllerFactory modelControllerFactory;
 
@@ -66,21 +68,30 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 
 		scrollPane.getVerticalScrollBar().addAdjustmentListener(e -> verticalScrollObservable.onNext(true));
 
-		patternObservable.switchMap(s -> {
-			if (s == null || s.isEmpty()) {
-				return Observable.just(false);
-			}
-
-			return treeModelController.getUpdateObservable().switchMap(aVoid -> {
-				expandVisible();
-				return verticalScrollObservable
-						.throttleLast(200, TimeUnit.MILLISECONDS);
-			});
-		}).subscribeOn(Schedulers.from(SwingUtilities::invokeLater)).subscribe(b -> {
-			if (b) {
-				expandVisible();
+		//TODO
+		patternObservable.subscribe(new Action1<String>() {
+			@Override
+			public void call(String s) {
+				RxUtils.unsubscribe(expandSubscription);
+				expandAvailable = false;
 			}
 		});
+
+		//TODO
+		treeModelController
+				.getUpdateObservable()
+				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
+				.subscribe(aVoid -> {
+					expandAvailable = true;
+					expandVisible();
+					updateExpandSubscription();
+			});
+	}
+
+	private void updateExpandSubscription() {
+		expandSubscription = verticalScrollObservable
+				.throttleLast(200, TimeUnit.MILLISECONDS)
+				.subscribe(aBoolean -> expandVisible());
 	}
 
 	@Override
@@ -131,7 +142,7 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 		int lastRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
 		expandNodes(tree, firstRow, lastRow);
 
-		lockSubscriber = Observable.interval(100, TimeUnit.MILLISECONDS).subscribe(aLong -> {
+		lockSubscriber = Observable.interval(50, TimeUnit.MILLISECONDS).subscribe(aLong -> {
 			if (lock) {
 				lock = false;
 				RxUtils.unsubscribe(lockSubscriber);
@@ -139,8 +150,9 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 		});
 	}
 
-	private static void expandNodes(JTree tree, int startingIndex, int stopIndex) {
-		for (int i = startingIndex; i <= stopIndex; i++) {
+	private boolean expandAvailable = false;
+	private void expandNodes(JTree tree, int startingIndex, int stopIndex) {
+		for (int i = startingIndex; i <= stopIndex && expandAvailable; i++) {
 			tree.expandRow(i);
 		}
 	}

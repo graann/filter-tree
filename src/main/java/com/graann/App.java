@@ -23,14 +23,28 @@ public class App {
 		JFrame frame = new JFrame("Tree");
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 /*		try {
-			UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
+		//	UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
+			//UIManager.setLookAndFeel("com.jtattoo.plaf.smart.SmartLookAndFeel");
+		//	UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+		//	UIManager.setLookAndFeel("Nimbus");
 		} catch (Exception e_) {*/
 			try {
 				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 			}  catch (Exception e) {
 				e.printStackTrace();
 			}
-//		}
+	//	}
+
+/*		try {
+			for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+		} catch (Exception e) {
+			// If Nimbus is not available, you can set the GUI to another look and feel.
+		}*/
 
 		Viewable<JComponent> newContentPane = treeFactory.create();
 		frame.setContentPane(newContentPane.getView());
