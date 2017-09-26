@@ -31,7 +31,7 @@ public class DefaultTreeLoader implements TreeLoader {
 
 		treeBehaviorSubject = BehaviorSubject.create();
 		Observable.<TreeStructure>create(subscriber -> subscriber.onNext(read()))
-				.observeOn(Schedulers.io())
+				.subscribeOn(Schedulers.io())
 				.first()
 				.subscribe(strings -> treeBehaviorSubject.onNext(strings));
 
