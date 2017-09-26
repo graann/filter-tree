@@ -1,6 +1,5 @@
 package com.graann.tree.components;
 
-import com.graann.common.RxUtils;
 import com.graann.common.Viewable;
 import com.graann.tree.model.TreeModelController;
 import com.graann.tree.model.TreeModelControllerFactory;
@@ -8,26 +7,21 @@ import com.graann.treeloader.TreeStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
-import rx.Subscription;
 import rx.schedulers.Schedulers;
-import rx.subjects.BehaviorSubject;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 /**
  * @author gromova on 22.09.17.
  */
-public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
+public class TreeWidget implements Viewable<JComponent> {
 	private static final Logger LOG = LoggerFactory.getLogger(TreeWidget.class);
 
 	private Observable<String> patternObservable;
-	private Subscription lockSubscriber;
-	private Subscription expandSubscription;
 
 	private TreeModelControllerFactory modelControllerFactory;
 
@@ -36,8 +30,6 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 	private CustomTree tree;
 	private JScrollPane scrollPane;
 	private DefaultTreeModel model;
-
-	private BehaviorSubject<Boolean> verticalScrollObservable = BehaviorSubject.create();
 
 	void setModelControllerFactory(TreeModelControllerFactory modelControllerFactory) {
 		this.modelControllerFactory = modelControllerFactory;
@@ -60,36 +52,16 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 		scrollPane = new JScrollPane(tree);
 		treeModelController = modelControllerFactory.create(model, patternObservable);
 
-		scrollPane.getVerticalScrollBar().addAdjustmentListener(e -> verticalScrollObservable.onNext(true));
-
-		//TODO
-		patternObservable.subscribe(s -> {
-			LOG.debug("new pattern: '"+s+"'");
-			lock = true;
-			tree.setExpandAvailable(false);
-			RxUtils.unsubscribe(expandSubscription);
-		});
-
-		//TODO
 		treeModelController
 				.getUpdateObservable()
 				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
-				.subscribe(aVoid -> {
-					LOG.debug("treeModelController subscription");
-					lock = false;
-					tree.setExpandAvailable(true);
-					expandVisible();
-					updateExpandSubscription();
+				.subscribe(defaultMutableTreeNodes -> {
+					updateExpandSubscription(defaultMutableTreeNodes);
 			});
 	}
 
-	private void updateExpandSubscription() {
-		expandSubscription = verticalScrollObservable
-				.throttleLast(200, TimeUnit.MILLISECONDS)
-				.subscribe(aBoolean -> {
-					LOG.debug("expandSubscription");
-					expandVisible();
-				});
+	private void updateExpandSubscription(List<DefaultMutableTreeNode> list) {
+
 	}
 
 	@Override
@@ -102,30 +74,11 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 		treeModelController.updateStructure(structure);
 	}
 
-	@Override
-	public void adjustmentValueChanged(AdjustmentEvent e) {
-		expandVisible();
-	}
-
-	private boolean lock;
-	private void expandVisible() {
-		if (lock) {
-			return;
-		}
-		RxUtils.unsubscribe(lockSubscriber);
-		lock = true;
-
+	public void expandVisible() {
 		final Rectangle visibleRectangle = scrollPane.getViewport().getViewRect();
 		final int firstRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
 		int lastRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
 		tree.expandNodes(firstRow, lastRow);
-
-		lockSubscriber = Observable.interval(50, TimeUnit.MILLISECONDS).subscribe(aLong -> {
-			if (lock) {
-				lock = false;
-				RxUtils.unsubscribe(lockSubscriber);
-			}
-		});
 	}
 
 

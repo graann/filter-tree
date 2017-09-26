@@ -32,7 +32,7 @@ public class TreeModelController implements Destroyable {
 	private Subscription treeFilterSubscription;
 	private Subscription lazyMarkSubscription;
 
-	private BehaviorSubject<Boolean> updateObservable = BehaviorSubject.create();
+	private BehaviorSubject<List<DefaultMutableTreeNode>> updateObservable = BehaviorSubject.create();
 
 	private TreeStructure structure;
 	private String pattern;
@@ -106,27 +106,17 @@ public class TreeModelController implements Destroyable {
 
 					model.setRoot(defaultMutableTreeNode);
 					patternLazyMark(defaultMutableTreeNodes);
-					updateObservable.onNext(true);
+					updateObservable.onNext(defaultMutableTreeNodes);
 				});
 	}
 
-	public Observable<Boolean> getUpdateObservable() {
+	public Observable<List<DefaultMutableTreeNode>> getUpdateObservable() {
 		return updateObservable;
 	}
 
 	private void patternLazyMark(List<DefaultMutableTreeNode> mutableTreeNodes) {
 		Iterator<DefaultMutableTreeNode> iterator = mutableTreeNodes.iterator();
 		patternMark(iterator);
-
-/*		RxUtils.unsubscribe(lazyMarkSubscription);
-		lazyMarkSubscription = Observable.interval(10, TimeUnit.MILLISECONDS, Schedulers.from(SwingUtilities::invokeLater))
-				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
-				.subscribe(aLong -> {
-					patternMark(iterator);
-					RxUtils.unsubscribe(lazyMarkSubscription);
-				});*/
-	//	lazyExpand(mutableTreeNodes);
-
 	}
 
 
