@@ -99,29 +99,25 @@ public class TreeModelController implements Destroyable {
 
 	private void patternLazyMark(List<DefaultMutableTreeNode> mutableTreeNodes) {
 		Iterator<DefaultMutableTreeNode> iterator = mutableTreeNodes.iterator();
-		RxUtils.unsubscribe(lazyMarkSubscription);
+		patternMark(iterator);
+
+/*		RxUtils.unsubscribe(lazyMarkSubscription);
 		lazyMarkSubscription = Observable.interval(10, TimeUnit.MILLISECONDS, Schedulers.from(SwingUtilities::invokeLater))
 				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(aLong -> {
+					patternMark(iterator);
+					RxUtils.unsubscribe(lazyMarkSubscription);
+				});*/
 
-					//int[] indexes = new int
-					int i = 100;
-					while (i > 0 && iterator.hasNext()) {
-						DefaultMutableTreeNode next = iterator.next();
-						String s = next.toString();
-						String res = "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
-						next.setUserObject(res);
+	}
 
-						i--;
-					}
-
-				//	model.nodesChanged();
-
-					if (!iterator.hasNext()) {
-						RxUtils.unsubscribe(lazyMarkSubscription);
-					}
-				});
-
+	private void patternMark(Iterator<DefaultMutableTreeNode> iterator) {
+		while (iterator.hasNext()) {
+			DefaultMutableTreeNode next = iterator.next();
+			String s = next.toString();
+			String res = "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
+			next.setUserObject(res);
+		}
 	}
 
 	@Override
