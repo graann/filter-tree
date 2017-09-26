@@ -96,6 +96,7 @@ public class TreeModelController implements Destroyable {
 					List<DefaultMutableTreeNode> defaultMutableTreeNodes = t2._2;
 
 					model.setRoot(defaultMutableTreeNode);
+					updateObservable.onNext(true);
 					patternLazyMark(defaultMutableTreeNodes);
 				});
 	}
@@ -107,7 +108,6 @@ public class TreeModelController implements Destroyable {
 	private void patternLazyMark(List<DefaultMutableTreeNode> mutableTreeNodes) {
 		Iterator<DefaultMutableTreeNode> iterator = mutableTreeNodes.iterator();
 		patternMark(iterator);
-		updateObservable.onNext(true);
 
 /*		RxUtils.unsubscribe(lazyMarkSubscription);
 		lazyMarkSubscription = Observable.interval(10, TimeUnit.MILLISECONDS, Schedulers.from(SwingUtilities::invokeLater))

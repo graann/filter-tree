@@ -37,8 +37,6 @@ public class TreeWidget implements Viewable<JComponent>, AdjustmentListener {
 	private JScrollPane scrollPane;
 	private DefaultTreeModel model;
 
-	private Subscription expandVisibleSubscription;
-
 	private BehaviorSubject<Boolean> verticalScrollObservable = BehaviorSubject.create();
 
 	void setModelControllerFactory(TreeModelControllerFactory modelControllerFactory) {
