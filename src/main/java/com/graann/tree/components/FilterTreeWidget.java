@@ -25,7 +25,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 	private JPanel panel;
 	private JTextField jTextField = new JTextField();
-	private JButton button = new JButton("expand");
+	private JButton button = new JButton("expand visible");
 
 	void setLoader(TreeLoader loader) {
 		this.loader = loader;
@@ -71,7 +71,6 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		panel.add(button);
 
 		TreeWidget treeWidget = treeWidgetFactory.create(patternObservable);
-
 
 		panel.add(treeWidget.getView(), "grow, span 2");
 
