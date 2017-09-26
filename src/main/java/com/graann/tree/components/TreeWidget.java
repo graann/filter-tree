@@ -54,9 +54,9 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		treeModelController
 				.getUpdateObservable()
-				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
+				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(defaultMutableTreeNodes -> {
-					updateExpandSubscription(defaultMutableTreeNodes);
+				//	expandVisible();
 			});
 	}
 

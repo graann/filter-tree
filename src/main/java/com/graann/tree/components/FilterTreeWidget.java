@@ -77,7 +77,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		panel.add(treeWidget.getView(), "grow, span 2");
 
 		loaderSubscriber = loader.loadTreeStructure()
-				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
+				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(treeWidget::updateStructure);
 	}
 

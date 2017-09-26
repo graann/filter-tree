@@ -13,6 +13,7 @@ import rx.subjects.BehaviorSubject;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +25,7 @@ public class TreeModelController implements Destroyable {
 	private Observable<String> patternObservable;
 
 	private StringFilterFactory stringFilterFactory = new StringFilterFactory();
-	private DefaultTreeModel model;
+	private volatile DefaultTreeModel model;
 	private TreeFilter treeFilter;
 	private StringFilter trigramStringFilter;
 
@@ -74,7 +75,7 @@ public class TreeModelController implements Destroyable {
 					return trigramStringFilter.appropriateStringObservable(pattern);
 
 				})
-				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
+				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(this::filteredStrings);
 	}
 
@@ -94,9 +95,9 @@ public class TreeModelController implements Destroyable {
 		}
 
 		treeFilterSubscription = treeFilter.rootObservable(structure, strings)
-				.subscribeOn(Schedulers.from(SwingUtilities::invokeLater))
+				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(t2 -> {
-					if (t2 == null) {
+					if (t2 == null || t2._1 == null) {
 						model.setRoot(null);
 						return;
 					}
@@ -104,10 +105,16 @@ public class TreeModelController implements Destroyable {
 					DefaultMutableTreeNode defaultMutableTreeNode = t2._1;
 					List<DefaultMutableTreeNode> defaultMutableTreeNodes = t2._2;
 
-					model.setRoot(defaultMutableTreeNode);
+					LOG.debug(Thread.currentThread().getName());
+
+					setRoot(defaultMutableTreeNode);
 					patternLazyMark(defaultMutableTreeNodes);
 					updateObservable.onNext(defaultMutableTreeNodes);
 				});
+	}
+
+	private void setRoot(TreeNode root) {
+		model.setRoot(root);
 	}
 
 	public Observable<List<DefaultMutableTreeNode>> getUpdateObservable() {
