@@ -8,12 +8,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.schedulers.Schedulers;
+import rx.subjects.BehaviorSubject;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author gromova on 22.09.17.
@@ -30,6 +34,10 @@ public class TreeWidget implements Viewable<JComponent> {
 	private CustomTree tree;
 	private JScrollPane scrollPane;
 	private DefaultTreeModel model;
+
+	private Set<TreeNode> opened = new HashSet<>();
+
+	private BehaviorSubject<Boolean> verticalScrollObservable = BehaviorSubject.create();
 
 	void setModelControllerFactory(TreeModelControllerFactory modelControllerFactory) {
 		this.modelControllerFactory = modelControllerFactory;
@@ -52,16 +60,23 @@ public class TreeWidget implements Viewable<JComponent> {
 		scrollPane = new JScrollPane(tree);
 		treeModelController = modelControllerFactory.create(model, patternObservable);
 
-		treeModelController
-				.getUpdateObservable()
-				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
-				.subscribe(defaultMutableTreeNodes -> {
-				//	expandVisible();
+		scrollPane.getVerticalScrollBar().addAdjustmentListener(e -> verticalScrollObservable.onNext(true));
+
+		patternObservable.switchMap(s -> {
+			if (s == null || s.isEmpty()) {
+				return Observable.just(false);
+			}
+
+			return treeModelController.getUpdateObservable().switchMap(aVoid -> {
+				expandVisible();
+				return verticalScrollObservable.throttleLast(100, TimeUnit.MILLISECONDS);
 			});
-	}
-
-	private void updateExpandSubscription(List<DefaultMutableTreeNode> list) {
-
+		}).observeOn(Schedulers.from(SwingUtilities::invokeLater)).subscribe(b -> {
+			if (b) {
+				opened.clear();
+				expandVisible();
+			}
+		});
 	}
 
 	@Override
@@ -78,8 +93,20 @@ public class TreeWidget implements Viewable<JComponent> {
 		final Rectangle visibleRectangle = scrollPane.getViewport().getViewRect();
 		final int firstRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
 		int lastRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
-		tree.expandNodes(firstRow, lastRow);
+		expandNodes(firstRow, lastRow);
 	}
 
-
+	private void expandNodes(int startingIndex, int stopIndex) {
+		for (int i = startingIndex; i <= stopIndex; i++) {
+			/**TODO fix it!
+			 *
+			 */
+			TreePath pathForRow = tree.getPathForRow(i);
+			TreeNode lastPathObject = (TreeNode) pathForRow.getLastPathComponent();
+			if (!opened.contains(lastPathObject)) {
+				opened.add(lastPathObject);
+				tree.expandRow(i);
+			}
+		}
+	}
 }
