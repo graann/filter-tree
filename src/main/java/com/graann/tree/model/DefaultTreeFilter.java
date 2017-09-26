@@ -35,6 +35,7 @@ public class DefaultTreeFilter implements TreeFilter {
 					.collect(Collectors.toSet());
 
 			if (filteredNodes.isEmpty()) {
+				LOG.info("filteredNodes.isEmpty() return null");
 				subscriber.onNext(null);
 				return;
 			}
@@ -43,6 +44,7 @@ public class DefaultTreeFilter implements TreeFilter {
 
 			Set<TreeNode> available = addParents(process, filteredNodes);
 			if (!process.get()) {
+				LOG.info("process false");
 				return;
 			}
 
@@ -64,8 +66,11 @@ public class DefaultTreeFilter implements TreeFilter {
 			addChildren(process, treeStructure.getRoot(), node, predicate, creator);
 
 			if (!process.get()) {
+				LOG.info("process false");
 				return;
 			}
+
+			LOG.info("onNext customTreeNodes.size: "+customTreeNodes);
 			subscriber.onNext(Tuples.t(node, customTreeNodes));
 
 			subscriber.add(Subscriptions.create(() -> process.set(false)));
