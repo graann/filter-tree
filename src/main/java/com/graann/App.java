@@ -20,7 +20,10 @@ public class App {
 		JFrame frame = new JFrame("Tree");
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		try {
-			UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
+			// UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
+			//UIManager.setLookAndFeel("com.jtattoo.plaf.mcwin.NoireLookAndFeel");
+			//UIManager.setLookAndFeel("com.jgoodies.looks.plastic.PlasticXPLookAndFeel");
+			/*UIManager.setLookAndFeel("com.pagosoft.plaf.PgsLookAndFeel");*/
 		} catch (Exception e_) {
 			try {
 				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
@@ -28,6 +31,8 @@ public class App {
 				e.printStackTrace();
 			}
 		}
+
+		com.alee.laf.WebLookAndFeel.install ();
 
 		Viewable<JComponent> newContentPane = treeFactory.create();
 		frame.setContentPane(newContentPane.getView());
