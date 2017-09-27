@@ -15,6 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import java.awt.Rectangle;
 import java.util.HashSet;
 import java.util.Set;
@@ -68,13 +69,18 @@ public class TreeWidget implements Viewable<JComponent> {
 				return Observable.just(false);
 			}
 
-			return treeModelController.getUpdateObservable().switchMap(aVoid -> {
+			opened.clear();
+
+			return treeModelController.getUpdateObservable().switchMap(b -> {
+				if (!b) {
+					return Observable.just(false);
+				}
+
 				expandVisible();
 				return verticalScrollObservable.throttleLast(100, TimeUnit.MILLISECONDS);
 			});
 		}).observeOn(Schedulers.from(SwingUtilities::invokeLater)).subscribe(b -> {
 			if (b) {
-				opened.clear();
 				expandVisible();
 			}
 		});
@@ -94,18 +100,21 @@ public class TreeWidget implements Viewable<JComponent> {
 		final Rectangle visibleRectangle = scrollPane.getViewport().getViewRect();
 		final int firstRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
 		int lastRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
+		if (lastRow == -1 || firstRow == -1) {
+			return;
+		}
 		expandNodes(firstRow, lastRow);
 	}
 
 	private void expandNodes(int startingIndex, int stopIndex) {
-/*		for (int i = startingIndex; i <= stopIndex; i++) {
+		for (int i = startingIndex; i <= stopIndex; i++) {
 
 			TreePath pathForRow = tree.getPathForRow(i);
-			TreeNode lastPathObject = (TreeNode) pathForRow.getLastPathComponent();
-			if (!opened.contains(lastPathObject)) {
-				opened.add(lastPathObject);
+			TreeNode node = (TreeNode) pathForRow.getLastPathComponent();
+			if (!opened.contains(node)) {
+				opened.add(node);
 				tree.expandRow(i);
 			}
-		}*/
+		}
 	}
 }

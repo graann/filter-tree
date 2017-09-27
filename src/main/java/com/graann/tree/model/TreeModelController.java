@@ -88,9 +88,12 @@ public class TreeModelController implements Destroyable {
 							String res = "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
 							next.setUserObject(res);
 						}
+						updateObservable.onNext(true);
+					} else {
+						updateObservable.onNext(false);
 					}
 
-					updateObservable.onNext(false);
+
 				});
 	}
 
