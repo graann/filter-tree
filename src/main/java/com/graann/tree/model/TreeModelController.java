@@ -82,7 +82,6 @@ public class TreeModelController implements Destroyable {
 					if (root instanceof RootTreeNode) {
 						RootTreeNode rootTreeNode = (RootTreeNode) root;
 						LOG.debug(pattern+": "+rootTreeNode.getSelectedNodes().size());
-						System.out.println(pattern+": "+rootTreeNode.getSelectedNodes().size());
 						for (DefaultMutableTreeNode next : rootTreeNode.getSelectedNodes()) {
 							String s = next.toString();
 							String res = "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";

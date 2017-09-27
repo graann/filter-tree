@@ -8,10 +8,13 @@ import rx.Subscription;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.*;
+import java.awt.Dimension;
 
 /**
  * @author gromova on 20.09.17.
@@ -25,7 +28,6 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 	private JPanel panel;
 	private JTextField jTextField = new JTextField();
-	private JButton button = new JButton("expand visible");
 
 	void setLoader(TreeLoader loader) {
 		this.loader = loader;
@@ -41,7 +43,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 	void initialize() {
 
-		panel = new JPanel(new MigLayout("fill, wrap 2", "[min!][]", "[min!][]"));
+		panel = new JPanel(new MigLayout("fill, flowy", "[min!][]", "[min!][]"));
 
 		panel.setPreferredSize(new Dimension(800, 600));
 		panel.add(jTextField, "wmin 100");
@@ -68,11 +70,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 			}
 		});
 
-		panel.add(button);
-
 		TreeWidget treeWidget = treeWidgetFactory.create(patternObservable);
-
-		button.addActionListener(e -> treeWidget.expandVisible());
 
 		panel.add(treeWidget.getView(), "grow, span 2");
 

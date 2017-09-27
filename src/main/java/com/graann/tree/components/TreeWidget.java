@@ -96,7 +96,7 @@ public class TreeWidget implements Viewable<JComponent> {
 		treeModelController.updateStructure(structure);
 	}
 
-	public void expandVisible() {
+	private void expandVisible() {
 		final Rectangle visibleRectangle = scrollPane.getViewport().getViewRect();
 		final int firstRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
 		int lastRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
