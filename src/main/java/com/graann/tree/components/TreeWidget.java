@@ -10,13 +10,11 @@ import rx.Observable;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -77,7 +75,7 @@ public class TreeWidget implements Viewable<JComponent> {
 				}
 
 				expandVisible();
-				return verticalScrollObservable.throttleLast(100, TimeUnit.MILLISECONDS);
+				return verticalScrollObservable.throttleLast(70, TimeUnit.MILLISECONDS);
 			});
 		}).observeOn(Schedulers.from(SwingUtilities::invokeLater)).subscribe(b -> {
 			if (b) {

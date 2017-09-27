@@ -10,7 +10,7 @@ import rx.Subscription;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.util.concurrent.TimeUnit;
@@ -78,8 +78,10 @@ public class TreeModelController implements Destroyable {
 				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(root -> {
 					model.setRoot(root);
+					boolean isRootTreeNode = root instanceof RootTreeNode;
+					updateObservable.onNext(isRootTreeNode);
 
-					if (root instanceof RootTreeNode) {
+					if (isRootTreeNode) {
 						RootTreeNode rootTreeNode = (RootTreeNode) root;
 						LOG.debug(pattern+": "+rootTreeNode.getSelectedNodes().size());
 						for (DefaultMutableTreeNode next : rootTreeNode.getSelectedNodes()) {
@@ -87,12 +89,7 @@ public class TreeModelController implements Destroyable {
 							String res = "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
 							next.setUserObject(res);
 						}
-						updateObservable.onNext(true);
-					} else {
-						updateObservable.onNext(false);
 					}
-
-
 				});
 	}
 
