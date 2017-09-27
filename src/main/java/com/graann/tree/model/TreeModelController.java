@@ -10,13 +10,9 @@ import rx.Subscription;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class TreeModelController implements Destroyable {
@@ -30,10 +26,8 @@ public class TreeModelController implements Destroyable {
 	private StringFilter trigramStringFilter;
 
 	private Subscription filterSubscription;
-	private Subscription treeFilterSubscription;
-	private Subscription lazyMarkSubscription;
 
-	private BehaviorSubject<List<DefaultMutableTreeNode>> updateObservable = BehaviorSubject.create();
+	private BehaviorSubject<Boolean> updateObservable = BehaviorSubject.create();
 
 	private TreeStructure structure;
 	private String pattern;
@@ -59,83 +53,51 @@ public class TreeModelController implements Destroyable {
 		trigramStringFilter = stringFilterFactory.create(structure.getStrings());
 
 		RxUtils.unsubscribe(filterSubscription);
-		RxUtils.unsubscribe(lazyMarkSubscription);
-		RxUtils.unsubscribe(treeFilterSubscription);
 
 		filterSubscription = patternObservable
 				.distinctUntilChanged()
-				.debounce(200, TimeUnit.MILLISECONDS)
+				.throttleLast(200, TimeUnit.MILLISECONDS)
 				.switchMap(s -> {
 					LOG.debug("new pattern: '"+s+"'");
-
 					pattern = s;
-					RxUtils.unsubscribe(treeFilterSubscription);
-					RxUtils.unsubscribe(lazyMarkSubscription);
-
 					return trigramStringFilter.appropriateStringObservable(pattern);
 
 				})
-				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
-				.subscribe(this::filteredStrings);
-	}
-
-
-	private void filteredStrings(Set<String> strings) {
-		RxUtils.unsubscribe(lazyMarkSubscription);
-		RxUtils.unsubscribe(treeFilterSubscription);
-
-		if (strings == null) {
-			model.setRoot(structure.getRoot());
-			return;
-		}
-
-		if (strings.isEmpty()) {
-			model.setRoot(null);
-			return;
-		}
-
-		treeFilterSubscription = treeFilter.rootObservable(structure, strings)
-				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
-				.subscribe(t2 -> {
-					if (t2 == null || t2._1 == null) {
-						model.setRoot(null);
-						return;
+				.switchMap(strings -> {
+					if (strings == null) {
+						return Observable.just(structure.getRoot());
 					}
 
-					DefaultMutableTreeNode defaultMutableTreeNode = t2._1;
-					List<DefaultMutableTreeNode> defaultMutableTreeNodes = t2._2;
+					if (strings.isEmpty()) {
+						return Observable.just(null);
+					}
 
-					LOG.debug(Thread.currentThread().getName());
+					return treeFilter.rootObservable(structure, strings);
+				})
+				.distinctUntilChanged()
+				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
+				.subscribe(root -> {
+					model.setRoot(root);
 
-					setRoot(defaultMutableTreeNode);
-					patternLazyMark(defaultMutableTreeNodes);
-					updateObservable.onNext(defaultMutableTreeNodes);
+					if (root instanceof RootTreeNode) {
+						RootTreeNode rootTreeNode = (RootTreeNode) root;
+						LOG.debug(pattern+": "+rootTreeNode.getSelectedNodes().size());
+						System.out.println(pattern+": "+rootTreeNode.getSelectedNodes().size());
+						for (DefaultMutableTreeNode next : rootTreeNode.getSelectedNodes()) {
+							String s = next.toString();
+							String res = "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
+							next.setUserObject(res);
+						}
+					}
+
+					updateObservable.onNext(false);
 				});
 	}
 
-	private void setRoot(TreeNode root) {
-		model.setRoot(root);
-	}
-
-	public Observable<List<DefaultMutableTreeNode>> getUpdateObservable() {
+	public Observable<Boolean> getUpdateObservable() {
 		return updateObservable;
 	}
 
-	private void patternLazyMark(List<DefaultMutableTreeNode> mutableTreeNodes) {
-		Iterator<DefaultMutableTreeNode> iterator = mutableTreeNodes.iterator();
-		patternMark(iterator);
-	}
-
-
-
-	private void patternMark(Iterator<DefaultMutableTreeNode> iterator) {
-		while (iterator.hasNext()) {
-			DefaultMutableTreeNode next = iterator.next();
-			String s = next.toString();
-			String res = "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
-			next.setUserObject(res);
-		}
-	}
 
 	@Override
 	public void destroy() {

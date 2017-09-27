@@ -1,27 +1,28 @@
 package com.graann.tree.model;
 
 import com.graann.treeloader.TreeStructure;
-import org.reactfx.util.Tuple2;
-import org.reactfx.util.Tuples;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.schedulers.Schedulers;
-import rx.subscriptions.Subscriptions;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class DefaultTreeFilter implements TreeFilter {
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultTreeFilter.class);
 
-	public Observable<Tuple2<DefaultMutableTreeNode, List<DefaultMutableTreeNode>>> rootObservable(TreeStructure treeStructure, Set<String> filtered) {
-		return Observable.<Tuple2<DefaultMutableTreeNode, List<DefaultMutableTreeNode>>>create(subscriber -> {
+	public Observable<TreeNode> rootObservable(TreeStructure treeStructure, Set<String> filtered) {
+		return Observable.<TreeNode>create(subscriber -> {
 			LOG.debug("rootObservable");
 			Set<TreeNode> filteredNodes = filtered
 					.stream()
@@ -35,53 +36,36 @@ public class DefaultTreeFilter implements TreeFilter {
 				return;
 			}
 
-			AtomicBoolean process = new AtomicBoolean(true);
-
-			Set<TreeNode> available = addParents(process, filteredNodes);
-			if (!process.get()) {
-				LOG.debug("process false");
-				return;
-			}
-
+			Set<TreeNode> available = addParents(filteredNodes);
 			Predicate<TreeNode> predicate = available::contains;
 
 			final List<DefaultMutableTreeNode> customTreeNodes = new ArrayList<>();
 
-			Function<TreeNode, DefaultMutableTreeNode> creator = source -> {
-				String s = source.toString();
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(s);
-				if (filtered.contains(s)) {
+			BiConsumer<TreeNode, DefaultMutableTreeNode> consumer = (source, node) -> {
+				if (filteredNodes.contains(source)) {
 					customTreeNodes.add(node);
 				}
-
-				return node;
 			};
 
-			DefaultMutableTreeNode node = creator.apply(treeStructure.getRoot());
-			addChildren(process, treeStructure.getRoot(), node, predicate, creator);
+			RootTreeNode node = new RootTreeNode(treeStructure.getRoot().toString());
+			node.setSelectedNodes(customTreeNodes);
+			consumer.accept(treeStructure.getRoot(), node);
 
-			if (!process.get()) {
-				LOG.debug("process false");
-				return;
-			}
-
-			LOG.debug("onNext customTreeNodes.size: ");
-			subscriber.onNext(Tuples.t(node, customTreeNodes));
-
-			subscriber.add(Subscriptions.create(() -> process.set(false)));
+			addChildren(treeStructure.getRoot(), node, predicate, consumer);
+			subscriber.onNext(node);
 		}).subscribeOn(Schedulers.computation());
 	}
 
-	private static Set<TreeNode> addParents(AtomicBoolean process, Set<TreeNode> nods) {
+	private static Set<TreeNode> addParents(Set<TreeNode> nods) {
 		Set<TreeNode> available = new LinkedHashSet<>();
-		if (!process.get()) {
-			return available;
-		}
 
 		for (TreeNode treeNode : nods) {
+			if (Thread.currentThread().isInterrupted()) {
+				return available;
+			}
 			TreeNode parent = treeNode.getParent();
 			if (!available.contains(parent)) {
-				while (parent != null && process.get()) {
+				while (parent != null && !Thread.currentThread().isInterrupted()) {
 					available.add(parent);
 					parent = parent.getParent();
 				}
@@ -92,19 +76,26 @@ public class DefaultTreeFilter implements TreeFilter {
 		return available;
 	}
 
-	private static void addChildren(AtomicBoolean process, TreeNode source, DefaultMutableTreeNode destination,
-									Predicate<TreeNode> predicate, Function<TreeNode, DefaultMutableTreeNode> creator) {
-		if (!process.get()) {
+	private static void addChildren(TreeNode source, DefaultMutableTreeNode destination,
+									Predicate<TreeNode> predicate, BiConsumer<TreeNode, DefaultMutableTreeNode> consumer) {
+		if (Thread.currentThread().isInterrupted()) {
 			return;
 		}
+
 		Enumeration children = source.children();
-		while (children.hasMoreElements()) {
+		while (children.hasMoreElements() && !Thread.currentThread().isInterrupted()) {
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) children.nextElement();
 			if (predicate.test(node)) {
-				DefaultMutableTreeNode newNode = creator.apply(node);
+				DefaultMutableTreeNode newNode = createNode(node);
+				consumer.accept(node, newNode);
+
 				destination.add(newNode);
-				addChildren(process, node, newNode, predicate, creator);
+				addChildren(node, newNode, predicate, consumer);
 			}
 		}
+	}
+
+	private static DefaultMutableTreeNode createNode(TreeNode source) {
+		return new DefaultMutableTreeNode(source.toString());
 	}
 }

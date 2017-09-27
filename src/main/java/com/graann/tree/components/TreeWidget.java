@@ -10,11 +10,12 @@ import rx.Observable;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Rectangle;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -97,16 +98,14 @@ public class TreeWidget implements Viewable<JComponent> {
 	}
 
 	private void expandNodes(int startingIndex, int stopIndex) {
-		for (int i = startingIndex; i <= stopIndex; i++) {
-			/**TODO fix it!
-			 *
-			 */
+/*		for (int i = startingIndex; i <= stopIndex; i++) {
+
 			TreePath pathForRow = tree.getPathForRow(i);
 			TreeNode lastPathObject = (TreeNode) pathForRow.getLastPathComponent();
 			if (!opened.contains(lastPathObject)) {
 				opened.add(lastPathObject);
 				tree.expandRow(i);
 			}
-		}
+		}*/
 	}
 }
