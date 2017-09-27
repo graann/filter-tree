@@ -6,7 +6,12 @@ import rx.Single;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -30,7 +35,7 @@ public class TrigramStringFilter implements StringFilter {
 				nGrams.forEach(nGram -> add(map, nGram, s));
 			});
 			subscriber.onSuccess(new PatriciaTrie<>(map));
-		}).observeOn(Schedulers.computation()).subscribe(setPatriciaTrie -> trieBehaviorSubject.onNext(setPatriciaTrie));
+		}).subscribeOn(Schedulers.computation()).subscribe(setPatriciaTrie -> trieBehaviorSubject.onNext(setPatriciaTrie));
 	}
 
 	@Override
