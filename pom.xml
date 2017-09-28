@@ -7,7 +7,6 @@
 	<groupId>graann</groupId>
 	<artifactId>filterTree</artifactId>
 	<version>1.0-SNAPSHOT</version>
-	<!-- https://mvnrepository.com/artifact/com.miglayout/miglayout-swing -->
 
 	<properties>
 		<slf4j.version>1.7.10</slf4j.version>
@@ -67,12 +66,12 @@
 
 
 
-		<!--		<dependency>
+				<dependency>
                     <groupId>com.seaglasslookandfeel</groupId>
                     <artifactId>seaglasslookandfeel</artifactId>
                     <version>0.2.1</version>
                 </dependency>
-                <dependency>
+ <!--               <dependency>
                     <groupId>com.jtattoo</groupId>
                     <artifactId>JTattoo</artifactId>
                     <version>1.6.11</version>
