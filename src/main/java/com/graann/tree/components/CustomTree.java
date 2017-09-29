@@ -15,6 +15,7 @@ import javax.swing.tree.TreePath;
 import java.awt.Rectangle;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -48,6 +49,11 @@ public class CustomTree extends JTree implements Destroyable {
 		model.setRoot(root);
 
 		suitableSet = root instanceof RootTreeNode ? ((RootTreeNode) root).getSelectedNodes() : Collections.emptySet();
+		Iterator<DefaultMutableTreeNode> iterator = suitableSet.iterator();
+
+		if(iterator.hasNext()) {
+			getSelectionModel().setSelectionPath(getPath(iterator.next()));
+		}
 
 		if(pattern != null && !pattern.isEmpty()) {
 			viewportAreaSubscription = viewportArea.subscribe(visibleRectangle -> {
@@ -59,6 +65,11 @@ public class CustomTree extends JTree implements Destroyable {
 				expandNodes(firstRow, lastRow);
 			});
 		}
+	}
+
+	private TreePath getPath(TreeNode node) {
+		TreeNode[] nodes = model.getPathToRoot(node);
+		return new TreePath(nodes);
 	}
 
 	@Override

@@ -78,8 +78,8 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		panel.add(scrollPane, "grow");
 
-		tree.addKeyListener(getHandler());
 		tree.addFocusListener(getHandler());
+		scrollPane.addFocusListener(getHandler());
 	}
 
 	void updateStructure(TreeStructure structure) {
@@ -92,12 +92,13 @@ public class TreeWidget implements Viewable<JComponent> {
 		treeModelController.destroy();
 	}
 
+
 	private class KeyHandler implements KeyListener, FocusListener {
 		private String typedString = "";
 
 		@Override
 		public void keyTyped(KeyEvent e) {
-			if (tree != null && tree.hasFocus() && tree.isEnabled()) {
+			if (tree != null && tree.isEnabled()) {
 				if (e.isAltDown() || isNavigationKey(e)) {
 					return;
 				}
@@ -137,11 +138,18 @@ public class TreeWidget implements Viewable<JComponent> {
 		@Override
 		public void focusGained(FocusEvent e) {
 			infoPane.setVisible(true);
+
+			tree.addKeyListener(getHandler());
+			scrollPane.addKeyListener(getHandler());
 		}
 
 		@Override
 		public void focusLost(FocusEvent e) {
 			infoPane.setVisible(false);
+
+			tree.removeKeyListener(getHandler());
+			scrollPane.removeKeyListener(getHandler());
+
 		}
 	}
 }
