@@ -4,7 +4,10 @@ import com.graann.common.Viewable;
 import com.graann.tree.components.DefaultFilterTreeWidgetFactory;
 import com.graann.tree.components.FilterTreeWidgetFactory;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 
 /**
  * @author gromova on 20.09.17.
@@ -23,7 +26,7 @@ public class App {
 			UIManager.setLookAndFeel("com.graann.laf.CustomWebLookAndFeel");
 		//	UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 			// UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
-			//UIManager.setLookAndFeel("com.jtattoo.plaf.mcwin.NoireLookAndFeel");
+		//	UIManager.setLookAndFeel("com.jtattoo.plaf.mcwin.NoireLookAndFeel");
 			//UIManager.setLookAndFeel("com.jgoodies.looks.plastic.PlasticXPLookAndFeel");
 	//		UIManager.setLookAndFeel("com.pagosoft.plaf.PgsLookAndFeel");
 		//	UIManager.setLookAndFeel("ch.randelshofer.quaqua.jaguar.Quaqua15JaguarLookAndFeel");

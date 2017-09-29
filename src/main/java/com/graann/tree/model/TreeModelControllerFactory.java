@@ -2,7 +2,6 @@ package com.graann.tree.model;
 
 import rx.Observable;
 
-import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
 
 public class TreeModelControllerFactory {
