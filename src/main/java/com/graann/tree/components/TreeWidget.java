@@ -7,22 +7,19 @@ import com.graann.treeloader.TreeStructure;
 import net.miginfocom.swing.MigLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rx.Observable;
-import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
-import javax.swing.*;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import java.awt.*;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
+import java.awt.Rectangle;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author gromova on 22.09.17.
@@ -42,12 +39,9 @@ public class TreeWidget implements Viewable<JComponent> {
 	private JPanel panel;
 	private JPanel infoPane;
 
-	private DefaultTreeModel model;
 	private KeyHandler keyHandler;
 
-	private Set<TreeNode> opened = new HashSet<>();
-
-	private BehaviorSubject<Boolean> verticalScrollObservable = BehaviorSubject.create();
+	private BehaviorSubject<Rectangle> verticalScrollObservable = BehaviorSubject.create();
 
 	void setModelControllerFactory(TreeModelControllerFactory modelControllerFactory) {
 		this.modelControllerFactory = modelControllerFactory;
@@ -66,10 +60,6 @@ public class TreeWidget implements Viewable<JComponent> {
 	}
 
 	void initialize() {
-		model = new DefaultTreeModel(null);
-		tree = new CustomTree(model);
-		tree.addKeyListener(getHandler());
-		tree.addFocusListener(getHandler());
 
 		infoPane = new JPanel(new MigLayout("ins 0, gap 0"));
 		infoLabel = new JLabel();
@@ -78,64 +68,23 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		panel = new JPanel(new MigLayout("flowy, ins 0, gap 0, fill", "", "[min!][]"));
 		panel.add(infoPane);
+
+		treeModelController = modelControllerFactory.create(patternObservable);
+
+		tree = new CustomTree(treeModelController.getUpdateObservable(), verticalScrollObservable);
+
 		scrollPane = new JScrollPane(tree);
+		scrollPane.getVerticalScrollBar().addAdjustmentListener(e -> verticalScrollObservable.onNext(scrollPane.getViewport().getViewRect()));
+
 		panel.add(scrollPane, "grow");
 
-		treeModelController = modelControllerFactory.create(model, patternObservable);
-
-		scrollPane.getVerticalScrollBar().addAdjustmentListener(e -> verticalScrollObservable.onNext(true));
-
-		patternObservable.switchMap(s -> {
-			infoLabel.setText(s);
-
-			if (s == null || s.isEmpty()) {
-				return Observable.just(false);
-			}
-
-			opened.clear();
-
-			return treeModelController.getUpdateObservable().switchMap(b -> {
-				if (!b) {
-					return Observable.just(false);
-				}
-
-				expandVisible();
-				return verticalScrollObservable.throttleLast(70, TimeUnit.MILLISECONDS);
-			});
-		}).observeOn(Schedulers.from(SwingUtilities::invokeLater)).subscribe(b -> {
-			if (b) {
-				expandVisible();
-			}
-		});
-
-
+		tree.addKeyListener(getHandler());
+		tree.addFocusListener(getHandler());
 	}
 
 	void updateStructure(TreeStructure structure) {
-		model.setRoot(structure.getRoot());
+		tree.updateModel(null, structure.getRoot());
 		treeModelController.updateStructure(structure);
-	}
-
-	private void expandVisible() {
-		final Rectangle visibleRectangle = scrollPane.getViewport().getViewRect();
-		final int firstRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
-		int lastRow = tree.getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
-		if (lastRow == -1 || firstRow == -1) {
-			return;
-		}
-		expandNodes(firstRow, lastRow);
-	}
-
-	private void expandNodes(int startingIndex, int stopIndex) {
-		for (int i = startingIndex; i <= stopIndex; i++) {
-
-			TreePath pathForRow = tree.getPathForRow(i);
-			TreeNode node = (TreeNode) pathForRow.getLastPathComponent();
-			if (!opened.contains(node)) {
-				opened.add(node);
-				tree.expandRow(i);
-			}
-		}
 	}
 
 	@Override
@@ -162,6 +111,7 @@ public class TreeWidget implements Viewable<JComponent> {
 					typedString += c;
 				}
 
+				infoLabel.setText(typedString);
 				patternObservable.onNext(typedString);
 			}
 
