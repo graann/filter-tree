@@ -7,12 +7,12 @@ import org.reactfx.util.Tuple2;
 import rx.Observable;
 import rx.Subscription;
 
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -52,7 +52,10 @@ public class CustomTree extends JTree implements Destroyable {
 		Iterator<DefaultMutableTreeNode> iterator = suitableSet.iterator();
 
 		if(iterator.hasNext()) {
-			getSelectionModel().setSelectionPath(getPath(iterator.next()));
+			TreePath path = getPath(iterator.next());
+
+			getSelectionModel().setSelectionPath(path);
+			scrollPathToVisible(path);
 		}
 
 		if(pattern != null && !pattern.isEmpty()) {
