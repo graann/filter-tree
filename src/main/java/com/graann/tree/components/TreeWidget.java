@@ -9,13 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.subjects.BehaviorSubject;
 
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
-import java.awt.Rectangle;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -125,7 +120,9 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		@Override
 		public void keyReleased(KeyEvent e) {
-
+			if(e.getKeyCode() == KeyEvent.VK_F3) {
+				tree.nextSuitable();
+			}
 		}
 
 		private boolean isNavigationKey(KeyEvent event) {
