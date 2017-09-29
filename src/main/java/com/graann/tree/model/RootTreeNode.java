@@ -2,19 +2,19 @@ package com.graann.tree.model;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author gromova on 27.09.17.
  */
 public class RootTreeNode extends DefaultMutableTreeNode {
-	private List<DefaultMutableTreeNode> selectedNodes = Collections.emptyList();
+	private Set<DefaultMutableTreeNode> selectedNodes = Collections.emptySet();
 
-	public void setSelectedNodes(List<DefaultMutableTreeNode> selectedNodes) {
+	public void setSelectedNodes(Set<DefaultMutableTreeNode> selectedNodes) {
 		this.selectedNodes = selectedNodes;
 	}
 
-	public List<DefaultMutableTreeNode> getSelectedNodes() {
+	public Set<DefaultMutableTreeNode> getSelectedNodes() {
 		return selectedNodes;
 	}
 

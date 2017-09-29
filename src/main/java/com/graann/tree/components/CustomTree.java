@@ -13,6 +13,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.Rectangle;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,6 +25,9 @@ public class CustomTree extends JTree implements Destroyable {
 	private Set<TreeNode> opened = new HashSet<>();
 	private Subscription filterSubscriber;
 	private Subscription viewportAreaSubscription;
+
+	private String pattern;
+	private Set<DefaultMutableTreeNode> suitableSet = Collections.emptySet();
 
 	private Observable<Rectangle> viewportArea;
 
@@ -39,19 +43,11 @@ public class CustomTree extends JTree implements Destroyable {
 	}
 
 	public void updateModel(String pattern, TreeNode root) {
-		RxUtils.unsubscribe(viewportAreaSubscription);
+		this.pattern = pattern;
 		opened.clear();
 		model.setRoot(root);
 
-		boolean isRootTreeNode = root instanceof RootTreeNode;
-		if (isRootTreeNode) {
-			RootTreeNode rootTreeNode = (RootTreeNode) root;
-			for (DefaultMutableTreeNode next : rootTreeNode.getSelectedNodes()) {
-				String s = next.toString();
-				String res = "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
-				next.setUserObject(res);
-			}
-		}
+		suitableSet = root instanceof RootTreeNode ? ((RootTreeNode) root).getSelectedNodes() : Collections.emptySet();
 
 		if(pattern != null && !pattern.isEmpty()) {
 			viewportAreaSubscription = viewportArea.subscribe(visibleRectangle -> {
@@ -66,8 +62,19 @@ public class CustomTree extends JTree implements Destroyable {
 	}
 
 	@Override
+	public String convertValueToText(Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+		String s = value.toString();
+		if(suitableSet.contains(value)) {
+			return "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
+		}
+
+		return s;
+	}
+
+	@Override
 	public void destroy() {
 		RxUtils.unsubscribe(filterSubscriber);
+		RxUtils.unsubscribe(viewportAreaSubscription);
 	}
 
 	private void expandNodes(int startingIndex, int stopIndex) {

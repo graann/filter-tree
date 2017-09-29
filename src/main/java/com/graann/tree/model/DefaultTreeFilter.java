@@ -8,11 +8,9 @@ import rx.schedulers.Schedulers;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
@@ -39,7 +37,7 @@ public class DefaultTreeFilter implements TreeFilter {
 			Set<TreeNode> available = addParents(filteredNodes);
 			Predicate<TreeNode> predicate = available::contains;
 
-			final List<DefaultMutableTreeNode> customTreeNodes = new ArrayList<>();
+			final Set<DefaultMutableTreeNode> customTreeNodes = new LinkedHashSet<>();
 
 			BiConsumer<TreeNode, DefaultMutableTreeNode> consumer = (source, node) -> {
 				if (filteredNodes.contains(source)) {
