@@ -8,13 +8,15 @@ import rx.Observable;
 import rx.Subscription;
 
 import javax.swing.*;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author gromova on 26.09.17.
@@ -27,6 +29,7 @@ public class CustomTree extends JTree implements Destroyable {
 
 	private String pattern;
 	private List<DefaultMutableTreeNode> suitables = Collections.emptyList();
+	private SelectionController selectionController;
 
 	private Observable<Rectangle> viewportArea;
 
@@ -36,8 +39,9 @@ public class CustomTree extends JTree implements Destroyable {
 		this.viewportArea = viewportArea;
 
 		setCellRenderer(new FilterTreeCellRenderer());
-		setExpandsSelectedPaths(true);
-		getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		//	setExpandsSelectedPaths(true);
+
+		selectionController = new SelectionController(this);
 
 		filterSubscriber = filterObservable.subscribe(t -> updateModel(t._1, t._2));
 	}
@@ -45,13 +49,15 @@ public class CustomTree extends JTree implements Destroyable {
 	public void updateModel(String pattern, TreeNode root) {
 		this.pattern = pattern;
 		opened.clear();
+		getSelectionModel().clearSelection();
 		model.setRoot(root);
 
 		suitables = root instanceof RootTreeNode ? ((RootTreeNode) root).getSelectedNodes() : Collections.emptyList();
 
-		firstSuitable();
+		selectionController.setSuitables(suitables);
 
-		if(pattern != null && !pattern.isEmpty()) {
+
+		if (pattern != null && !pattern.isEmpty()) {
 			viewportAreaSubscription = viewportArea.subscribe(visibleRectangle -> {
 				final int firstRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
 				int lastRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
@@ -64,39 +70,20 @@ public class CustomTree extends JTree implements Destroyable {
 	}
 
 
+	public void previousSuitable() {
+
+	}
+
 	public void nextSuitable() {
-		int i = selectionModel.getLeadSelectionRow();
-		List<Integer> collect = suitables.stream().map(this::getPath).map(this::getRowForPath).sorted().collect(Collectors.toList());
-		for (int j = i + 1; j < getRowCount() ; j++) {
-			if(collect.contains(j)) {
-				setSelectionRow(j);
-				scrollRowToVisible(j);
-				return;
-			}
-		}
-		firstSuitable();
-	}
-
-	private void firstSuitable() {
-		if(!suitables.isEmpty()) {
-			TreePath path = getPath(suitables.get(0));
-
-			getSelectionModel().setSelectionPath(path);
-			scrollPathToVisible(path);
-		}
+		selectionController.nextSuitable();
 	}
 
 
-
-	private TreePath getPath(TreeNode node) {
-		TreeNode[] nodes = model.getPathToRoot(node);
-		return new TreePath(nodes);
-	}
 
 	@Override
 	public String convertValueToText(Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 		String s = value.toString();
-		if(suitables.contains(value)) {
+		if (suitables.contains(value)) {
 			return "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
 		}
 

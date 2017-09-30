@@ -1,10 +1,10 @@
 package com.graann.laf;
 
-import com.seaglasslookandfeel.SeaGlassLookAndFeel;
+import javax.swing.*;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import java.awt.*;
 
-import javax.swing.UIDefaults;
-
-public class CustomWebLookAndFeel extends SeaGlassLookAndFeel {
+public class CustomWebLookAndFeel extends MetalLookAndFeel {
 	@Override
 	protected void initClassDefaults(UIDefaults table) {
 		super.initClassDefaults(table);
@@ -17,9 +17,15 @@ public class CustomWebLookAndFeel extends SeaGlassLookAndFeel {
 		// *** Tree
 		table.putDefaults(new Object[]{
 				"Tree.paintLines", Boolean.FALSE,
-				"Tree.rowHeight", 19,
+				"Tree.expandedIcon", FontIcon.builder().symbol(IconFontSymbols.ARROW_DOWN.getString())
+				.color(new Color(0x666666)).build(),
+				"Tree.collapsedIcon", FontIcon.builder().symbol(IconFontSymbols.ARROW_RIGHT.getString())
+				.color(new Color(0x666666)).build(),
+				"Tree.rowHeight", 25,
 				"Tree.rightChildIndent", 7
 		});
 		return table;
 	}
+
+
 }

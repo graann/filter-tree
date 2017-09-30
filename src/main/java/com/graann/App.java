@@ -4,10 +4,8 @@ import com.graann.common.Viewable;
 import com.graann.tree.components.DefaultFilterTreeWidgetFactory;
 import com.graann.tree.components.FilterTreeWidgetFactory;
 
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * @author gromova on 20.09.17.
@@ -37,6 +35,18 @@ public class App {
 				e.printStackTrace();
 			}
 		}
+
+
+		Font font = null;
+		try {
+			font = Font.createFont(Font.TRUETYPE_FONT, App.class.getResource("/Rivolicons-Free.ttf").openStream());
+			GraphicsEnvironment genv = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			genv.registerFont(font);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+
 
 		//WebLookAndFeel.install (CustomWebLookAndFeel.class, false);
 

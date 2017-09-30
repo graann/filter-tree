@@ -7,6 +7,7 @@ import rx.subjects.BehaviorSubject;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.HashSet;
@@ -18,7 +19,7 @@ import java.util.Set;
  * @author gromova on 22.09.17.
  */
 public class DefaultTreeLoader implements TreeLoader {
-	private static String FILE_NAME = "tree.txt";
+	private static String FILE_NAME = "/tree_.txt";
 	private static String CHARSET_NAME = "UTF8";
 
 	private BehaviorSubject<TreeStructure> treeBehaviorSubject;
@@ -45,9 +46,10 @@ public class DefaultTreeLoader implements TreeLoader {
 		DefaultMutableTreeNode prev = null;
 
 		try {
+			File file = new File( this.getClass().getResource(FILE_NAME).toURI() );
 			BufferedReader bufferedReader = new BufferedReader(
 					new InputStreamReader(
-							new FileInputStream(FILE_NAME), CHARSET_NAME));
+							new FileInputStream(file), CHARSET_NAME));
 
 			for (String line; (line = bufferedReader.readLine()) != null; ) {
 				int level = getLevel(line);
