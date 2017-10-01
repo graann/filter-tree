@@ -12,6 +12,7 @@ public class SelectionController {
 
 	SelectionController(JTree tree) {
 		this.tree = tree;
+		tree.setExpandsSelectedPaths(true);
 		selectionModel = tree.getSelectionModel();
 		selectionModel.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 	}
@@ -51,7 +52,7 @@ public class SelectionController {
 
 		int i = selectionModel.getLeadSelectionRow();
 		boolean succeed;
-		if(selectedNode.isLeaf() || tree.isExpanded(i)) {
+		if (selectedNode.isLeaf() || tree.isExpanded(i)) {
 			succeed = next(++i);
 		} else {
 			succeed = firstSuitableChild(selectedNode);
@@ -93,12 +94,17 @@ public class SelectionController {
 	}
 
 	private boolean previous(int i) {
+		if (i < 0) {
+			lastSuitable();
+			return true;
+		}
+
 		DefaultMutableTreeNode node = getNode(i);
 		if (node == null) {
 			return false;
 		}
 
-		if(tree.isExpanded(i) || node.isLeaf()) {
+		if (tree.isExpanded(i) || node.isLeaf()) {
 			if (check(node)) {
 				setSelection(node);
 				return true;
@@ -121,7 +127,7 @@ public class SelectionController {
 	}
 
 	private boolean lastSuitableChild(DefaultMutableTreeNode node) {
-		while(!node.isLeaf()) {
+		while (!node.isLeaf()) {
 			node = (DefaultMutableTreeNode) node.getLastChild();
 		}
 		if (check(node)) {
@@ -134,6 +140,13 @@ public class SelectionController {
 	private void firstSuitable() {
 		TreePath path = getPath(suitables.get(0));
 		setSelectionPath(path);
+	}
+
+	private void lastSuitable() {
+		TreePath path = getPath(suitables.get(suitables.size() - 1));
+		tree.expandPath(path.getParentPath());
+		setSelectionPath(path);
+
 	}
 
 	private void setSelection(TreeNode node) {

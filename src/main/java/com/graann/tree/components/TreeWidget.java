@@ -1,6 +1,7 @@
 package com.graann.tree.components;
 
 import com.graann.common.Viewable;
+import com.graann.laf.ColorScheme;
 import com.graann.laf.FontIcon;
 import com.graann.laf.IconFontSymbols;
 import com.graann.tree.model.TreeModelController;
@@ -60,8 +61,9 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		infoPane = new JPanel(new MigLayout("ins 0, gap 7"));
 		infoLabel = new JLabel();
+		infoLabel.setForeground(ColorScheme.PATTERN);
 		infoPane.add(new JLabel(FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
-				.color(new Color(0x666666)).build()));
+				.color(ColorScheme.DEFAULT_ICON).build()));
 		infoPane.add(infoLabel);
 
 		panel = new JPanel(new MigLayout("flowy, ins 0, gap 0, fill", "", "[min!][]"));
