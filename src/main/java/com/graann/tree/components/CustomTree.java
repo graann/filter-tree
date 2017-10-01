@@ -57,15 +57,7 @@ public class CustomTree extends JTree implements Destroyable {
 
 		boolean isRootTreeNode = root instanceof RootTreeNode;
 		if (isRootTreeNode) {
-			RootTreeNode rootTreeNode = (RootTreeNode) root;
-			for (DefaultMutableTreeNode next : rootTreeNode.getSelectedNodes()) {
-				String s = next.toString();
-				String res = "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
-				next.setUserObject(res);
-			}
-		}
-
-		if (isRootTreeNode) {
+			updateSuitables();
 			viewportAreaSubscription = viewportArea.subscribe(visibleRectangle -> {
 				final int firstRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
 				int lastRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
@@ -86,11 +78,20 @@ public class CustomTree extends JTree implements Destroyable {
 		selectionController.nextSuitable();
 	}
 
-	private boolean filtered() {
-		return pattern != null && !pattern.isEmpty();
+
+	/**
+	 * used instead of {@link #convertValueToText} to avoid leaks
+	 */
+	private void updateSuitables() {
+		for (DefaultMutableTreeNode next : suitables) {
+			String s = next.toString();
+			String res = "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
+			next.setUserObject(res);
+		}
 	}
 
-/*	@Override
+/*
+	@Override
 	public String convertValueToText(Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 		String s = value.toString();
 		if (filtered() && suitables.contains(value)) {
