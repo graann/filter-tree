@@ -71,7 +71,7 @@ public class CustomTree extends JTree implements Destroyable {
 
 
 	public void previousSuitable() {
-
+		selectionController.previousSuitable();
 	}
 
 	public void nextSuitable() {

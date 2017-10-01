@@ -23,6 +23,23 @@ public class SelectionController {
 		}
 	}
 
+	void previousSuitable() {
+		if (suitables == null || suitables.isEmpty()) return;
+		DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) getSelectedNode();
+		if (selectedNode == null) {
+			firstSuitable();
+			return;
+		}
+
+		int i = selectionModel.getLeadSelectionRow();
+		boolean succeed;
+		succeed = previous(--i);
+
+		if (!succeed) {
+			firstSuitable();
+		}
+	}
+
 	void nextSuitable() {
 		if (suitables == null || suitables.isEmpty()) return;
 
@@ -75,6 +92,23 @@ public class SelectionController {
 		return firstSuitableChild(node);
 	}
 
+	private boolean previous(int i) {
+		DefaultMutableTreeNode node = getNode(i);
+		if (node == null) {
+			return false;
+		}
+
+		if(tree.isExpanded(i) || node.isLeaf()) {
+			if (check(node)) {
+				setSelection(node);
+				return true;
+			}
+			return previous(--i);
+		}
+
+		return lastSuitableChild(node);
+	}
+
 	private boolean firstSuitableChild(DefaultMutableTreeNode node) {
 		while (!node.isLeaf()) {
 			node = (DefaultMutableTreeNode) node.getFirstChild();
@@ -82,6 +116,17 @@ public class SelectionController {
 				setSelection(node);
 				return true;
 			}
+		}
+		return false;
+	}
+
+	private boolean lastSuitableChild(DefaultMutableTreeNode node) {
+		while(!node.isLeaf()) {
+			node = (DefaultMutableTreeNode) node.getLastChild();
+		}
+		if (check(node)) {
+			setSelection(node);
+			return true;
 		}
 		return false;
 	}

@@ -120,8 +120,12 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		@Override
 		public void keyReleased(KeyEvent e) {
-			if(e.getKeyCode() == KeyEvent.VK_F3) {
-				tree.nextSuitable();
+			if (e.getKeyCode() == KeyEvent.VK_F3) {
+				if (e.isShiftDown()) {
+					tree.previousSuitable();
+				} else {
+					tree.nextSuitable();
+				}
 			}
 		}
 
