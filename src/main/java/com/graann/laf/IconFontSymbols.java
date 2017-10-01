@@ -5,9 +5,9 @@ package com.graann.laf;
  * @author gromova on 30.09.17.
  */
 public enum IconFontSymbols {
-	ARROW_DOWN(0xf35f),
-	ARROW_RIGHT(0xf363),
-	SEARCH(0xf4a4),
+	ARROW_DOWN(0x25be),
+	ARROW_RIGHT(0x25b8),
+	SEARCH(0xe70a),
 	;
 
 	private final String symbol;

@@ -8,7 +8,7 @@ import java.awt.*;
  */
 public class FontIcon implements Icon {
 	private static final int DEFAULT_FONT_SIZE = 16;
-	private static Font ICON_FONT = new Font("ionicons", Font.PLAIN, DEFAULT_FONT_SIZE);
+	private static Font ICON_FONT = new Font("entypo", Font.PLAIN, DEFAULT_FONT_SIZE);
 
 	private final String symbol;
 	private final Color color;
