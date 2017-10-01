@@ -5,9 +5,9 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.metal.MetalTreeUI;
 import java.awt.event.KeyListener;
 
-public class CustomTreeUI extends MetalTreeUI {
+public class MyTreeUI extends MetalTreeUI {
 	public static ComponentUI createUI(JComponent x) {
-		return new CustomTreeUI();
+		return new MyTreeUI();
 	}
 
 	protected KeyListener createKeyListener() {

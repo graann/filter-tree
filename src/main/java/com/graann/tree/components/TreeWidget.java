@@ -58,7 +58,7 @@ public class TreeWidget implements Viewable<JComponent> {
 
 	void initialize() {
 
-		infoPane = new JPanel(new MigLayout("ins 0, gap 10"));
+		infoPane = new JPanel(new MigLayout("ins 0, gap 7"));
 		infoLabel = new JLabel();
 		infoPane.add(new JLabel(FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
 				.color(new Color(0x666666)).build()));
@@ -78,6 +78,7 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		tree.addFocusListener(getHandler());
 		scrollPane.addFocusListener(getHandler());
+		infoPane.setVisible(false);
 	}
 
 	void updateStructure(TreeStructure structure) {
@@ -118,11 +119,6 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		@Override
 		public void keyPressed(KeyEvent e) {
-
-		}
-
-		@Override
-		public void keyReleased(KeyEvent e) {
 			if (e.getKeyCode() == KeyEvent.VK_F3) {
 				if (e.isShiftDown()) {
 					tree.previousSuitable();
@@ -130,6 +126,11 @@ public class TreeWidget implements Viewable<JComponent> {
 					tree.nextSuitable();
 				}
 			}
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+
 		}
 
 		private boolean isNavigationKey(KeyEvent event) {

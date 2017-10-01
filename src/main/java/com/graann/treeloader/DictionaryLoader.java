@@ -18,7 +18,7 @@ import java.util.Set;
 /**
  * @author gromova on 22.09.17.
  */
-public class DefaultTreeLoader implements TreeLoader {
+public class DictionaryLoader implements TreeLoader {
 	private static String FILE_NAME = "/tree_.txt";
 	private static String CHARSET_NAME = "UTF8";
 

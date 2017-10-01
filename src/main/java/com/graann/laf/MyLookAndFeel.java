@@ -4,11 +4,11 @@ import javax.swing.*;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.*;
 
-public class CustomWebLookAndFeel extends MetalLookAndFeel {
+public class MyLookAndFeel extends MetalLookAndFeel {
 	@Override
 	protected void initClassDefaults(UIDefaults table) {
 		super.initClassDefaults(table);
-		table.put("TreeUI", CustomTreeUI.class.getName());
+		table.put("TreeUI", MyTreeUI.class.getName());
 	}
 
 	@Override
@@ -22,6 +22,7 @@ public class CustomWebLookAndFeel extends MetalLookAndFeel {
 				"Tree.collapsedIcon", FontIcon.builder().symbol(IconFontSymbols.ARROW_RIGHT.getString())
 				.color(new Color(0x666666)).build(),
 				"Tree.rowHeight", 25,
+				"Tree.totalChildIndent", 20,
 				"Tree.rightChildIndent", 10,
 				"Tree.leftChildIndent", 10
 		});

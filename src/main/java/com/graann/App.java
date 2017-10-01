@@ -32,7 +32,7 @@ public class App {
 
 
 		try {
-			UIManager.setLookAndFeel("com.graann.laf.CustomWebLookAndFeel");
+			UIManager.setLookAndFeel("com.graann.laf.MyLookAndFeel");
 		//	UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 			// UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
 		//	UIManager.setLookAndFeel("com.jtattoo.plaf.mcwin.NoireLookAndFeel");
@@ -50,7 +50,7 @@ public class App {
 
 
 
-		//WebLookAndFeel.install (CustomWebLookAndFeel.class, false);
+		//WebLookAndFeel.install (MyLookAndFeel.class, false);
 
 		Viewable<JComponent> newContentPane = treeFactory.create();
 		frame.setContentPane(newContentPane.getView());
