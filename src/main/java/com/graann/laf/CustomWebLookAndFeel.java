@@ -22,7 +22,8 @@ public class CustomWebLookAndFeel extends MetalLookAndFeel {
 				"Tree.collapsedIcon", FontIcon.builder().symbol(IconFontSymbols.ARROW_RIGHT.getString())
 				.color(new Color(0x666666)).build(),
 				"Tree.rowHeight", 25,
-				"Tree.rightChildIndent", 7
+				"Tree.rightChildIndent", 10,
+				"Tree.leftChildIndent", 10
 		});
 		return table;
 	}
