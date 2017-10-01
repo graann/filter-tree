@@ -20,7 +20,6 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 	private TreeWidgetFactory treeWidgetFactory;
 
 	private JPanel panel;
-	private JButton button = new JButton("bla");
 
 	void setLoader(TreeLoader loader) {
 		this.loader = loader;
@@ -36,13 +35,12 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 	void initialize() {
 
-		panel = new JPanel(new MigLayout("fill, flowy", "[min!][]", "[min!][]"));
+		panel = new JPanel(new MigLayout("fill, flowy"));
 
 		panel.setPreferredSize(new Dimension(800, 600));
 
 		TreeWidget treeWidget = treeWidgetFactory.create();
 
-		panel.add(button);
 		panel.add(treeWidget.getView(), "grow, span 2");
 
 		loaderSubscriber = loader.loadTreeStructure()

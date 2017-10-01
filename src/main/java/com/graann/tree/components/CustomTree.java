@@ -48,16 +48,24 @@ public class CustomTree extends JTree implements Destroyable {
 
 	public void updateModel(String pattern, TreeNode root) {
 		this.pattern = pattern;
+		suitables = root instanceof RootTreeNode ? ((RootTreeNode) root).getSelectedNodes() : Collections.emptyList();
+
 		opened.clear();
 		getSelectionModel().clearSelection();
 		model.setRoot(root);
-
-		suitables = root instanceof RootTreeNode ? ((RootTreeNode) root).getSelectedNodes() : Collections.emptyList();
-
 		selectionController.setSuitables(suitables);
 
+		boolean isRootTreeNode = root instanceof RootTreeNode;
+		if (isRootTreeNode) {
+			RootTreeNode rootTreeNode = (RootTreeNode) root;
+			for (DefaultMutableTreeNode next : rootTreeNode.getSelectedNodes()) {
+				String s = next.toString();
+				String res = "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
+				next.setUserObject(res);
+			}
+		}
 
-		if (pattern != null && !pattern.isEmpty()) {
+		if (isRootTreeNode) {
 			viewportAreaSubscription = viewportArea.subscribe(visibleRectangle -> {
 				final int firstRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
 				int lastRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
@@ -78,17 +86,19 @@ public class CustomTree extends JTree implements Destroyable {
 		selectionController.nextSuitable();
 	}
 
+	private boolean filtered() {
+		return pattern != null && !pattern.isEmpty();
+	}
 
-
-	@Override
+/*	@Override
 	public String convertValueToText(Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 		String s = value.toString();
-		if (suitables.contains(value)) {
+		if (filtered() && suitables.contains(value)) {
 			return "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
 		}
 
 		return s;
-	}
+	}*/
 
 	@Override
 	public void destroy() {
