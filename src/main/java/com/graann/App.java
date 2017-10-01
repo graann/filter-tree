@@ -23,7 +23,7 @@ public class App {
 
 
 		try {
-			Font font = Font.createFont(Font.TRUETYPE_FONT, App.class.getResource("/entypo.ttf").openStream());
+			Font font = Font.createFont(Font.TRUETYPE_FONT, App.class.getResource("/ionicons.ttf").openStream());
 			GraphicsEnvironment genv = GraphicsEnvironment.getLocalGraphicsEnvironment();
 			genv.registerFont(font);
 		} catch (Exception e) {
