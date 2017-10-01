@@ -8,6 +8,7 @@ public enum IconFontSymbols {
 	ARROW_DOWN(0x25be),
 	ARROW_RIGHT(0x25b8),
 	SEARCH(0xe70a),
+	LEAF(0x1f342),
 	;
 
 	private final String symbol;

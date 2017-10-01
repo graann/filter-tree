@@ -39,6 +39,8 @@ public class App {
 			//UIManager.setLookAndFeel("com.jgoodies.looks.plastic.PlasticXPLookAndFeel");
 	//		UIManager.setLookAndFeel("com.pagosoft.plaf.PgsLookAndFeel");
 		//	UIManager.setLookAndFeel("ch.randelshofer.quaqua.jaguar.Quaqua15JaguarLookAndFeel");
+
+
 		} catch (Exception e_) {
 			try {
 				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
@@ -50,7 +52,7 @@ public class App {
 
 
 
-		//WebLookAndFeel.install (MyLookAndFeel.class, false);
+		//WebLookAndFeel.install ();
 
 		Viewable<JComponent> newContentPane = treeFactory.create();
 		frame.setContentPane(newContentPane.getView());
@@ -58,5 +60,6 @@ public class App {
 		frame.pack();
 		frame.setVisible(true);
 	}
+
 
 }
