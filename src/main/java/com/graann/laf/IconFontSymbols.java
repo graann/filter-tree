@@ -1,5 +1,9 @@
 package com.graann.laf;
 
+
+/**
+ * @author gromova on 30.09.17.
+ */
 public enum IconFontSymbols {
 	ARROW_DOWN(0xe60c),
 	ARROW_RIGHT(0xe610),

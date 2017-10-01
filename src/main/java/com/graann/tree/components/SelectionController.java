@@ -69,10 +69,10 @@ public class SelectionController {
 		}
 
 		if (node.isLeaf()) {
-			return false;
+			return next(++i);
 		}
 
-		return next(++i);
+		return firstSuitableChild(node);
 	}
 
 	private boolean firstSuitableChild(DefaultMutableTreeNode node) {

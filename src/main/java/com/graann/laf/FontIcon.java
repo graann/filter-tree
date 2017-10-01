@@ -3,6 +3,9 @@ package com.graann.laf;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * @author gromova on 30.09.17.
+ */
 public class FontIcon implements Icon {
 	private static final int DEFAULT_FONT_SIZE = 16;
 	private static Font ICON_FONT = new Font("Rivolicons-Free", Font.PLAIN, DEFAULT_FONT_SIZE);
