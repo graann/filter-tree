@@ -2,6 +2,7 @@ package com.graann.tree.components;
 
 import com.graann.common.Destroyable;
 import com.graann.common.RxUtils;
+import com.graann.laf.ColorScheme;
 import com.graann.tree.model.RootTreeNode;
 import org.reactfx.util.Tuple2;
 import rx.Observable;
@@ -85,11 +86,15 @@ public class CustomTree extends JTree implements Destroyable {
 	private void updateSuitables() {
 		for (DefaultMutableTreeNode next : suitables) {
 			String s = next.toString();
-			String res = "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
+			String res = "<html>" + s.replace(pattern, "<font color='"+getHex(ColorScheme.PATTERN)+"'>" + pattern + "</font>") + "</html>";
 			next.setUserObject(res);
 		}
 	}
 
+
+	private String getHex(Color color) {
+		return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+	}
 /*
 	@Override
 	public String convertValueToText(Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {

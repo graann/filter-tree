@@ -28,9 +28,9 @@ public class MyLookAndFeel extends PgsLookAndFeel {
 				"Tree.leafIcon", FontIcon.builder().symbol(IconFontSymbols.LEAF.getString())
 				.color(ColorScheme.LEAF_ICON).build(),
 				"Tree.closedIcon", FontIcon.builder().symbol(IconFontSymbols.FOLDER.getString())
-				.color(ColorScheme.DEFAULT_ICON).build(),
+				.color(ColorScheme.FOLDER_ICON).build(),
 				"Tree.openIcon", FontIcon.builder().symbol(IconFontSymbols.OPEN_FOLDER.getString())
-				.color(ColorScheme.DEFAULT_ICON).build(),
+				.color(ColorScheme.FOLDER_ICON).build(),
 		});
 		return table;
 	}
