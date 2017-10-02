@@ -4,8 +4,8 @@ import com.graann.common.Viewable;
 import com.graann.styling.ColorScheme;
 import com.graann.styling.FontIcon;
 import com.graann.styling.IconFontSymbols;
-import com.graann.tree.model.TreeModelController;
-import com.graann.tree.model.TreeModelControllerFactory;
+import com.graann.tree.model.TreeFilter;
+import com.graann.tree.model.TreeFilterFactory;
 import com.graann.treeloader.TreeStructure;
 import net.miginfocom.swing.MigLayout;
 import org.slf4j.Logger;
@@ -32,9 +32,9 @@ public class TreeWidget implements Viewable<JComponent> {
 
 	private BehaviorSubject<String> patternObservable = BehaviorSubject.create();
 
-	private TreeModelControllerFactory modelControllerFactory;
+	private TreeFilterFactory modelControllerFactory;
 
-	private TreeModelController treeModelController;
+	private TreeFilter treeFilter;
 
 	private CustomTree tree;
 	private JLabel infoLabel;
@@ -46,7 +46,7 @@ public class TreeWidget implements Viewable<JComponent> {
 
 	private BehaviorSubject<Rectangle> verticalScrollObservable = BehaviorSubject.create();
 
-	void setModelControllerFactory(TreeModelControllerFactory modelControllerFactory) {
+	void setModelControllerFactory(TreeFilterFactory modelControllerFactory) {
 		this.modelControllerFactory = modelControllerFactory;
 	}
 
@@ -74,9 +74,9 @@ public class TreeWidget implements Viewable<JComponent> {
 		panel = new JPanel(new MigLayout("flowy, ins 0, gap 0, fill", "", "[min!][]"));
 		panel.add(infoPane);
 
-		treeModelController = modelControllerFactory.create(patternObservable);
+		treeFilter = modelControllerFactory.create(patternObservable);
 
-		tree = new CustomTree(treeModelController.getUpdateObservable(), verticalScrollObservable);
+		tree = new CustomTree(treeFilter.filteredStateObservable(), verticalScrollObservable);
 
 		scrollPane = new JScrollPane(tree);
 		scrollPane.getVerticalScrollBar().addAdjustmentListener(e -> verticalScrollObservable.onNext(scrollPane.getViewport().getViewRect()));
@@ -90,12 +90,12 @@ public class TreeWidget implements Viewable<JComponent> {
 
 	void updateStructure(TreeStructure structure) {
 		tree.updateModel(null, structure.getRoot());
-		treeModelController.updateStructure(structure);
+		treeFilter.updateStructure(structure);
 	}
 
 	@Override
 	public void destroy() {
-		treeModelController.destroy();
+		treeFilter.destroy();
 	}
 
 

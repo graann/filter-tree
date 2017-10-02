@@ -39,10 +39,6 @@ public class CustomTree extends JTree implements Destroyable {
 		super(new DefaultTreeModel(null));
 		model = (DefaultTreeModel) getModel();
 		this.viewportArea = viewportArea;
-
-		setCellRenderer(new FilterTreeCellRenderer());
-		//	setExpandsSelectedPaths(true);
-
 		selectionController = new SelectionController(this);
 
 		filterSubscriber = filterObservable.subscribe(t -> updateModel(t._1, t._2));
@@ -72,11 +68,11 @@ public class CustomTree extends JTree implements Destroyable {
 	}
 
 
-	public void previousSuitable() {
+	void previousSuitable() {
 		selectionController.previousSuitable();
 	}
 
-	public void nextSuitable() {
+	void nextSuitable() {
 		selectionController.nextSuitable();
 	}
 
