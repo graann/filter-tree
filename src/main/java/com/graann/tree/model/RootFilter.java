@@ -19,7 +19,6 @@ public class RootFilter implements TreeNodeFilter {
 
 	public Observable<TreeNode> rootObservable(TreeStructure treeStructure, Set<String> filtered) {
 		return Observable.<TreeNode>create(subscriber -> {
-			LOG.debug("rootObservable");
 			Set<TreeNode> filteredNodes = filtered
 					.stream()
 					.map(key -> treeStructure.getTreemap().get(key))
@@ -60,12 +59,9 @@ public class RootFilter implements TreeNodeFilter {
 		Set<TreeNode> available = new LinkedHashSet<>();
 
 		for (TreeNode treeNode : nods) {
-			if (Thread.currentThread().isInterrupted()) {
-				return available;
-			}
 			TreeNode parent = treeNode.getParent();
 			if (!available.contains(parent)) {
-				while (parent != null && !Thread.currentThread().isInterrupted()) {
+				while (parent != null) {
 					available.add(parent);
 					parent = parent.getParent();
 				}
@@ -83,7 +79,7 @@ public class RootFilter implements TreeNodeFilter {
 		}
 
 		Enumeration children = source.children();
-		while (children.hasMoreElements() && !Thread.currentThread().isInterrupted()) {
+		while (children.hasMoreElements()) {
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) children.nextElement();
 			if (predicate.test(node)) {
 				DefaultMutableTreeNode newNode = createNode(node);
