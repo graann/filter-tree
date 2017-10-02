@@ -64,8 +64,7 @@ public class TreeWidget implements Viewable<JComponent> {
 	}
 
 	void initialize() {
-
-		JPanel infopane = new JPanel(new MigLayout("flowx, fillx, ins 0 0 5 0", "[min!]push[min!][min!]"));
+		JPanel infopane = new JPanel(new MigLayout("flowx, fillx, ins 0 0 5 0", "[pref!]push[min!][min!]"));
 
 		filterLabel = new JLabel();
 		filterLabel.setForeground(ColorScheme.MAINT_TEXT);
@@ -80,7 +79,7 @@ public class TreeWidget implements Viewable<JComponent> {
 				.fontSize(14)
 				.color(ColorScheme.LEAF_ICON).build());
 
-		infopane.add(filterLabel, "wmax 220");
+		infopane.add(filterLabel, "w 220!");
 		infopane.add(totalLabel);
 		infopane.add(shownLabel);
 
@@ -98,7 +97,7 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		tree.addFocusListener(getHandler());
 		scrollPane.addFocusListener(getHandler());
-		filterLabel.setVisible(false);
+		updateFilterLabel();
 	}
 
 	private void updateFilteredCounter(Integer count) {
@@ -116,6 +115,11 @@ public class TreeWidget implements Viewable<JComponent> {
 	private void updatePattern(String typedString) {
 		filterLabel.setText(typedString);
 		patternObservable.onNext(typedString);
+		updateFilterLabel();
+	}
+
+	private void updateFilterLabel() {
+		filterLabel.setVisible(focused || !filterLabel.getText().isEmpty());
 	}
 
 	@Override
@@ -123,6 +127,7 @@ public class TreeWidget implements Viewable<JComponent> {
 		treeFilter.destroy();
 	}
 
+	private boolean focused;
 
 	private class KeyHandler implements KeyListener, FocusListener {
 		private String typedString = "";
@@ -173,7 +178,8 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		@Override
 		public void focusGained(FocusEvent e) {
-			filterLabel.setVisible(true);
+			focused = true;
+			updateFilterLabel();
 
 			tree.addKeyListener(getHandler());
 			scrollPane.addKeyListener(getHandler());
@@ -181,7 +187,8 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		@Override
 		public void focusLost(FocusEvent e) {
-			filterLabel.setVisible(false);
+			focused = false;
+			updateFilterLabel();
 
 			tree.removeKeyListener(getHandler());
 			scrollPane.removeKeyListener(getHandler());

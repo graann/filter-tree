@@ -8,6 +8,7 @@ import com.graann.tree.components.FilterTreeWidgetFactory;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
+import java.awt.Dimension;
 
 /**
  * @author gromova on 20.09.17.
@@ -22,6 +23,7 @@ public class App {
 	private static void createAndShow() {
 		JFrame frame = new JFrame("Tree");
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		frame.setMinimumSize(new Dimension(400, 300));
 
 		LAFUtils.initLaf();
 		frame.setIconImage(LAFUtils.getImageIcon());
