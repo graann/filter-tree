@@ -1,11 +1,13 @@
 package com.graann;
 
 import com.graann.common.Viewable;
+import com.graann.styling.LAFUtils;
 import com.graann.tree.components.DefaultFilterTreeWidgetFactory;
 import com.graann.tree.components.FilterTreeWidgetFactory;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 /**
  * @author gromova on 20.09.17.
@@ -21,25 +23,8 @@ public class App {
 		JFrame frame = new JFrame("Tree");
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-
-		try {
-			Font font = Font.createFont(Font.TRUETYPE_FONT, App.class.getResource("/ionicons.ttf").openStream());
-			GraphicsEnvironment genv = GraphicsEnvironment.getLocalGraphicsEnvironment();
-			genv.registerFont(font);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-
-		try {
-			UIManager.setLookAndFeel("com.graann.laf.MyLookAndFeel");
-		} catch (Exception e_) {
-			try {
-				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-			}  catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		LAFUtils.initLaf();
+		frame.setIconImage(LAFUtils.getImageIcon());
 
 		Viewable<JComponent> newContentPane = treeFactory.create();
 		frame.setContentPane(newContentPane.getView());

@@ -1,8 +1,8 @@
-package com.graann.laf;
+package com.graann.styling;
 
 import com.pagosoft.plaf.PgsLookAndFeel;
 
-import javax.swing.*;
+import javax.swing.UIDefaults;
 
 public class MyLookAndFeel extends PgsLookAndFeel {
 	@Override
@@ -21,7 +21,7 @@ public class MyLookAndFeel extends PgsLookAndFeel {
 				.color(ColorScheme.DEFAULT_ICON).build(),
 				"Tree.collapsedIcon", FontIcon.builder().symbol(IconFontSymbols.ARROW_RIGHT.getString())
 				.color(ColorScheme.DEFAULT_ICON).build(),
-				"Tree.rowHeight", 25,
+				"Tree.rowHeight", 22,
 				"Tree.totalChildIndent", 15,
 				"Tree.rightChildIndent", 10,
 				"Tree.leftChildIndent", 15,

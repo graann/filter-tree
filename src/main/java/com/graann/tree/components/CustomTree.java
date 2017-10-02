@@ -2,18 +2,19 @@ package com.graann.tree.components;
 
 import com.graann.common.Destroyable;
 import com.graann.common.RxUtils;
-import com.graann.laf.ColorScheme;
+import com.graann.styling.ColorScheme;
+import com.graann.styling.LAFUtils;
 import com.graann.tree.model.RootTreeNode;
 import org.reactfx.util.Tuple2;
 import rx.Observable;
 import rx.Subscription;
 
-import javax.swing.*;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Rectangle;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -86,15 +87,11 @@ public class CustomTree extends JTree implements Destroyable {
 	private void updateSuitables() {
 		for (DefaultMutableTreeNode next : suitables) {
 			String s = next.toString();
-			String res = "<html>" + s.replace(pattern, "<font color='"+getHex(ColorScheme.PATTERN)+"'>" + pattern + "</font>") + "</html>";
+			String res = LAFUtils.replacePattern(pattern, s, ColorScheme.PATTERN);
 			next.setUserObject(res);
 		}
 	}
 
-
-	private String getHex(Color color) {
-		return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
-	}
 /*
 	@Override
 	public String convertValueToText(Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {

@@ -1,9 +1,9 @@
 package com.graann.tree.components;
 
 import com.graann.common.Viewable;
-import com.graann.laf.ColorScheme;
-import com.graann.laf.FontIcon;
-import com.graann.laf.IconFontSymbols;
+import com.graann.styling.ColorScheme;
+import com.graann.styling.FontIcon;
+import com.graann.styling.IconFontSymbols;
 import com.graann.tree.model.TreeModelController;
 import com.graann.tree.model.TreeModelControllerFactory;
 import com.graann.treeloader.TreeStructure;
@@ -12,8 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.subjects.BehaviorSubject;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
+import java.awt.Rectangle;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;

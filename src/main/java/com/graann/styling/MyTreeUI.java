@@ -1,6 +1,6 @@
-package com.graann.laf;
+package com.graann.styling;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.metal.MetalTreeUI;
 import java.awt.event.KeyListener;
