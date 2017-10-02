@@ -12,7 +12,7 @@ import rx.Subscription;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.tree.TreeNode;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -85,11 +85,11 @@ public class TreeFilter implements Destroyable {
 		RxUtils.unsubscribe(filterSubscription);
 	}
 
-	public class Filtered {
+	private class Filtered {
 		String pattern;
 		Set<String> strings;
 
-		public Filtered(String pattern, Set<String> strings) {
+		private Filtered(String pattern, Set<String> strings) {
 			this.pattern = pattern;
 			this.strings = strings;
 		}

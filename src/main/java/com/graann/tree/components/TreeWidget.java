@@ -15,10 +15,7 @@ import rx.subjects.BehaviorSubject;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 
 /**
  * @author gromova on 22.09.17.
@@ -40,8 +37,10 @@ public class TreeWidget implements Viewable<JComponent> {
 	private JPanel panel;
 
 	private KeyHandler keyHandler;
+	private boolean focused;
 
 	private BehaviorSubject<Rectangle> verticalScrollObservable = BehaviorSubject.create();
+	private AdjustmentListener verticalScrollBarListener = e -> verticalScrollObservable.onNext(scrollPane.getViewport().getViewRect());
 
 	void setModelControllerFactory(TreeFilterFactory modelControllerFactory) {
 		this.modelControllerFactory = modelControllerFactory;
@@ -63,11 +62,12 @@ public class TreeWidget implements Viewable<JComponent> {
 		JPanel infopane = new JPanel(new MigLayout("flowx, fillx, ins 0 0 5 0", "[pref!]push[min!][min!]"));
 
 		filterLabel = new JLabel();
-		filterLabel.setForeground(ColorScheme.MAINT_TEXT);
 		totalLabel = new JLabel();
+		shownLabel = new JLabel();
+
+		filterLabel.setForeground(ColorScheme.MAINT_TEXT);
 		totalLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.COUNT.getString())
 				.color(ColorScheme.LEAF_ICON).build());
-		shownLabel = new JLabel();
 		shownLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.FUNNEL.getString())
 				.fontSize(14)
 				.color(ColorScheme.LEAF_ICON).build());
@@ -84,7 +84,7 @@ public class TreeWidget implements Viewable<JComponent> {
 		tree = new CustomTree(treeFilter.filteredStateObservable(), verticalScrollObservable, this::updateFilteredCounter);
 
 		scrollPane = new JScrollPane(tree);
-		scrollPane.getVerticalScrollBar().addAdjustmentListener(e -> verticalScrollObservable.onNext(scrollPane.getViewport().getViewRect()));
+		scrollPane.getVerticalScrollBar().addAdjustmentListener(verticalScrollBarListener);
 
 		panel.add(scrollPane, "grow");
 
@@ -117,15 +117,13 @@ public class TreeWidget implements Viewable<JComponent> {
 		filterLabel.setIcon(focused ? FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
 				.color(ColorScheme.DEFAULT_ICON).build() : FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
 				.color(ColorScheme.DISABLED).build() );
-
 	}
 
 	@Override
 	public void destroy() {
 		treeFilter.destroy();
+		scrollPane.getVerticalScrollBar().removeAdjustmentListener(verticalScrollBarListener);
 	}
-
-	private boolean focused;
 
 	private class KeyHandler implements KeyListener, FocusListener {
 		private String typedString = "";

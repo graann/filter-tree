@@ -9,12 +9,12 @@ import org.reactfx.util.Tuple2;
 import rx.Observable;
 import rx.Subscription;
 
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -37,7 +37,7 @@ public class CustomTree extends JTree implements Destroyable {
 	private Observable<Rectangle> viewportArea;
 	private Consumer<Integer> filteredCounterConsumer;
 
-	public CustomTree(Observable<Tuple2<String, TreeNode>> filterObservable, Observable<Rectangle> viewportArea, Consumer<Integer> filteredCounterConsumer) {
+	CustomTree(Observable<Tuple2<String, TreeNode>> filterObservable, Observable<Rectangle> viewportArea, Consumer<Integer> filteredCounterConsumer) {
 		super(new DefaultTreeModel(null));
 		model = (DefaultTreeModel) getModel();
 		this.viewportArea = viewportArea;
@@ -47,16 +47,18 @@ public class CustomTree extends JTree implements Destroyable {
 		filterSubscriber = filterObservable.subscribe(t -> updateModel(t._1, t._2));
 	}
 
-	public void updateModel(String pattern, TreeNode root) {
+	void updateModel(String pattern, TreeNode root) {
 		this.pattern = pattern;
-		suitables = root instanceof RootTreeNode ? ((RootTreeNode) root).getSelectedNodes() : Collections.emptyList();
+		boolean isRootTreeNode = root instanceof RootTreeNode;
+		suitables = isRootTreeNode ? ((RootTreeNode) root).getSelectedNodes() : Collections.emptyList();
 
 		opened.clear();
 		getSelectionModel().clearSelection();
 		model.setRoot(root);
 		selectionController.setSuitables(suitables);
 
-		boolean isRootTreeNode = root instanceof RootTreeNode;
+		RxUtils.unsubscribe(viewportAreaSubscription);
+
 		if (isRootTreeNode) {
 			filteredCounterConsumer.accept(((RootTreeNode) root).getFilteredCount());
 			updateSuitables();
