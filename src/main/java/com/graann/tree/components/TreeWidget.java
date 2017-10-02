@@ -68,7 +68,7 @@ public class TreeWidget implements Viewable<JComponent> {
 		JPanel infopane = new JPanel(new MigLayout("flowx, fillx, ins 0 0 5 0", "[min!]push[min!][min!]"));
 
 		filterLabel = new JLabel();
-		filterLabel.setForeground(ColorScheme.PATTERN);
+		filterLabel.setForeground(ColorScheme.MAINT_TEXT);
 		filterLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
 				.color(ColorScheme.DEFAULT_ICON).build());
 
@@ -89,7 +89,7 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		treeFilter = modelControllerFactory.create(patternObservable);
 
-		tree = new CustomTree(treeFilter.filteredStateObservable(), verticalScrollObservable, integer -> shownLabel.setText(integer != null ? String.valueOf(integer) : totalLabel.getText()));
+		tree = new CustomTree(treeFilter.filteredStateObservable(), verticalScrollObservable, this::updateFilteredCounter);
 
 		scrollPane = new JScrollPane(tree);
 		scrollPane.getVerticalScrollBar().addAdjustmentListener(e -> verticalScrollObservable.onNext(scrollPane.getViewport().getViewRect()));
@@ -99,6 +99,11 @@ public class TreeWidget implements Viewable<JComponent> {
 		tree.addFocusListener(getHandler());
 		scrollPane.addFocusListener(getHandler());
 		filterLabel.setVisible(false);
+	}
+
+	private void updateFilteredCounter(Integer count) {
+		shownLabel.setText(count != null ? String.valueOf(count) : totalLabel.getText());
+		filterLabel.setForeground(count != null && count == 0 ? ColorScheme.PATTERN : ColorScheme.MAINT_TEXT);
 	}
 
 	void updateStructure(TreeStructure structure) {
