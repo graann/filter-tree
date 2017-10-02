@@ -43,9 +43,12 @@ public class TreeFilter implements Destroyable {
 	}
 
 	public void updateStructure(TreeStructure structure) {
-		trigramStringFilter = stringFilterFactory.create(structure.getStrings());
-
+		if(trigramStringFilter != null) {
+			trigramStringFilter.destroy();
+		}
 		RxUtils.unsubscribe(filterSubscription);
+
+		trigramStringFilter = stringFilterFactory.create(structure.getStrings());
 
 		filterSubscription = patternObservable
 				.distinctUntilChanged()
