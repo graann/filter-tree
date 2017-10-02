@@ -37,8 +37,9 @@ public class TreeWidget implements Viewable<JComponent> {
 	private TreeFilter treeFilter;
 
 	private CustomTree tree;
+	private JLabel shownLabel;
 	private JLabel filterLabel;
-	private JLabel counterLabel;
+	private JLabel totalLabel;
 	private JScrollPane scrollPane;
 	private JPanel panel;
 
@@ -64,26 +65,31 @@ public class TreeWidget implements Viewable<JComponent> {
 
 	void initialize() {
 
-		JPanel infopane = new JPanel(new MigLayout("flowx, fillx, ins 0 0 5 0", "[][min!]"));
+		JPanel infopane = new JPanel(new MigLayout("flowx, fillx, ins 0 0 5 0", "[min!]push[min!][min!]"));
 
 		filterLabel = new JLabel();
 		filterLabel.setForeground(ColorScheme.PATTERN);
 		filterLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
 				.color(ColorScheme.DEFAULT_ICON).build());
 
-		counterLabel = new JLabel();
-		counterLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.COUNT.getString())
+		totalLabel = new JLabel();
+		totalLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.COUNT.getString())
+				.color(ColorScheme.DEFAULT_ICON).build());
+		shownLabel = new JLabel();
+		shownLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.FUNNEL.getString())
+				.fontSize(14)
 				.color(ColorScheme.DEFAULT_ICON).build());
 
-		infopane.add(filterLabel);
-		infopane.add(counterLabel);
+		infopane.add(filterLabel, "wmax 220");
+		infopane.add(totalLabel);
+		infopane.add(shownLabel);
 
 		panel = new JPanel(new MigLayout("flowy, ins 0, gap 0, fill", "", "[min!][]"));
-		panel.add(infopane, "grow");
+		panel.add(infopane, "growx");
 
 		treeFilter = modelControllerFactory.create(patternObservable);
 
-		tree = new CustomTree(treeFilter.filteredStateObservable(), verticalScrollObservable);
+		tree = new CustomTree(treeFilter.filteredStateObservable(), verticalScrollObservable, integer -> shownLabel.setText(integer != null ? String.valueOf(integer) : totalLabel.getText()));
 
 		scrollPane = new JScrollPane(tree);
 		scrollPane.getVerticalScrollBar().addAdjustmentListener(e -> verticalScrollObservable.onNext(scrollPane.getViewport().getViewRect()));
@@ -96,9 +102,15 @@ public class TreeWidget implements Viewable<JComponent> {
 	}
 
 	void updateStructure(TreeStructure structure) {
-		counterLabel.setText(String.valueOf(structure.getCount()));
+		totalLabel.setText(String.valueOf(structure.getCount()));
+		shownLabel.setText(String.valueOf(structure.getCount()));
 		tree.updateModel(null, structure.getRoot());
 		treeFilter.updateStructure(structure);
+	}
+
+	private void updatePattern(String typedString) {
+		filterLabel.setText(typedString);
+		patternObservable.onNext(typedString);
 	}
 
 	@Override
@@ -126,8 +138,8 @@ public class TreeWidget implements Viewable<JComponent> {
 					typedString += c;
 				}
 
-				filterLabel.setText(typedString);
-				patternObservable.onNext(typedString);
+				updatePattern(typedString);
+
 			}
 		}
 

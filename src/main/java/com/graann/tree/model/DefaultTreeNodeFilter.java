@@ -14,6 +14,7 @@ import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -40,8 +41,10 @@ public class DefaultTreeNodeFilter implements TreeNodeFilter {
 			Predicate<TreeNode> predicate = available::contains;
 
 			final List<DefaultMutableTreeNode> customTreeNodes = new ArrayList<>();
+			final AtomicInteger counter = new AtomicInteger();
 
 			BiConsumer<TreeNode, DefaultMutableTreeNode> consumer = (source, node) -> {
+				counter.incrementAndGet();
 				if (filteredNodes.contains(source)) {
 					customTreeNodes.add(node);
 				}
@@ -49,6 +52,8 @@ public class DefaultTreeNodeFilter implements TreeNodeFilter {
 
 			RootTreeNode node = new RootTreeNode(treeStructure.getRoot().toString());
 			node.setSelectedNodes(customTreeNodes);
+			node.setFilteredCount(counter);
+
 			consumer.accept(treeStructure.getRoot(), node);
 
 			addChildren(treeStructure.getRoot(), node, predicate, consumer);

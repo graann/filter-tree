@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * @author gromova on 26.09.17.
@@ -34,12 +35,14 @@ public class CustomTree extends JTree implements Destroyable {
 	private SelectionController selectionController;
 
 	private Observable<Rectangle> viewportArea;
+	private Consumer<Integer> filteredCounterConsumer;
 
-	public CustomTree(Observable<Tuple2<String, TreeNode>> filterObservable, Observable<Rectangle> viewportArea) {
+	public CustomTree(Observable<Tuple2<String, TreeNode>> filterObservable, Observable<Rectangle> viewportArea, Consumer<Integer> filteredCounterConsumer) {
 		super(new DefaultTreeModel(null));
 		model = (DefaultTreeModel) getModel();
 		this.viewportArea = viewportArea;
 		selectionController = new SelectionController(this);
+		this.filteredCounterConsumer = filteredCounterConsumer;
 
 		filterSubscriber = filterObservable.subscribe(t -> updateModel(t._1, t._2));
 	}
@@ -55,6 +58,7 @@ public class CustomTree extends JTree implements Destroyable {
 
 		boolean isRootTreeNode = root instanceof RootTreeNode;
 		if (isRootTreeNode) {
+			filteredCounterConsumer.accept(((RootTreeNode) root).getFilteredCount());
 			updateSuitables();
 			viewportAreaSubscription = viewportArea.subscribe(visibleRectangle -> {
 				final int firstRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
@@ -64,6 +68,10 @@ public class CustomTree extends JTree implements Destroyable {
 				}
 				expandNodes(firstRow, lastRow);
 			});
+		} else if(root == null) {
+			filteredCounterConsumer.accept(0);
+		} else {
+			filteredCounterConsumer.accept(null);
 		}
 	}
 

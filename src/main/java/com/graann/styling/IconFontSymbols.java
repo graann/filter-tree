@@ -12,6 +12,7 @@ public enum IconFontSymbols {
 	FOLDER(0xf2e0),
 	OPEN_FOLDER(0xf139),
 	COUNT(0xf453),
+	FUNNEL(0xf31b),
 	;
 
 	private final String symbol;
