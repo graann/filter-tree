@@ -19,8 +19,8 @@ import java.util.Set;
  * @author gromova on 22.09.17.
  */
 public class DictionaryLoader implements TreeLoader {
-	private static String FILE_NAME = "/tree_.txt";
-	private static String CHARSET_NAME = "UTF8";
+	private static final String FILE_NAME = "/tree.txt";
+	private static final String CHARSET_NAME = "UTF8";
 
 	private BehaviorSubject<TreeStructure> treeBehaviorSubject;
 
@@ -52,7 +52,7 @@ public class DictionaryLoader implements TreeLoader {
 					new InputStreamReader(
 							new FileInputStream(file), CHARSET_NAME));
 
-			for (String line; (line = bufferedReader.readLine()) != null; ) {
+			for (String line; (line = bufferedReader.readLine()) != null && !Thread.currentThread().isInterrupted();) {
 				int level = getLevel(line);
 				String value = line.substring(level);
 

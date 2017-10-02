@@ -43,10 +43,7 @@ public class TreeFilter implements Destroyable {
 	}
 
 	public void updateStructure(TreeStructure structure) {
-		if(trigramStringFilter != null) {
-			trigramStringFilter.destroy();
-		}
-		RxUtils.unsubscribe(filterSubscription);
+		clear();
 
 		trigramStringFilter = stringFilterFactory.create(structure.getStrings());
 
@@ -85,7 +82,14 @@ public class TreeFilter implements Destroyable {
 
 	@Override
 	public void destroy() {
+		clear();
+	}
+
+	private void clear() {
 		RxUtils.unsubscribe(filterSubscription);
+		if(trigramStringFilter != null) {
+			trigramStringFilter.destroy();
+		}
 	}
 
 	private class Filtered {

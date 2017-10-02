@@ -8,19 +8,14 @@ import rx.schedulers.Schedulers;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class DefaultTreeNodeFilter implements TreeNodeFilter {
-	private static final Logger LOG = LoggerFactory.getLogger(DefaultTreeNodeFilter.class);
+public class RootFilter implements TreeNodeFilter {
+	private static final Logger LOG = LoggerFactory.getLogger(RootFilter.class);
 
 	public Observable<TreeNode> rootObservable(TreeStructure treeStructure, Set<String> filtered) {
 		return Observable.<TreeNode>create(subscriber -> {

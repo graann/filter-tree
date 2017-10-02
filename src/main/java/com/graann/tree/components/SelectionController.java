@@ -5,7 +5,7 @@ import javax.swing.tree.*;
 import java.util.Collections;
 import java.util.List;
 
-public class SelectionController {
+class SelectionController {
 	private JTree tree;
 	private TreeSelectionModel selectionModel;
 	private List<DefaultMutableTreeNode> suitables = Collections.emptyList();
@@ -166,7 +166,6 @@ public class SelectionController {
 		}
 
 		TreeNode node = (TreeNode) pathForRow.getLastPathComponent();
-
 
 		return (DefaultMutableTreeNode) node;
 	}

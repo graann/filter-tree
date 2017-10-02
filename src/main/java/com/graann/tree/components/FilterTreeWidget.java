@@ -34,20 +34,16 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 	}
 
 	void initialize() {
-
-		panel = new JPanel(new MigLayout("fill, flowy"));
-
-		panel.setPreferredSize(new Dimension(800, 600));
-
 		TreeWidget treeWidget = treeWidgetFactory.create();
 
+		panel = new JPanel(new MigLayout("fill, flowy"));
+		panel.setPreferredSize(new Dimension(800, 600));
 		panel.add(treeWidget.getView(), "grow, span 2");
 
 		loaderSubscriber = loader.loadTreeStructure()
 				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(treeWidget::updateStructure);
 	}
-
 
 	@Override
 	public void destroy() {

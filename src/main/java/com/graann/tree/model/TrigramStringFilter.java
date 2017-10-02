@@ -6,12 +6,7 @@ import rx.Single;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -27,15 +22,17 @@ public class TrigramStringFilter implements StringFilter {
 
 	private void computeTrie(Set<String> strings) {
 		Single.<PatriciaTrie<Set<String>>>create(subscriber -> {
-			Map<String, Set<String>> map = new LinkedHashMap<>();
-			strings.forEach(s -> {
-				add(map, s, s);
+				Map<String, Set<String>> map = new LinkedHashMap<>();
+				strings.forEach(s -> {
+					add(map, s, s);
 
-				Set<String> nGrams = getNGrams(s, N);
-				nGrams.forEach(nGram -> add(map, nGram, s));
-			});
-			subscriber.onSuccess(new PatriciaTrie<>(map));
-		}).subscribeOn(Schedulers.computation()).subscribe(setPatriciaTrie -> trieBehaviorSubject.onNext(setPatriciaTrie));
+					Set<String> nGrams = getNGrams(s, N);
+					nGrams.forEach(nGram -> add(map, nGram, s));
+				});
+				subscriber.onSuccess(new PatriciaTrie<>(map));
+			})
+			.subscribeOn(Schedulers.computation())
+			.subscribe(setPatriciaTrie -> trieBehaviorSubject.onNext(setPatriciaTrie));
 	}
 
 	@Override
