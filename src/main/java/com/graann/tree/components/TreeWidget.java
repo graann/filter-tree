@@ -4,6 +4,7 @@ import com.graann.common.Viewable;
 import com.graann.styling.ColorScheme;
 import com.graann.styling.FontIcon;
 import com.graann.styling.IconFontSymbols;
+import com.graann.styling.LAFUtils;
 import com.graann.tree.model.TreeFilter;
 import com.graann.tree.model.TreeFilterFactory;
 import com.graann.treeloader.TreeStructure;
@@ -108,7 +109,7 @@ public class TreeWidget implements Viewable<JComponent> {
 		filterLabel.setText(typedString);
 		patternObservable.onNext(typedString);
 		updateFilterLabel();
-		Utils.setTooltipIfNeeded(filterLabel);
+		LAFUtils.setTooltipIfNeeded(filterLabel);
 	}
 
 	private void updateFilterLabel() {

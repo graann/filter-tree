@@ -5,14 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.plaf.IconUIResource;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GraphicsEnvironment;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,7 +57,7 @@ public class LAFUtils {
 		return table -> loadIcon(LAFUtils.class, resourceName);
 	}
 
-	public static IconUIResource loadIcon(final Class<?> baseClass, final String resourceName) {
+	static IconUIResource loadIcon(final Class<?> baseClass, final String resourceName) {
 		try (InputStream imageStream = baseClass.getResourceAsStream(resourceName)) {
 			if (imageStream == null) {
 				LOG.warn("Image is not found {}", resourceName);
@@ -76,5 +71,47 @@ public class LAFUtils {
 			LOG.warn("Failed to load image {}", resourceName, ex);
 			return null;
 		}
+	}
+
+	public static void setTooltipIfNeeded(JLabel label) {
+		String labelText = label.getText();
+		if (labelText == null) {
+			label.setToolTipText(null);
+			return;
+		}
+
+		Icon icon = (label.isEnabled()) ? label.getIcon() : label.getDisabledIcon();
+		Rectangle paintViewR = new Rectangle();
+		Rectangle paintIconR = new Rectangle();
+		Rectangle paintTextR = new Rectangle();
+
+		Insets insets = label.getInsets(null);
+
+		paintViewR.x = insets.left;
+		paintViewR.y = insets.top;
+		paintViewR.width = label.getWidth() - (insets.left + insets.right);
+		paintViewR.height = label.getHeight() - (insets.top + insets.bottom);
+
+		if (icon != null) {
+			paintIconR.width = icon.getIconWidth();
+			paintIconR.height = icon.getIconHeight();
+		}
+
+		FontMetrics fontMetrics = label.getFontMetrics(label.getFont());
+
+		String clipped = SwingUtilities.layoutCompoundLabel(label,
+				fontMetrics,
+				labelText,
+				icon,
+				label.getVerticalAlignment(),
+				label.getHorizontalAlignment(),
+				label.getVerticalTextPosition(),
+				label.getHorizontalTextPosition(),
+				paintViewR,
+				paintIconR,
+				paintTextR,
+				label.getIconTextGap());
+
+		label.setToolTipText(!labelText.equals(clipped) ? labelText : null);
 	}
 }
