@@ -31,6 +31,8 @@ public class MyLookAndFeel extends PgsLookAndFeel {
 				.color(ColorScheme.FOLDER_ICON).build(),
 				"Tree.openIcon", FontIcon.builder().symbol(IconFontSymbols.OPEN_FOLDER.getString())
 				.color(ColorScheme.FOLDER_ICON).build(),
+
+				"Label.foreground", ColorScheme.MAINT_TEXT
 		});
 		return table;
 	}

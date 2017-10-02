@@ -74,11 +74,11 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		totalLabel = new JLabel();
 		totalLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.COUNT.getString())
-				.color(ColorScheme.DEFAULT_ICON).build());
+				.color(ColorScheme.LEAF_ICON).build());
 		shownLabel = new JLabel();
 		shownLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.FUNNEL.getString())
 				.fontSize(14)
-				.color(ColorScheme.DEFAULT_ICON).build());
+				.color(ColorScheme.LEAF_ICON).build());
 
 		infopane.add(filterLabel, "wmax 220");
 		infopane.add(totalLabel);
