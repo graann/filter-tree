@@ -14,8 +14,8 @@ public class MyLookAndFeel extends PgsLookAndFeel {
 	@Override
 	public UIDefaults getDefaults() {
 		UIDefaults table = super.getDefaults();
-		// *** Tree
 		table.putDefaults(new Object[]{
+				// *** Tree
 				"Tree.paintLines", Boolean.FALSE,
 				"Tree.expandedIcon", FontIcon.builder().symbol(IconFontSymbols.ARROW_DOWN.getString())
 				.color(ColorScheme.DEFAULT_ICON).build(),
@@ -32,6 +32,7 @@ public class MyLookAndFeel extends PgsLookAndFeel {
 				"Tree.openIcon", FontIcon.builder().symbol(IconFontSymbols.OPEN_FOLDER.getString())
 				.color(ColorScheme.FOLDER_ICON).build(),
 
+				// *** Label
 				"Label.foreground", ColorScheme.MAINT_TEXT
 		});
 		return table;
