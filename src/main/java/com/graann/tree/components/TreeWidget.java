@@ -130,7 +130,7 @@ public class TreeWidget implements Viewable<JComponent> {
 		@Override
 		public void keyTyped(KeyEvent e) {
 			if (tree != null && tree.isEnabled()) {
-				if (e.isAltDown() || isNavigationKey(e)) {
+				if (e.isAltDown() || e.isControlDown() || isNavigationKey(e)) {
 					return;
 				}
 
