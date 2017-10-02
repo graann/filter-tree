@@ -10,6 +10,7 @@ import java.util.Set;
 public final class TreeStructure {
 	private final TreeNode root;
 	private final Map<String, Set<TreeNode>> treemap;
+	private final int count;
 
 	public TreeNode getRoot() {
 		return root;
@@ -23,8 +24,13 @@ public final class TreeStructure {
 		return treemap.keySet();
 	}
 
-	TreeStructure(TreeNode root, Map<String, Set<TreeNode>> treemap) {
+	public int getCount() {
+		return count;
+	}
+
+	TreeStructure(TreeNode root, Map<String, Set<TreeNode>> treemap, int count) {
 		this.root = root;
 		this.treemap = treemap;
+		this.count = count;
 	}
 }

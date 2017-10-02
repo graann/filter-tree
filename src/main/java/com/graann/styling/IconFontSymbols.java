@@ -11,6 +11,7 @@ public enum IconFontSymbols {
 	LEAF(0xf1fd),
 	FOLDER(0xf2e0),
 	OPEN_FOLDER(0xf139),
+	COUNT(0xf453),
 	;
 
 	private final String symbol;

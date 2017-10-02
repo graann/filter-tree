@@ -41,6 +41,7 @@ public class DictionaryLoader implements TreeLoader {
 
 	private TreeStructure read() {
 		Map<String, Set<TreeNode>> map = new LinkedHashMap<>();
+		int nodeCounter = 0;
 
 		DefaultMutableTreeNode root = null;
 		DefaultMutableTreeNode prev = null;
@@ -55,6 +56,7 @@ public class DictionaryLoader implements TreeLoader {
 				int level = getLevel(line);
 				String value = line.substring(level);
 
+				nodeCounter++;
 				DefaultMutableTreeNode node = new DefaultMutableTreeNode(value);
 				Set<TreeNode> treeNodes = map.computeIfAbsent(value, k -> new HashSet<>());
 
@@ -81,7 +83,7 @@ public class DictionaryLoader implements TreeLoader {
 			e.printStackTrace();
 		}
 
-		return new TreeStructure(root, map);
+		return new TreeStructure(root, map, nodeCounter);
 	}
 
 	private static int getLevel(String string) {

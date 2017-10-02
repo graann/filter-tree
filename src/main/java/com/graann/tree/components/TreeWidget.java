@@ -37,10 +37,10 @@ public class TreeWidget implements Viewable<JComponent> {
 	private TreeFilter treeFilter;
 
 	private CustomTree tree;
-	private JLabel infoLabel;
+	private JLabel filterLabel;
+	private JLabel counterLabel;
 	private JScrollPane scrollPane;
 	private JPanel panel;
-	private JPanel infoPane;
 
 	private KeyHandler keyHandler;
 
@@ -64,15 +64,22 @@ public class TreeWidget implements Viewable<JComponent> {
 
 	void initialize() {
 
-		infoPane = new JPanel(new MigLayout("ins 0, gap 7"));
-		infoLabel = new JLabel();
-		infoLabel.setForeground(ColorScheme.PATTERN);
-		infoPane.add(new JLabel(FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
-				.color(ColorScheme.DEFAULT_ICON).build()));
-		infoPane.add(infoLabel);
+		JPanel infopane = new JPanel(new MigLayout("flowx, fillx, ins 0 0 5 0", "[][min!]"));
+
+		filterLabel = new JLabel();
+		filterLabel.setForeground(ColorScheme.PATTERN);
+		filterLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
+				.color(ColorScheme.DEFAULT_ICON).build());
+
+		counterLabel = new JLabel();
+		counterLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.COUNT.getString())
+				.color(ColorScheme.DEFAULT_ICON).build());
+
+		infopane.add(filterLabel);
+		infopane.add(counterLabel);
 
 		panel = new JPanel(new MigLayout("flowy, ins 0, gap 0, fill", "", "[min!][]"));
-		panel.add(infoPane);
+		panel.add(infopane, "grow");
 
 		treeFilter = modelControllerFactory.create(patternObservable);
 
@@ -85,10 +92,11 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		tree.addFocusListener(getHandler());
 		scrollPane.addFocusListener(getHandler());
-		infoPane.setVisible(false);
+		filterLabel.setVisible(false);
 	}
 
 	void updateStructure(TreeStructure structure) {
+		counterLabel.setText(String.valueOf(structure.getCount()));
 		tree.updateModel(null, structure.getRoot());
 		treeFilter.updateStructure(structure);
 	}
@@ -118,10 +126,9 @@ public class TreeWidget implements Viewable<JComponent> {
 					typedString += c;
 				}
 
-				infoLabel.setText(typedString);
+				filterLabel.setText(typedString);
 				patternObservable.onNext(typedString);
 			}
-
 		}
 
 		@Override
@@ -149,7 +156,7 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		@Override
 		public void focusGained(FocusEvent e) {
-			infoPane.setVisible(true);
+			filterLabel.setVisible(true);
 
 			tree.addKeyListener(getHandler());
 			scrollPane.addKeyListener(getHandler());
@@ -157,7 +164,7 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		@Override
 		public void focusLost(FocusEvent e) {
-			infoPane.setVisible(false);
+			filterLabel.setVisible(false);
 
 			tree.removeKeyListener(getHandler());
 			scrollPane.removeKeyListener(getHandler());
