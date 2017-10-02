@@ -12,13 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.subjects.BehaviorSubject;
 
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
-import java.awt.Rectangle;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -68,9 +63,6 @@ public class TreeWidget implements Viewable<JComponent> {
 
 		filterLabel = new JLabel();
 		filterLabel.setForeground(ColorScheme.MAINT_TEXT);
-		filterLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
-				.color(ColorScheme.DEFAULT_ICON).build());
-
 		totalLabel = new JLabel();
 		totalLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.COUNT.getString())
 				.color(ColorScheme.LEAF_ICON).build());
@@ -116,10 +108,15 @@ public class TreeWidget implements Viewable<JComponent> {
 		filterLabel.setText(typedString);
 		patternObservable.onNext(typedString);
 		updateFilterLabel();
+		Utils.setTooltipIfNeeded(filterLabel);
 	}
 
 	private void updateFilterLabel() {
 		filterLabel.setVisible(focused || !filterLabel.getText().isEmpty());
+		filterLabel.setIcon(focused ? FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
+				.color(ColorScheme.DEFAULT_ICON).build() : FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
+				.color(ColorScheme.DISABLED).build() );
+
 	}
 
 	@Override
