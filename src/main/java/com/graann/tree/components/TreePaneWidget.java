@@ -18,6 +18,7 @@ public class TreePaneWidget implements Viewable<JComponent> {
 
 	private TreeLoader loader;
 	private TreeWidgetFactory treeWidgetFactory;
+	private FilterTreeWidget filterTreeWidget;
 
 	private JPanel panel;
 
@@ -34,7 +35,7 @@ public class TreePaneWidget implements Viewable<JComponent> {
 	}
 
 	void initialize() {
-		FilterTreeWidget filterTreeWidget = treeWidgetFactory.create();
+		filterTreeWidget = treeWidgetFactory.create();
 
 		panel = new JPanel(new MigLayout("fill, flowy"));
 		panel.setPreferredSize(new Dimension(800, 600));
@@ -49,6 +50,7 @@ public class TreePaneWidget implements Viewable<JComponent> {
 	@Override
 	public void destroy() {
 		RxUtils.unsubscribe(loaderSubscriber);
+		filterTreeWidget.destroy();
 	}
 }
 

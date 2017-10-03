@@ -72,11 +72,6 @@
             <artifactId>log4j-over-slf4j</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-        <dependency>
-            <groupId>de.sciss</groupId>
-            <artifactId>weblaf-ui</artifactId>
-            <version>RELEASE</version>
-        </dependency>
     </dependencies>
 
 

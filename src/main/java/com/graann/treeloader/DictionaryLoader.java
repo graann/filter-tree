@@ -40,7 +40,7 @@ public class DictionaryLoader implements TreeLoader {
 		DefaultMutableTreeNode prev = null;
 
 		try (Scanner scanner = new Scanner(this.getClass().getResourceAsStream(FILE_NAME), CHARSET_NAME)) {
-			while (scanner.hasNextLine() && !Thread.currentThread().isInterrupted()) {
+			while (scanner.hasNextLine()) {
 				String line = scanner.nextLine();
 				int level = getLevel(line);
 				String value = line.substring(level);
