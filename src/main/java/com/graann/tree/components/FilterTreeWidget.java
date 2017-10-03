@@ -90,7 +90,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 	private void updateFilteredCounter(Integer count) {
 		shownLabel.setText(count != null ? String.valueOf(count) : totalLabel.getText());
-		filterLabel.setForeground(count != null && count == 0 ? ColorScheme.PATTERN : ColorScheme.MAINT_TEXT);
+		filterLabel.setForeground(count != null && count == 0 ? ColorScheme.ERROR : ColorScheme.MAINT_TEXT);
 	}
 
 	void updateStructure(TreeStructure structure) {
