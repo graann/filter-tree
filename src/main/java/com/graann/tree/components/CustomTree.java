@@ -98,16 +98,6 @@ public class CustomTree extends JTree implements Destroyable {
 		}
 	}
 
-/*
-	@Override
-	public String convertValueToText(Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-		String s = value.toString();
-		if (filtered() && suitables.contains(value)) {
-			return "<html>" + s.replace(pattern, "<font color='red'>" + pattern + "</font>") + "</html>";
-		}
-
-		return s;
-	}*/
 
 	@Override
 	public void destroy() {

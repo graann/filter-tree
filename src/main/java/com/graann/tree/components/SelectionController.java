@@ -95,8 +95,7 @@ class SelectionController {
 
 	private boolean previous(int i) {
 		if (i < 0) {
-			lastSuitable();
-			return true;
+			return false;
 		}
 
 		DefaultMutableTreeNode node = getNode(i);
@@ -140,13 +139,6 @@ class SelectionController {
 	private void firstSuitable() {
 		TreePath path = getPath(suitables.get(0));
 		setSelectionPath(path);
-	}
-
-	private void lastSuitable() {
-		TreePath path = getPath(suitables.get(suitables.size() - 1));
-		tree.expandPath(path.getParentPath());
-		setSelectionPath(path);
-
 	}
 
 	private void setSelection(TreeNode node) {

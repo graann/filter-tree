@@ -6,15 +6,8 @@ import rx.subjects.BehaviorSubject;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.net.URISyntaxException;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author gromova on 22.09.17.
@@ -47,19 +40,9 @@ public class DictionaryLoader implements TreeLoader {
 		DefaultMutableTreeNode root = null;
 		DefaultMutableTreeNode prev = null;
 
-		File file = null;
-		try {
-			file = new File(this.getClass().getResource(FILE_NAME).toURI());
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			return null;
-		}
-
-		try (FileInputStream fileInputStream = new FileInputStream(file);
-			InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, CHARSET_NAME);
-			BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-
-			for (String line; (line = bufferedReader.readLine()) != null; ) {
+		try (Scanner scanner = new Scanner(new File(getClass().getResource(FILE_NAME).toURI()), CHARSET_NAME)) {
+			while (scanner.hasNextLine()) {
+				String line = scanner.nextLine();
 				int level = getLevel(line);
 				String value = line.substring(level);
 
