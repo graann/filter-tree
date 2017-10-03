@@ -6,7 +6,6 @@ import rx.subjects.BehaviorSubject;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-import java.io.File;
 import java.util.*;
 
 /**
@@ -40,7 +39,7 @@ public class DictionaryLoader implements TreeLoader {
 		DefaultMutableTreeNode root = null;
 		DefaultMutableTreeNode prev = null;
 
-		try (Scanner scanner = new Scanner(new File(getClass().getResource(FILE_NAME).toURI()), CHARSET_NAME)) {
+		try (Scanner scanner = new Scanner(this.getClass().getResourceAsStream(FILE_NAME), CHARSET_NAME)) {
 			while (scanner.hasNextLine() && !Thread.currentThread().isInterrupted()) {
 				String line = scanner.nextLine();
 				int level = getLevel(line);
