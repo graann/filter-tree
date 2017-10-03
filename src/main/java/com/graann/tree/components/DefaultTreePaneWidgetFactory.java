@@ -6,12 +6,12 @@ import com.graann.treeloader.TreeLoader;
 /**
  * @author gromova on 20.09.17.
  */
-public class DefaultFilterTreeWidgetFactory implements FilterTreeWidgetFactory {
+public class DefaultTreePaneWidgetFactory implements TreePaneWidgetFactory {
 	private TreeLoader loader = new DictionaryLoader();
 	private TreeWidgetFactory treeWidgetFactory = new TreeWidgetFactory();
 
-	public FilterTreeWidget create() {
-		FilterTreeWidget tree = new FilterTreeWidget();
+	public TreePaneWidget create() {
+		TreePaneWidget tree = new TreePaneWidget();
 		tree.setLoader(loader);
 		tree.setTreeWidgetFactory(treeWidgetFactory);
 		tree.initialize();

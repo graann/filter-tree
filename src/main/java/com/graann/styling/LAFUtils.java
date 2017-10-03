@@ -57,7 +57,7 @@ public class LAFUtils {
 		return table -> loadIcon(LAFUtils.class, resourceName);
 	}
 
-	static IconUIResource loadIcon(final Class<?> baseClass, final String resourceName) {
+	private static IconUIResource loadIcon(final Class<?> baseClass, final String resourceName) {
 		try (InputStream imageStream = baseClass.getResourceAsStream(resourceName)) {
 			if (imageStream == null) {
 				LOG.warn("Image is not found {}", resourceName);
