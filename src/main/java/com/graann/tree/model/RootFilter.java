@@ -23,6 +23,7 @@ public class RootFilter implements TreeNodeFilter {
 					.stream()
 					.map(key -> treeStructure.getTreemap().get(key))
 					.flatMap(Collection::stream)
+					.parallel()
 					.collect(Collectors.toSet());
 
 			if (filteredNodes.isEmpty()) {
@@ -59,9 +60,12 @@ public class RootFilter implements TreeNodeFilter {
 		Set<TreeNode> available = new LinkedHashSet<>();
 
 		for (TreeNode treeNode : nods) {
+			if (Thread.currentThread().isInterrupted()) {
+				return available;
+			}
 			TreeNode parent = treeNode.getParent();
 			if (!available.contains(parent)) {
-				while (parent != null) {
+				while (parent != null && !Thread.currentThread().isInterrupted()) {
 					available.add(parent);
 					parent = parent.getParent();
 				}
@@ -79,7 +83,7 @@ public class RootFilter implements TreeNodeFilter {
 		}
 
 		Enumeration children = source.children();
-		while (children.hasMoreElements()) {
+		while (children.hasMoreElements() && !Thread.currentThread().isInterrupted()) {
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) children.nextElement();
 			if (predicate.test(node)) {
 				DefaultMutableTreeNode newNode = createNode(node);

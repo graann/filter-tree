@@ -23,7 +23,11 @@ public class TrigramStringFilter implements StringFilter {
 	private void computeTrie(Set<String> strings) {
 		Single.<PatriciaTrie<Set<String>>>create(subscriber -> {
 				Map<String, Set<String>> map = new LinkedHashMap<>();
-				strings.forEach(s -> {
+				strings.parallelStream().forEach(s -> {
+					if(Thread.currentThread().isInterrupted()) {
+						return;
+					}
+
 					add(map, s, s);
 
 					Set<String> nGrams = getNGrams(s, N);
