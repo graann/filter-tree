@@ -32,7 +32,7 @@ public class App {
 		frame.setContentPane(newContentPane.getView());
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosed(WindowEvent e) {
+			public void windowClosing(WindowEvent e) {
 				newContentPane.destroy();
 			}
 		});
