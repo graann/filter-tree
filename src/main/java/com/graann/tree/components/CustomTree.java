@@ -65,8 +65,9 @@ public class CustomTree extends JTree implements Destroyable {
 		if (isRootTreeNode) {
 			filteredCounterConsumer.accept(((RootTreeNode) root).getFilteredCount());
 			updateSuitables();
-			lock = false;
+
 			viewportAreaSubscription = viewportArea.subscribe(visibleRectangle -> {
+				lock = false;
 				final int firstRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
 				int rowCount = visibleRectangle.height / rowHeight;
 				int lastRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
