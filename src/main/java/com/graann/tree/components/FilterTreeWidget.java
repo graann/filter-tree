@@ -2,10 +2,7 @@ package com.graann.tree.components;
 
 import com.graann.common.NumberFormatter;
 import com.graann.common.Viewable;
-import com.graann.styling.ColorScheme;
-import com.graann.styling.FontIcon;
-import com.graann.styling.IconFontSymbols;
-import com.graann.styling.LAFUtils;
+import com.graann.styling.*;
 import com.graann.tree.model.TreeFilter;
 import com.graann.tree.model.TreeFilterFactory;
 import com.graann.treeloader.TreeStructure;
@@ -30,6 +27,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 	private JLabel shownLabel;
 	private JLabel filterLabel;
 	private JLabel totalLabel;
+	private JLabel nothingFound;
 	private JScrollPane scrollPane;
 	private JPanel panel;
 
@@ -56,13 +54,16 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 	}
 
 	void initialize() {
+
 		JPanel infopane = new JPanel(new MigLayout("flowx, fillx, ins 0 0 5 0", "[pref!]push[min!][min!]"));
 
 		filterLabel = new JLabel();
 		totalLabel = new JLabel();
 		shownLabel = new JLabel();
+		nothingFound = new JLabel(Messages.NOTHING_FOUND);
 
 		filterLabel.setForeground(ColorScheme.MAINT_TEXT);
+		nothingFound.setForeground(ColorScheme.MAINT_TEXT);
 		totalLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.COUNT.getString())
 				.color(ColorScheme.LEAF_ICON).build());
 		shownLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.FUNNEL.getString())
@@ -73,7 +74,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		infopane.add(totalLabel);
 		infopane.add(shownLabel);
 
-		panel = new JPanel(new MigLayout("flowy, ins 0, gap 0, fill", "", "[min!][]"));
+		panel = new JPanel(new MigLayout("flowy, ins 0, gap 0, fill, hidemode 3", "", "[min!][]"));
 		panel.add(infopane, "growx");
 
 		treeFilter = treeFilterFactory.create(patternObservable);
@@ -83,21 +84,26 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		scrollPane = new JScrollPane(tree);
 		scrollPane.getVerticalScrollBar().addAdjustmentListener(verticalScrollBarListener);
 
+		panel.add(nothingFound, "pos 10 30");
 		panel.add(scrollPane, "grow");
 
 		tree.addFocusListener(getHandler());
 		scrollPane.addFocusListener(getHandler());
+		nothingFound.setVisible(false);
 		updateFilterLabel();
 	}
 
 	private void updateFilteredCounter(Integer count) {
 		shownLabel.setText(count != null ? formatter.format(count) : totalLabel.getText());
-		filterLabel.setForeground(count != null && count == 0 ? ColorScheme.ERROR : ColorScheme.MAINT_TEXT);
+		boolean empty = count != null && count == 0;
+
+		nothingFound.setVisible(empty);
+		filterLabel.setForeground(empty? ColorScheme.ERROR : ColorScheme.MAINT_TEXT);
 	}
 
 	void updateStructure(TreeStructure structure) {
 		totalLabel.setText(formatter.format(structure.getCount()));
-		shownLabel.setText(formatter.format(structure.getCount()));
+		updateFilteredCounter(null);
 		tree.updateModel(null, structure.getRoot());
 		treeFilter.updateStructure(structure);
 	}
