@@ -64,11 +64,13 @@ public class CustomTree extends JTree implements Destroyable {
 			updateSuitables();
 			viewportAreaSubscription = viewportArea.subscribe(visibleRectangle -> {
 				final int firstRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
+				int rowCount = visibleRectangle.height / rowHeight;
 				int lastRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
-				if (lastRow == -1 || firstRow == -1) {
+
+				if (firstRow == -1) {
 					return;
 				}
-				expandNodes(firstRow, lastRow);
+				expandNodes(firstRow, Math.max(lastRow, rowCount));
 			});
 		} else if(root == null) {
 			filteredCounterConsumer.accept(0);
@@ -106,7 +108,7 @@ public class CustomTree extends JTree implements Destroyable {
 	}
 
 	private void expandNodes(int startingIndex, int stopIndex) {
-		for (int i = startingIndex; i <= stopIndex; i++) {
+		for (int i = startingIndex; i <= stopIndex && i <= getRowCount(); i++) {
 
 			TreePath pathForRow = getPathForRow(i);
 			TreeNode node = (TreeNode) pathForRow.getLastPathComponent();
