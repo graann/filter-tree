@@ -37,6 +37,8 @@ public class CustomTree extends JTree implements Destroyable {
 	private Observable<Rectangle> viewportArea;
 	private Consumer<Integer> filteredCounterConsumer;
 
+	private boolean lock;
+
 	CustomTree(Observable<Tuple2<String, TreeNode>> filterObservable, Observable<Rectangle> viewportArea, Consumer<Integer> filteredCounterConsumer) {
 		super(new DefaultTreeModel(null));
 		model = (DefaultTreeModel) getModel();
@@ -48,6 +50,7 @@ public class CustomTree extends JTree implements Destroyable {
 	}
 
 	void updateModel(String pattern, TreeNode root) {
+		lock = true;
 		this.pattern = pattern;
 		boolean isRootTreeNode = root instanceof RootTreeNode;
 		suitables = isRootTreeNode ? ((RootTreeNode) root).getSelectedNodes() : Collections.emptyList();
@@ -62,6 +65,7 @@ public class CustomTree extends JTree implements Destroyable {
 		if (isRootTreeNode) {
 			filteredCounterConsumer.accept(((RootTreeNode) root).getFilteredCount());
 			updateSuitables();
+			lock = false;
 			viewportAreaSubscription = viewportArea.subscribe(visibleRectangle -> {
 				final int firstRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
 				int rowCount = visibleRectangle.height / rowHeight;
@@ -72,7 +76,7 @@ public class CustomTree extends JTree implements Destroyable {
 				}
 				expandNodes(firstRow, Math.max(lastRow, rowCount));
 			});
-		} else if(root == null) {
+		} else if (root == null) {
 			filteredCounterConsumer.accept(0);
 		} else {
 			filteredCounterConsumer.accept(null);
@@ -108,9 +112,13 @@ public class CustomTree extends JTree implements Destroyable {
 	}
 
 	private void expandNodes(int startingIndex, int stopIndex) {
-		for (int i = startingIndex; i <= stopIndex && i <= getRowCount(); i++) {
+		for (int i = startingIndex; i <= stopIndex && i <= getRowCount() && !lock; i++) {
 
 			TreePath pathForRow = getPathForRow(i);
+			if (pathForRow == null) {
+				return;
+			}
+
 			TreeNode node = (TreeNode) pathForRow.getLastPathComponent();
 			if (!opened.contains(node)) {
 				opened.add(node);
