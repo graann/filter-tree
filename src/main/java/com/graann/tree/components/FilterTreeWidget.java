@@ -2,7 +2,12 @@ package com.graann.tree.components;
 
 import com.graann.common.NumberFormatter;
 import com.graann.common.Viewable;
-import com.graann.styling.*;
+import com.graann.components.FilterBox;
+import com.graann.components.Messages;
+import com.graann.components.WidgetFactory;
+import com.graann.styling.ColorScheme;
+import com.graann.styling.FontIcon;
+import com.graann.styling.IconFontSymbols;
 import com.graann.tree.model.TreeFilter;
 import com.graann.tree.model.TreeFilterFactory;
 import com.graann.treeloader.TreeStructure;
@@ -25,14 +30,13 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 	private CustomTree tree;
 	private JLabel shownLabel;
-	private JLabel filterLabel;
+	private FilterBox filterLabel;
 	private JLabel totalLabel;
 	private JLabel nothingFound;
 	private JScrollPane scrollPane;
 	private JPanel panel;
 
 	private KeyHandler keyHandler;
-	private boolean focused;
 
 	private BehaviorSubject<Rectangle> verticalScrollObservable = BehaviorSubject.create();
 	private AdjustmentListener verticalScrollBarListener = e -> verticalScrollObservable.onNext(scrollPane.getViewport().getViewRect());
@@ -57,20 +61,18 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 		JPanel infopane = new JPanel(new MigLayout("flowx, fillx, ins 0 0 5 0", "[pref!]push[min!][min!]"));
 
-		filterLabel = new JLabel();
+		filterLabel = new FilterBox();
 		totalLabel = new JLabel();
 		shownLabel = new JLabel();
-		nothingFound = new JLabel(Messages.NOTHING_FOUND);
+		nothingFound = WidgetFactory.createWarningLabel(Messages.NOTHING_FOUND);
 
-		filterLabel.setForeground(ColorScheme.MAINT_TEXT);
-		nothingFound.setForeground(ColorScheme.MAINT_TEXT);
 		totalLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.COUNT.getString())
 				.color(ColorScheme.LEAF_ICON).build());
 		shownLabel.setIcon(FontIcon.builder().symbol(IconFontSymbols.FUNNEL.getString())
 				.fontSize(14)
 				.color(ColorScheme.LEAF_ICON).build());
 
-		infopane.add(filterLabel, "w 220!");
+		infopane.add(filterLabel.getView(), "w 220!");
 		infopane.add(totalLabel);
 		infopane.add(shownLabel);
 
@@ -90,7 +92,6 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		tree.addFocusListener(getHandler());
 		scrollPane.addFocusListener(getHandler());
 		nothingFound.setVisible(false);
-		updateFilterLabel();
 	}
 
 	private void updateFilteredCounter(Integer count) {
@@ -98,7 +99,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		boolean empty = count != null && count == 0;
 
 		nothingFound.setVisible(empty);
-		filterLabel.setForeground(empty? ColorScheme.ERROR : ColorScheme.MAINT_TEXT);
+		filterLabel.setState(empty ? FilterBox.State.ERROR : FilterBox.State.SUCCESS);
 	}
 
 	void updateStructure(TreeStructure structure) {
@@ -111,15 +112,6 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 	private void updatePattern(String typedString) {
 		filterLabel.setText(typedString);
 		patternObservable.onNext(typedString);
-		updateFilterLabel();
-		LAFUtils.setTooltipIfNeeded(filterLabel);
-	}
-
-	private void updateFilterLabel() {
-		filterLabel.setVisible(focused || !filterLabel.getText().isEmpty());
-		filterLabel.setIcon(focused ? FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
-				.color(ColorScheme.DEFAULT_ICON).build() : FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
-				.color(ColorScheme.DISABLED).build() );
 	}
 
 	@Override
@@ -177,18 +169,12 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 		@Override
 		public void focusGained(FocusEvent e) {
-			focused = true;
-			updateFilterLabel();
-
 			tree.addKeyListener(getHandler());
 			scrollPane.addKeyListener(getHandler());
 		}
 
 		@Override
 		public void focusLost(FocusEvent e) {
-			focused = false;
-			updateFilterLabel();
-
 			tree.removeKeyListener(getHandler());
 			scrollPane.removeKeyListener(getHandler());
 

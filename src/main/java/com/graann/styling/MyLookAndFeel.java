@@ -2,7 +2,7 @@ package com.graann.styling;
 
 import com.pagosoft.plaf.PgsLookAndFeel;
 
-import javax.swing.UIDefaults;
+import javax.swing.*;
 
 public class MyLookAndFeel extends PgsLookAndFeel {
 	@Override
@@ -33,7 +33,7 @@ public class MyLookAndFeel extends PgsLookAndFeel {
 				.color(ColorScheme.FOLDER_ICON).build(),
 
 				// *** Label
-				"Label.foreground", ColorScheme.MAINT_TEXT
+				"Label.foreground", ColorScheme.MAINT
 		});
 		return table;
 	}

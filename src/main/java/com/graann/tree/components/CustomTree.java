@@ -2,8 +2,8 @@ package com.graann.tree.components;
 
 import com.graann.common.Destroyable;
 import com.graann.common.RxUtils;
+import com.graann.components.Utils;
 import com.graann.styling.ColorScheme;
-import com.graann.styling.LAFUtils;
 import com.graann.tree.model.RootTreeNode;
 import org.reactfx.util.Tuple2;
 import rx.Observable;
@@ -93,7 +93,7 @@ public class CustomTree extends JTree implements Destroyable {
 	private void updateSuitables() {
 		for (DefaultMutableTreeNode next : suitables) {
 			String s = next.toString();
-			String res = LAFUtils.replacePattern(pattern, s, ColorScheme.PATTERN);
+			String res = Utils.replacePattern(pattern, s, ColorScheme.PATTERN);
 			next.setUserObject(res);
 		}
 	}
