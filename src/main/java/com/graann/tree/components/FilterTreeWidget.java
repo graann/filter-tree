@@ -1,5 +1,6 @@
 package com.graann.tree.components;
 
+import com.graann.common.NumberFormatter;
 import com.graann.common.Viewable;
 import com.graann.styling.ColorScheme;
 import com.graann.styling.FontIcon;
@@ -19,6 +20,7 @@ import java.awt.event.*;
  * @author gromova on 22.09.17.
  */
 public class FilterTreeWidget implements Viewable<JComponent> {
+	private NumberFormatter formatter = new NumberFormatter();
 	private BehaviorSubject<String> patternObservable = BehaviorSubject.create();
 
 	private TreeFilterFactory treeFilterFactory;
@@ -89,13 +91,13 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 	}
 
 	private void updateFilteredCounter(Integer count) {
-		shownLabel.setText(count != null ? String.valueOf(count) : totalLabel.getText());
+		shownLabel.setText(count != null ? formatter.format(count) : totalLabel.getText());
 		filterLabel.setForeground(count != null && count == 0 ? ColorScheme.ERROR : ColorScheme.MAINT_TEXT);
 	}
 
 	void updateStructure(TreeStructure structure) {
-		totalLabel.setText(String.valueOf(structure.getCount()));
-		shownLabel.setText(String.valueOf(structure.getCount()));
+		totalLabel.setText(formatter.format(structure.getCount()));
+		shownLabel.setText(formatter.format(structure.getCount()));
 		tree.updateModel(null, structure.getRoot());
 		treeFilter.updateStructure(structure);
 	}
