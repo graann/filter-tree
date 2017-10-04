@@ -70,12 +70,11 @@ public class CustomTree extends JTree implements Destroyable {
 				lock = false;
 				final int firstRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
 				int rowCount = visibleRectangle.height / rowHeight;
-				int lastRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y + visibleRectangle.height);
 
 				if (firstRow == -1) {
 					return;
 				}
-				expandNodes(firstRow, Math.max(lastRow, rowCount));
+				expandNodes(firstRow, firstRow + rowCount);
 			});
 		} else if (root == null) {
 			filteredCounterConsumer.accept(0);
