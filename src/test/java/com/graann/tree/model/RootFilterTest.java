@@ -74,23 +74,28 @@ public class RootFilterTest {
 
 					assertEquals(root.toString(), root.toString());
 
-					TreeNode child0 = root.getChildAt(0);
+					DefaultMutableTreeNode child0 = (DefaultMutableTreeNode) root.getChildAt(0);
 					assertEquals(child0.toString(), ch0.toString());
 
-					TreeNode child01 = child0.getChildAt(0);
-					assertEquals(child01.toString(), ch00.toString());
+					DefaultMutableTreeNode child00 = (DefaultMutableTreeNode) child0.getChildAt(0);
+					assertEquals(child00.toString(), ch00.toString());
 
-					TreeNode child1 = root.getChildAt(1);
+					DefaultMutableTreeNode child1 = (DefaultMutableTreeNode) root.getChildAt(1);
 					assertEquals(child1.toString(), ch1.toString());
 
-					TreeNode child10 = child1.getChildAt(0);
+					DefaultMutableTreeNode child10 = (DefaultMutableTreeNode) child1.getChildAt(0);
 					assertEquals(child10.toString(), ch10.toString());
 
-					TreeNode child11 = child1.getChildAt(1);
+					DefaultMutableTreeNode child11 = (DefaultMutableTreeNode) child1.getChildAt(1);
 					assertEquals(child11.toString(), ch12.toString());
 
-					TreeNode child110 = child11.getChildAt(0);
+					DefaultMutableTreeNode child110 = (DefaultMutableTreeNode) child11.getChildAt(0);
 					assertEquals(child110.toString(), ch120.toString());
+
+					DefaultMutableTreeNode[] treeNodes = {child0, child00, child10, child110};
+					List<DefaultMutableTreeNode> selectedNodes = root.getSelectedNodes();
+
+					Assert.assertArrayEquals(treeNodes, selectedNodes.toArray());
 				});
 
 		Thread.sleep(500);
