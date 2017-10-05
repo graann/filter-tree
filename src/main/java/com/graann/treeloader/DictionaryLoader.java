@@ -13,6 +13,7 @@ import java.util.*;
  */
 public class DictionaryLoader implements TreeLoader {
 //	private static final String FILE_NAME = "/dict.txt";
+//	private static final String FILE_NAME = "/filestreeBig.txt";
 	private static final String FILE_NAME = "/filestree.txt";
 	private static final String CHARSET_NAME = "UTF8";
 
