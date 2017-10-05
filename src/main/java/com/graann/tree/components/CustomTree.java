@@ -61,8 +61,9 @@ public class CustomTree extends JTree implements Destroyable {
 
 		RxUtils.unsubscribe(viewportAreaSubscription);
 
+		filteredCounterConsumer.accept(isRootTreeNode ? ((RootTreeNode) root).getFilteredCount() : null);
+
 		if (isRootTreeNode) {
-			filteredCounterConsumer.accept(((RootTreeNode) root).getFilteredCount());
 			updateSuitables();
 			expandVisible(viewportArea.getValue());
 
