@@ -28,6 +28,10 @@ public class FilterBox implements Viewable<JComponent> {
 		};
 
 		label.addPropertyChangeListener("text", listener);
+		label.setIcon(FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
+				.color(ColorScheme.MAINT).build());
+		label.setDisabledIcon(FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
+				.color(ColorScheme.DISABLED).build());
 
 	}
 
@@ -51,9 +55,7 @@ public class FilterBox implements Viewable<JComponent> {
 
 	private void updateStatus() {
 		label.setVisible(active || !isNullOrEmpty(label.getText()));
-		label.setIcon(active ? FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
-				.color(ColorScheme.MAINT).build() : FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
-				.color(ColorScheme.DISABLED).build() );
+		label.setEnabled(active);
 	}
 
 	private static boolean isNullOrEmpty(@Nullable String string) {
