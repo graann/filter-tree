@@ -45,8 +45,7 @@ public class TreeFilter implements Destroyable {
 		trigramStringFilter = stringFilterFactory.create(structure.getStrings());
 
 		filterSubscription = patternObservable
-				.distinctUntilChanged()
-				.throttleLast(200, TimeUnit.MILLISECONDS)
+				.debounce(200, TimeUnit.MILLISECONDS)
 				.startWith("")
 				.switchMap(s -> {
 					if(s == null || s.isEmpty()) {
