@@ -17,8 +17,6 @@ import javax.swing.tree.TreeNode;
 import java.util.concurrent.TimeUnit;
 
 public class TreeFilter implements Destroyable {
-	private static final Logger LOG = LoggerFactory.getLogger(TreeFilter.class);
-
 	private Observable<String> patternObservable;
 
 	private StringFilterFactory stringFilterFactory = new StringFilterFactory();
@@ -48,7 +46,7 @@ public class TreeFilter implements Destroyable {
 
 		filterSubscription = patternObservable
 				.distinctUntilChanged()
-				.debounce(300, TimeUnit.MILLISECONDS)
+				.throttleLast(200, TimeUnit.MILLISECONDS)
 				.startWith("")
 				.switchMap(s -> {
 					if(s == null || s.isEmpty()) {
