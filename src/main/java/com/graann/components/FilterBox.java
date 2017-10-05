@@ -7,7 +7,6 @@ import com.graann.styling.IconFontSymbols;
 import com.sun.istack.internal.Nullable;
 
 import javax.swing.*;
-import java.beans.PropertyChangeListener;
 
 public class FilterBox implements Viewable<JComponent> {
 	public enum State {
@@ -23,11 +22,7 @@ public class FilterBox implements Viewable<JComponent> {
 		label = WidgetFactory.createIconLabel(IconFontSymbols.SEARCH);
 		label.setForeground(ColorScheme.MAINT);
 
-		PropertyChangeListener listener = (e) -> {
-			Utils.setTooltipIfNeeded(label);
-		};
-
-		label.addPropertyChangeListener("text", listener);
+		label.addPropertyChangeListener("text", (e) -> Utils.setTooltipIfNeeded(label));
 		label.setIcon(FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())
 				.color(ColorScheme.MAINT).build());
 		label.setDisabledIcon(FontIcon.builder().symbol(IconFontSymbols.SEARCH.getString())

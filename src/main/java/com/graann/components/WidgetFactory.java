@@ -8,17 +8,9 @@ import javax.swing.*;
 import java.awt.*;
 
 public class WidgetFactory {
-	public static final String ERROR = "error";
-
 	private static JLabel createLabel() {
 		JLabel label = new JLabel();
 		label.setForeground(ColorScheme.MAINT);
-		return label;
-	}
-
-	public static JLabel createLabel(Messages key) {
-		JLabel label = createLabel();
-		label.setText(key.getString());
 		return label;
 	}
 
@@ -36,12 +28,10 @@ public class WidgetFactory {
 		label.setFont(new Font(labelFont.getName(), style, size));
 	}
 
-	public static JLabel createIconLabel(IconFontSymbols key) {
+	static JLabel createIconLabel(IconFontSymbols key) {
 		JLabel label = createLabel();
 		label.setIcon(FontIcon.builder().symbol(key.getString())
 				.color(ColorScheme.LEAF_ICON).build());
 		return label;
 	}
-
-
 }

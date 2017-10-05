@@ -14,7 +14,6 @@ import rx.subjects.BehaviorSubject;
 
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class TreeFilter implements Destroyable {
@@ -52,26 +51,26 @@ public class TreeFilter implements Destroyable {
 				.throttleLast(200, TimeUnit.MILLISECONDS)
 				.switchMap(s -> {
 					if(s == null) {
-						return Observable.just(new Filtered(s, null));
+						return Observable.just(null);
 					}
 					return trigramStringFilter.appropriateStringObservable(s)
-							.map(strings -> new Filtered(s, strings));
+							.map(strings -> Tuples.t(s, strings));
 				})
-				.switchMap(filtered -> {
-					if (filtered.strings == null) {
-						return Observable.just(Tuples.t(filtered.pattern, structure.getRoot()));
+				.switchMap(tuple2 -> {
+					if (tuple2 == null) {
+						return Observable.just(Tuples.t("", structure.getRoot()));
 					}
 
-					if (filtered.strings.isEmpty()) {
-						return Observable.just(Tuples.t(filtered.pattern, ((TreeNode) null)));
+					if (tuple2._2.isEmpty()) {
+						return Observable.just(Tuples.t(tuple2._1, ((TreeNode) null)));
 					}
 
-					return treeNodeFilter.rootObservable(structure, filtered.strings)
-							.map(treeNode -> Tuples.t(filtered.pattern, treeNode));
+					return treeNodeFilter.rootObservable(structure, tuple2._2)
+							.map(treeNode -> Tuples.t(tuple2._1, treeNode));
 				})
 				.distinctUntilChanged()
 				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
-				.subscribe(t ->	filterObservable.onNext(t));
+				.subscribe(filterObservable::onNext);
 	}
 
 
@@ -89,16 +88,6 @@ public class TreeFilter implements Destroyable {
 		RxUtils.unsubscribe(filterSubscription);
 		if(trigramStringFilter != null) {
 			trigramStringFilter.destroy();
-		}
-	}
-
-	private class Filtered {
-		final String pattern;
-		final Set<String> strings;
-
-		private Filtered(String pattern, Set<String> strings) {
-			this.pattern = pattern;
-			this.strings = strings;
 		}
 	}
 }
