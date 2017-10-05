@@ -130,13 +130,21 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 					return;
 				}
 
+
 				char c = e.getKeyChar();
-				if (c == KeyEvent.VK_BACK_SPACE) {
-					if (typedString.length() > 0) {
-						typedString = typedString.substring(0, typedString.length() - 1);
-					}
-				} else {
-					typedString += c;
+
+				switch (c) {
+					case KeyEvent.VK_ESCAPE:
+						typedString = "";
+						break;
+					case KeyEvent.VK_BACK_SPACE:
+						if (typedString.length() > 0) {
+							typedString = typedString.substring(0, typedString.length() - 1);
+						}
+						break;
+					default:
+						typedString += c;
+
 				}
 
 				updatePattern(typedString);
