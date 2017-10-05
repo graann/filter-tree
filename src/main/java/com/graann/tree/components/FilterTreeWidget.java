@@ -39,7 +39,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 	private KeyHandler keyHandler;
 
 	private final BehaviorSubject<Rectangle> verticalScrollObservable = BehaviorSubject.create();
-	private final AdjustmentListener verticalScrollBarListener = e -> verticalScrollObservable.onNext(scrollPane.getViewport().getViewRect());
+	private final AdjustmentListener verticalScrollBarListener = e -> fillScrollObservable();
 
 	void setTreeFilterFactory(TreeFilterFactory treeFilterFactory) {
 		this.treeFilterFactory = treeFilterFactory;
@@ -91,6 +91,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 		tree.addFocusListener(getHandler());
 		scrollPane.addFocusListener(getHandler());
+		fillScrollObservable();
 		nothingFound.setVisible(false);
 	}
 
@@ -112,6 +113,10 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 	private void updatePattern(String typedString) {
 		filterLabel.setText(typedString);
 		patternObservable.onNext(typedString);
+	}
+
+	private void fillScrollObservable() {
+		verticalScrollObservable.onNext(scrollPane.getViewport().getViewRect());
 	}
 
 	@Override

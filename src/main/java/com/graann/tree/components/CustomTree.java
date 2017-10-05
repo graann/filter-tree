@@ -8,6 +8,7 @@ import com.graann.tree.model.RootTreeNode;
 import org.reactfx.util.Tuple2;
 import rx.Observable;
 import rx.Subscription;
+import rx.subjects.BehaviorSubject;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -35,12 +36,10 @@ public class CustomTree extends JTree implements Destroyable {
 	private List<DefaultMutableTreeNode> suitables = Collections.emptyList();
 	private final SelectionController selectionController;
 
-	private final Observable<Rectangle> viewportArea;
+	private final BehaviorSubject<Rectangle> viewportArea;
 	private final Consumer<Integer> filteredCounterConsumer;
 
-	private boolean lock;
-
-	CustomTree(Observable<Tuple2<String, TreeNode>> filterObservable, Observable<Rectangle> viewportArea, Consumer<Integer> filteredCounterConsumer) {
+	CustomTree(Observable<Tuple2<String, TreeNode>> filterObservable, BehaviorSubject<Rectangle> viewportArea, Consumer<Integer> filteredCounterConsumer) {
 		super(new DefaultTreeModel(null));
 		model = (DefaultTreeModel) getModel();
 		this.viewportArea = viewportArea;
@@ -51,7 +50,6 @@ public class CustomTree extends JTree implements Destroyable {
 	}
 
 	void updateModel(String pattern, TreeNode root) {
-		lock = true;
 		this.pattern = pattern;
 		boolean isRootTreeNode = root instanceof RootTreeNode;
 		suitables = isRootTreeNode ? ((RootTreeNode) root).getSelectedNodes() : Collections.emptyList();
@@ -66,24 +64,26 @@ public class CustomTree extends JTree implements Destroyable {
 		if (isRootTreeNode) {
 			filteredCounterConsumer.accept(((RootTreeNode) root).getFilteredCount());
 			updateSuitables();
+			expandVisible(viewportArea.getValue());
 
 			viewportAreaSubscription = viewportArea
 					.throttleLast(80, TimeUnit.MILLISECONDS)
-					.subscribe(visibleRectangle -> {
-				lock = false;
-				final int firstRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
-				int rowCount = visibleRectangle.height / rowHeight;
-
-				if (firstRow == -1) {
-					return;
-				}
-				expandNodes(firstRow, firstRow + rowCount);
-			});
+					.subscribe(this::expandVisible);
 		} else if (root == null) {
 			filteredCounterConsumer.accept(0);
 		} else {
 			filteredCounterConsumer.accept(null);
 		}
+	}
+
+	private void expandVisible(Rectangle visibleRectangle) {
+		final int firstRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
+		int rowCount = visibleRectangle.height / rowHeight;
+
+		if (firstRow == -1) {
+			return;
+		}
+		expandNodes(firstRow, firstRow + rowCount);
 	}
 
 
@@ -115,7 +115,7 @@ public class CustomTree extends JTree implements Destroyable {
 	}
 
 	private void expandNodes(int startingIndex, int stopIndex) {
-		for (int i = startingIndex; i <= stopIndex && i <= getRowCount() && !lock; i++) {
+		for (int i = startingIndex; i <= stopIndex && i <= getRowCount(); i++) {
 
 			TreePath pathForRow = getPathForRow(i);
 			if (pathForRow == null) {

@@ -50,14 +50,14 @@ public class TreeFilter implements Destroyable {
 				.distinctUntilChanged()
 				.throttleLast(200, TimeUnit.MILLISECONDS)
 				.switchMap(s -> {
-					if(s == null) {
+					if(s == null || s.isEmpty()) {
 						return Observable.just(null);
 					}
 					return trigramStringFilter.appropriateStringObservable(s)
 							.map(strings -> Tuples.t(s, strings));
 				})
 				.switchMap(tuple2 -> {
-					if (tuple2 == null) {
+					if (tuple2 == null || tuple2._2 == null) {
 						return Observable.just(Tuples.t("", structure.getRoot()));
 					}
 
