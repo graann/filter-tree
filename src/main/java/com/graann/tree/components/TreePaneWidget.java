@@ -20,6 +20,8 @@ public class TreePaneWidget implements Viewable<JComponent> {
 	private TreeWidgetFactory treeWidgetFactory;
 	private FilterTreeWidget filterTreeWidget;
 
+	private String fileName;
+
 	private JPanel panel;
 
 	void setLoader(TreeLoader loader) {
@@ -28,6 +30,10 @@ public class TreePaneWidget implements Viewable<JComponent> {
 
 	void setTreeWidgetFactory(TreeWidgetFactory treeWidgetFactory) {
 		this.treeWidgetFactory = treeWidgetFactory;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 
 	public JComponent getView() {
@@ -42,7 +48,7 @@ public class TreePaneWidget implements Viewable<JComponent> {
 
 		panel.add(filterTreeWidget.getView(), "grow, span 2");
 
-		loaderSubscriber = loader.loadTreeStructure()
+		loaderSubscriber = loader.loadTreeStructure(fileName)
 				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(filterTreeWidget::updateStructure);
 	}

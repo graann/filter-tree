@@ -10,8 +10,9 @@ public class DefaultTreePaneWidgetFactory implements TreePaneWidgetFactory {
 	private final TreeLoader loader = new DictionaryLoader();
 	private final TreeWidgetFactory treeWidgetFactory = new TreeWidgetFactory();
 
-	public TreePaneWidget create() {
+	public TreePaneWidget create(String fileName) {
 		TreePaneWidget tree = new TreePaneWidget();
+		tree.setFileName(fileName);
 		tree.setLoader(loader);
 		tree.setTreeWidgetFactory(treeWidgetFactory);
 		tree.initialize();
