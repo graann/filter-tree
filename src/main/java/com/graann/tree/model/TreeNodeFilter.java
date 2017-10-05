@@ -9,6 +9,6 @@ import java.util.Set;
 /**
  * @author gromova on 25.09.17.
  */
-public interface TreeNodeFilter {
+interface TreeNodeFilter {
 	Observable<TreeNode> rootObservable(TreeStructure treeStructure, Set<String> filtered);
 }

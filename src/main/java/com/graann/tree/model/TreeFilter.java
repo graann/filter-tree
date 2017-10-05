@@ -28,7 +28,7 @@ public class TreeFilter implements Destroyable {
 
 	private Subscription filterSubscription;
 
-	private BehaviorSubject<Tuple2<String, TreeNode>> filterObservable = BehaviorSubject.create();
+	private final BehaviorSubject<Tuple2<String, TreeNode>> filterObservable = BehaviorSubject.create();
 
 	void setStringFilterFactory(StringFilterFactory stringFilterFactory) {
 		this.stringFilterFactory = stringFilterFactory;
@@ -93,8 +93,8 @@ public class TreeFilter implements Destroyable {
 	}
 
 	private class Filtered {
-		String pattern;
-		Set<String> strings;
+		final String pattern;
+		final Set<String> strings;
 
 		private Filtered(String pattern, Set<String> strings) {
 			this.pattern = pattern;

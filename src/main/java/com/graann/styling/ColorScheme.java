@@ -10,5 +10,5 @@ public class ColorScheme {
 	public static final Color DISABLED = new Color(0xBBBBBB);
 	public static final Color FOLDER_ICON = new Color(0x95918B);
 	public static final Color LEAF_ICON = new Color(0x7BA4AB);
-	public static final Color PATTERN = new Color(0xC86C00);
+	public static final Color PATTERN = new Color(0xEC6000);
 }

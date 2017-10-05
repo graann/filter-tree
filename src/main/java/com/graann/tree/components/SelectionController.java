@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.List;
 
 class SelectionController {
-	private JTree tree;
-	private TreeSelectionModel selectionModel;
+	private final JTree tree;
+	private final TreeSelectionModel selectionModel;
 	private List<DefaultMutableTreeNode> suitables = Collections.emptyList();
 
 	SelectionController(JTree tree) {

@@ -25,17 +25,17 @@ import java.util.function.Consumer;
  * @author gromova on 26.09.17.
  */
 public class CustomTree extends JTree implements Destroyable {
-	private DefaultTreeModel model;
-	private Set<TreeNode> opened = new HashSet<>();
-	private Subscription filterSubscriber;
+	private final DefaultTreeModel model;
+	private final Set<TreeNode> opened = new HashSet<>();
+	private final Subscription filterSubscriber;
 	private Subscription viewportAreaSubscription;
 
 	private String pattern;
 	private List<DefaultMutableTreeNode> suitables = Collections.emptyList();
-	private SelectionController selectionController;
+	private final SelectionController selectionController;
 
-	private Observable<Rectangle> viewportArea;
-	private Consumer<Integer> filteredCounterConsumer;
+	private final Observable<Rectangle> viewportArea;
+	private final Consumer<Integer> filteredCounterConsumer;
 
 	private boolean lock;
 

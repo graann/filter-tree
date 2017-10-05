@@ -12,7 +12,7 @@ import java.awt.*;
  * @author gromova on 20.09.17.
  */
 public class App {
-	private static TreePaneWidgetFactory treeFactory = new DefaultTreePaneWidgetFactory();
+	private static final TreePaneWidgetFactory treeFactory = new DefaultTreePaneWidgetFactory();
 
 	public static void main(String[] args) {
 		createAndShow();

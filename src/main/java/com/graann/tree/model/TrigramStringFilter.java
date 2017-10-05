@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  */
 public class TrigramStringFilter implements StringFilter {
 	private final static int N = 3;
-	private static BehaviorSubject<PatriciaTrie<Set<String>>> trieBehaviorSubject = BehaviorSubject.create();
+	private static final BehaviorSubject<PatriciaTrie<Set<String>>> trieBehaviorSubject = BehaviorSubject.create();
 
 	void setStrings(Set<String> strings) {
 		computeTrie(strings);

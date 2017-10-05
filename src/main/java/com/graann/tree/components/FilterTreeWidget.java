@@ -22,8 +22,8 @@ import java.awt.event.*;
  * @author gromova on 22.09.17.
  */
 public class FilterTreeWidget implements Viewable<JComponent> {
-	private NumberFormatter formatter = new NumberFormatter();
-	private BehaviorSubject<String> patternObservable = BehaviorSubject.create();
+	private final NumberFormatter formatter = new NumberFormatter();
+	private final BehaviorSubject<String> patternObservable = BehaviorSubject.create();
 
 	private TreeFilterFactory treeFilterFactory;
 	private TreeFilter treeFilter;
@@ -38,8 +38,8 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 	private KeyHandler keyHandler;
 
-	private BehaviorSubject<Rectangle> verticalScrollObservable = BehaviorSubject.create();
-	private AdjustmentListener verticalScrollBarListener = e -> verticalScrollObservable.onNext(scrollPane.getViewport().getViewRect());
+	private final BehaviorSubject<Rectangle> verticalScrollObservable = BehaviorSubject.create();
+	private final AdjustmentListener verticalScrollBarListener = e -> verticalScrollObservable.onNext(scrollPane.getViewport().getViewRect());
 
 	void setTreeFilterFactory(TreeFilterFactory treeFilterFactory) {
 		this.treeFilterFactory = treeFilterFactory;
@@ -130,9 +130,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 					return;
 				}
 
-
 				char c = e.getKeyChar();
-
 				switch (c) {
 					case KeyEvent.VK_ESCAPE:
 						typedString = "";
@@ -177,12 +175,14 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 		@Override
 		public void focusGained(FocusEvent e) {
+			filterLabel.setActive(true);
 			tree.addKeyListener(getHandler());
 			scrollPane.addKeyListener(getHandler());
 		}
 
 		@Override
 		public void focusLost(FocusEvent e) {
+			filterLabel.setActive(false);
 			tree.removeKeyListener(getHandler());
 			scrollPane.removeKeyListener(getHandler());
 

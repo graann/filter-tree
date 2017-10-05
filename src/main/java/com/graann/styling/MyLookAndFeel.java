@@ -21,10 +21,10 @@ public class MyLookAndFeel extends PgsLookAndFeel {
 				.color(ColorScheme.DEFAULT_ICON).build(),
 				"Tree.collapsedIcon", FontIcon.builder().symbol(IconFontSymbols.ARROW_RIGHT.getString())
 				.color(ColorScheme.DEFAULT_ICON).build(),
-				"Tree.rowHeight", Integer.valueOf(22),
-				"Tree.totalChildIndent", Integer.valueOf(15),
-				"Tree.rightChildIndent", Integer.valueOf(10),
-				"Tree.leftChildIndent", Integer.valueOf(15),
+				"Tree.rowHeight", 22,
+				"Tree.totalChildIndent", 15,
+				"Tree.rightChildIndent", 10,
+				"Tree.leftChildIndent", 15,
 				"Tree.leafIcon", FontIcon.builder().symbol(IconFontSymbols.LEAF.getString())
 				.color(ColorScheme.LEAF_ICON).build(),
 				"Tree.closedIcon", FontIcon.builder().symbol(IconFontSymbols.FOLDER.getString())

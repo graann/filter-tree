@@ -10,7 +10,7 @@ import java.awt.*;
 public class WidgetFactory {
 	public static final String ERROR = "error";
 
-	public static JLabel createLabel() {
+	private static JLabel createLabel() {
 		JLabel label = new JLabel();
 		label.setForeground(ColorScheme.MAINT);
 		return label;
@@ -26,7 +26,7 @@ public class WidgetFactory {
 		JLabel label = createLabel();
 		label.setText(key.getString());
 		label.setForeground(ColorScheme.WARNING);
-		changeFontSize(label, Font.ITALIC, 16);
+		changeFontSize(label, Font.PLAIN, 16);
 
 		return label;
 	}

@@ -3,8 +3,8 @@ package com.graann.tree.model;
 import rx.Observable;
 
 public class TreeFilterFactory {
-	private TreeNodeFilter treeNodeFilter = new RootFilter();
-	private StringFilterFactory stringFilterFactory = new StringFilterFactory();
+	private final TreeNodeFilter treeNodeFilter = new RootFilter();
+	private final StringFilterFactory stringFilterFactory = new StringFilterFactory();
 
 	public TreeFilter create(Observable<String> patternObservable) {
 		TreeFilter controller = new TreeFilter();

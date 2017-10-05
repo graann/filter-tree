@@ -1,22 +1,14 @@
 package com.graann.styling;
 
-import javax.swing.Icon;
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * @author gromova on 30.09.17.
  */
 public class FontIcon implements Icon {
 	private static final int DEFAULT_FONT_SIZE = 16;
-	private static Font ICON_FONT = new Font("ionicons", Font.PLAIN, DEFAULT_FONT_SIZE);
+	private static final Font ICON_FONT = new Font("ionicons", Font.PLAIN, DEFAULT_FONT_SIZE);
 
 	private final String symbol;
 	private final Color color;
@@ -30,7 +22,7 @@ public class FontIcon implements Icon {
 		return new SymbolFontIconBuilder();
 	}
 
-	public FontIcon(String symbol, Color color, Dimension size, int xShift, int yShift, int fontSize, boolean useBaselineDescent) {
+	private FontIcon(String symbol, Color color, Dimension size, int xShift, int yShift, int fontSize, boolean useBaselineDescent) {
 		this.symbol = symbol;
 		this.color = color;
 		this.size = size;
