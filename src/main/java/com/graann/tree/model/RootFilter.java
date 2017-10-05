@@ -1,5 +1,6 @@
 package com.graann.tree.model;
 
+import com.graann.common.Reference;
 import com.graann.treeloader.TreeStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +37,10 @@ public class RootFilter implements TreeNodeFilter {
 			Predicate<TreeNode> predicate = available::contains;
 
 			final List<DefaultMutableTreeNode> customTreeNodes = new ArrayList<>();
-			final AtomicInteger counter = new AtomicInteger();
+			final Reference<Integer> counter = new Reference<>(0);
 
 			BiConsumer<TreeNode, DefaultMutableTreeNode> consumer = (source, node) -> {
-				counter.incrementAndGet();
+				counter.setValue(counter.getValue()+1);
 				if (filteredNodes.contains(source)) {
 					customTreeNodes.add(node);
 				}
