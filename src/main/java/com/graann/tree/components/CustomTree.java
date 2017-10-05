@@ -49,7 +49,7 @@ public class CustomTree extends JTree implements Destroyable {
 		filterSubscriber = filterObservable.subscribe(t -> updateModel(t._1, t._2));
 	}
 
-	void updateModel(String pattern, TreeNode root) {
+	private void updateModel(String pattern, TreeNode root) {
 		this.pattern = pattern;
 		boolean isRootTreeNode = root instanceof RootTreeNode;
 		suitables = isRootTreeNode ? ((RootTreeNode) root).getSelectedNodes() : Collections.emptyList();

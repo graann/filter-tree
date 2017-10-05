@@ -105,8 +105,6 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 	void updateStructure(TreeStructure structure) {
 		totalLabel.setText(formatter.format(structure.getCount()));
-		updateFilteredCounter(null);
-		tree.updateModel(null, structure.getRoot());
 		treeFilter.updateStructure(structure);
 	}
 
