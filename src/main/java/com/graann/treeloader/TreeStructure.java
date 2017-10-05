@@ -28,7 +28,7 @@ public final class TreeStructure {
 		return count;
 	}
 
-	TreeStructure(TreeNode root, Map<String, Set<TreeNode>> treemap, int count) {
+	public TreeStructure(TreeNode root, Map<String, Set<TreeNode>> treemap, int count) {
 		this.root = root;
 		this.treemap = treemap;
 		this.count = count;
