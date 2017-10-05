@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -66,7 +67,9 @@ public class CustomTree extends JTree implements Destroyable {
 			filteredCounterConsumer.accept(((RootTreeNode) root).getFilteredCount());
 			updateSuitables();
 
-			viewportAreaSubscription = viewportArea.subscribe(visibleRectangle -> {
+			viewportAreaSubscription = viewportArea
+					.throttleLast(80, TimeUnit.MILLISECONDS)
+					.subscribe(visibleRectangle -> {
 				lock = false;
 				final int firstRow = getClosestRowForLocation(visibleRectangle.x, visibleRectangle.y);
 				int rowCount = visibleRectangle.height / rowHeight;

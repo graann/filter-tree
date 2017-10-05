@@ -36,7 +36,7 @@ public class TrigramStringFilter implements StringFilter {
 				subscriber.onSuccess(new PatriciaTrie<>(map));
 			})
 			.subscribeOn(Schedulers.computation())
-			.subscribe(setPatriciaTrie -> trieBehaviorSubject.onNext(setPatriciaTrie));
+			.subscribe(trieBehaviorSubject::onNext);
 	}
 
 	@Override
