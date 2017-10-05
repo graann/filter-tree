@@ -1,6 +1,5 @@
 package com.graann.tree.components;
 
-import com.graann.common.NumberFormatter;
 import com.graann.common.Viewable;
 import com.graann.components.FilterBox;
 import com.graann.components.Messages;
@@ -17,12 +16,13 @@ import rx.subjects.BehaviorSubject;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.DecimalFormat;
 
 /**
  * @author gromova on 22.09.17.
  */
 public class FilterTreeWidget implements Viewable<JComponent> {
-	private final NumberFormatter formatter = new NumberFormatter();
+	private final DecimalFormat formatter = new DecimalFormat();
 	private final BehaviorSubject<String> patternObservable = BehaviorSubject.create();
 
 	private TreeFilterFactory treeFilterFactory;

@@ -48,7 +48,7 @@ public class TreeFilter implements Destroyable {
 
 		filterSubscription = patternObservable
 				.distinctUntilChanged()
-				.throttleLast(200, TimeUnit.MILLISECONDS)
+				.debounce(300, TimeUnit.MILLISECONDS)
 				.startWith("")
 				.switchMap(s -> {
 					if(s == null || s.isEmpty()) {
