@@ -34,6 +34,9 @@ public class RootFilterTest {
 	private DefaultMutableTreeNode ch12= createNode("widget", map);
 	private DefaultMutableTreeNode ch120 = createNode("tree", map);
 
+	private final Object lock = new Object();
+	private volatile boolean semaphore = false;
+
 	@Before
 	public void setUp() throws Exception {
 		root.add(ch0);
@@ -57,6 +60,7 @@ public class RootFilterTest {
 
 	@After
 	public void tearDown() throws Exception {
+		semaphore = false;
 	}
 
 	@Test
@@ -65,6 +69,8 @@ public class RootFilterTest {
 		set.add(ch00.toString());
 		set.add(ch0.toString());
 		set.add(ch120.toString());
+
+
 
 		treeNodeFilter.rootObservable(treeStructure, set)
 				.subscribe(treeNode -> {
@@ -96,17 +102,23 @@ public class RootFilterTest {
 					List<DefaultMutableTreeNode> selectedNodes = root.getSelectedNodes();
 
 					Assert.assertArrayEquals(treeNodes, selectedNodes.toArray());
+
+					synchronized (lock) {
+						semaphore = true;
+						lock.notifyAll();
+					}
 				});
 
-		Thread.sleep(500);
+		synchronized (lock) {
+			while (!semaphore) {
+				lock.wait(10000);
+			}
+		}
 	}
 
 	@Test
 	public void emptySetObservable() throws Exception {
 		treeNodeFilter.rootObservable(treeStructure, Collections.emptySet())
 				.subscribe(Assert::assertNull);
-
-		Thread.sleep(500);
 	}
-
 }
