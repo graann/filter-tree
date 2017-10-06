@@ -132,6 +132,8 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 				char c = e.getKeyChar();
 				switch (c) {
+					case KeyEvent.VK_ENTER:
+						return;
 					case KeyEvent.VK_ESCAPE:
 						typedString = "";
 						break;
