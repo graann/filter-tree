@@ -15,7 +15,6 @@ public class FilterBox implements Viewable<JComponent> {
 	}
 
 	private final JLabel label;
-	private State state = State.SUCCESS;
 	private boolean active;
 
 	public FilterBox() {
