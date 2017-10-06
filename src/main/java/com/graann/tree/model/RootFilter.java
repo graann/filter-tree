@@ -78,9 +78,8 @@ public class RootFilter implements TreeNodeFilter {
 			return;
 		}
 
-		Enumeration children = source.children();
-		while (children.hasMoreElements() && !Thread.currentThread().isInterrupted()) {
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) children.nextElement();
+		for (int i = 0; i < source.getChildCount() && !Thread.currentThread().isInterrupted(); i++) {
+			TreeNode node = source.getChildAt(i);
 			if (predicate.test(node)) {
 				DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(node.toString());
 				consumer.accept(node, newNode);
