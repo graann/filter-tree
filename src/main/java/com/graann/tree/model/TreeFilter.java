@@ -64,7 +64,6 @@ public class TreeFilter implements Destroyable {
 					return treeNodeFilter.rootObservable(structure, tuple2._2)
 							.map(treeNode -> Tuples.t(tuple2._1, treeNode));
 				})
-				.distinctUntilChanged()
 				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(filterObservable::onNext);
 	}

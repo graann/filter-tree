@@ -2,8 +2,6 @@ package com.graann.tree.model;
 
 import com.graann.common.Reference;
 import com.graann.treeloader.TreeStructure;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
@@ -15,7 +13,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class RootFilter implements TreeNodeFilter {
-	private static final Logger LOG = LoggerFactory.getLogger(RootFilter.class);
 
 	public Observable<TreeNode> rootObservable(TreeStructure treeStructure, Set<String> filtered) {
 		return Observable.<TreeNode>create(subscriber -> {
@@ -27,7 +24,6 @@ public class RootFilter implements TreeNodeFilter {
 					.collect(Collectors.toSet());
 
 			if (filteredNodes.isEmpty()) {
-				LOG.debug("filteredNodes.isEmpty() return null");
 				subscriber.onNext(null);
 				return;
 			}
