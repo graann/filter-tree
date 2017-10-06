@@ -8,7 +8,7 @@ import java.util.List;
 class SelectionController {
 	private final JTree tree;
 	private final TreeSelectionModel selectionModel;
-	private List<DefaultMutableTreeNode> suitables = Collections.emptyList();
+	private List<DefaultMutableTreeNode> suitable = Collections.emptyList();
 
 	SelectionController(JTree tree) {
 		this.tree = tree;
@@ -17,15 +17,15 @@ class SelectionController {
 		selectionModel.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 	}
 
-	void setSuitables(List<DefaultMutableTreeNode> suitables) {
-		this.suitables = suitables;
-		if (suitables != null && !suitables.isEmpty()) {
+	void setSuitable(List<DefaultMutableTreeNode> suitable) {
+		this.suitable = suitable;
+		if (suitable != null && !suitable.isEmpty()) {
 			firstSuitable();
 		}
 	}
 
 	void previousSuitable() {
-		if (suitables == null || suitables.isEmpty()) return;
+		if (suitable == null || suitable.isEmpty()) return;
 		DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) getSelectedNode();
 		if (selectedNode == null) {
 			firstSuitable();
@@ -42,7 +42,7 @@ class SelectionController {
 	}
 
 	void nextSuitable() {
-		if (suitables == null || suitables.isEmpty()) return;
+		if (suitable == null || suitable.isEmpty()) return;
 
 		DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) getSelectedNode();
 		if (selectedNode == null) {
@@ -73,7 +73,7 @@ class SelectionController {
 	}
 
 	private boolean check(DefaultMutableTreeNode node) {
-		return node != null && node != getSelectedNode() && suitables.contains(node);
+		return node != null && node != getSelectedNode() && suitable.contains(node);
 	}
 
 	private boolean next(int i) {
@@ -137,7 +137,7 @@ class SelectionController {
 	}
 
 	private void firstSuitable() {
-		TreePath path = getPath(suitables.get(0));
+		TreePath path = getPath(suitable.get(0));
 		setSelectionPath(path);
 	}
 

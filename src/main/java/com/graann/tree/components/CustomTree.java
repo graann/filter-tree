@@ -33,7 +33,7 @@ public class CustomTree extends JTree implements Destroyable {
 	private Subscription viewportAreaSubscription;
 
 	private String pattern;
-	private List<DefaultMutableTreeNode> suitables = Collections.emptyList();
+	private List<DefaultMutableTreeNode> suitable = Collections.emptyList();
 	private final SelectionController selectionController;
 
 	private final BehaviorSubject<Rectangle> viewportArea;
@@ -52,19 +52,19 @@ public class CustomTree extends JTree implements Destroyable {
 	private void updateModel(String pattern, TreeNode root) {
 		this.pattern = pattern;
 		boolean isRootTreeNode = root instanceof RootTreeNode;
-		suitables = isRootTreeNode ? ((RootTreeNode) root).getSelectedNodes() : Collections.emptyList();
+		suitable = isRootTreeNode ? ((RootTreeNode) root).getSelectedNodes() : Collections.emptyList();
 
 		opened.clear();
 		getSelectionModel().clearSelection();
 		model.setRoot(root);
-		selectionController.setSuitables(suitables);
+		selectionController.setSuitable(suitable);
 
 		RxUtils.unsubscribe(viewportAreaSubscription);
 
 		filteredCounterConsumer.accept(isRootTreeNode ? ((RootTreeNode) root).getFilteredCount() : null);
 
 		if (isRootTreeNode) {
-			updateSuitables();
+			updateSuitable();
 			expandVisible(viewportArea.getValue());
 
 			viewportAreaSubscription = viewportArea
@@ -100,8 +100,8 @@ public class CustomTree extends JTree implements Destroyable {
 	/**
 	 * used instead of {@link #convertValueToText} to avoid leaks
 	 */
-	private void updateSuitables() {
-		for (DefaultMutableTreeNode next : suitables) {
+	private void updateSuitable() {
+		for (DefaultMutableTreeNode next : suitable) {
 			String s = next.toString();
 			String res = Utils.replacePattern(pattern, s, ColorScheme.PATTERN);
 			next.setUserObject(res);

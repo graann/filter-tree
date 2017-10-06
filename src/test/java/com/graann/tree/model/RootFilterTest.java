@@ -14,21 +14,21 @@ import static org.junit.Assert.*;
 
 public class RootFilterTest {
 	private final TreeNodeFilter treeNodeFilter = new RootFilter();
-	private TreeStructure treeStructure;
 
-	private Map<String, Set<TreeNode>> map = new LinkedHashMap<>();
+	private final Map<String, Set<TreeNode>> map = new LinkedHashMap<>();
 
-	private DefaultMutableTreeNode root = createNode("abc", map);
-	private DefaultMutableTreeNode ch0 = createNode("filter tree", map);
-	private DefaultMutableTreeNode ch00 = createNode("import", map);
-	private DefaultMutableTreeNode ch10 = createNode("import", map);
-	private DefaultMutableTreeNode ch1 = createNode("stop", map);
-	private DefaultMutableTreeNode ch11 = createNode("action", map);
-	private DefaultMutableTreeNode ch12= createNode("widget", map);
-	private DefaultMutableTreeNode ch120 = createNode("tree", map);
+	private final DefaultMutableTreeNode root = createNode("abc", map);
+	private final DefaultMutableTreeNode ch0 = createNode("filter tree", map);
+	private final DefaultMutableTreeNode ch00 = createNode("import", map);
+	private final DefaultMutableTreeNode ch10 = createNode("import", map);
+	private final DefaultMutableTreeNode ch1 = createNode("stop", map);
+	private final DefaultMutableTreeNode ch11 = createNode("action", map);
+	private final DefaultMutableTreeNode ch12= createNode("widget", map);
+	private final DefaultMutableTreeNode ch120 = createNode("tree", map);
 
 	private final Object lock = new Object();
 	private volatile boolean semaphore = false;
+	private TreeStructure treeStructure;
 
 	@Before
 	public void setUp() throws Exception {
@@ -40,7 +40,7 @@ public class RootFilterTest {
 		ch1.add(ch12);
 		ch12.add(ch120);
 
-		treeStructure = new TreeStructure(root, map, 6);
+		treeStructure = new TreeStructure(root, map, 7);
 	}
 
 	private static DefaultMutableTreeNode createNode(String string, Map<String, Set<TreeNode>> map) {
