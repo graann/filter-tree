@@ -4,7 +4,6 @@ import com.graann.common.Viewable;
 import com.graann.styling.ColorScheme;
 import com.graann.styling.FontIcon;
 import com.graann.styling.IconFontSymbols;
-import com.sun.istack.internal.Nullable;
 
 import javax.swing.*;
 
@@ -52,7 +51,7 @@ public class FilterBox implements Viewable<JComponent> {
 		label.setEnabled(active);
 	}
 
-	private static boolean isNullOrEmpty(@Nullable String string) {
+	private static boolean isNullOrEmpty(String string) {
 		return string == null || string.isEmpty();
 	}
 
