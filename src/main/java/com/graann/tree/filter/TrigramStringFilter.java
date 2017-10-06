@@ -1,4 +1,4 @@
-package com.graann.tree.model;
+package com.graann.tree.filter;
 
 import org.apache.commons.collections4.trie.PatriciaTrie;
 import rx.Observable;

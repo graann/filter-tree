@@ -1,6 +1,6 @@
 package com.graann.tree.ui;
 
-import com.graann.tree.model.TreeFilterFactory;
+import com.graann.tree.filter.TreeFilterFactory;
 
 class TreeWidgetFactory {
 	private final TreeFilterFactory treeFilterFactory = new TreeFilterFactory();

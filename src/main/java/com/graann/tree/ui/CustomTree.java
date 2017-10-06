@@ -3,7 +3,7 @@ package com.graann.tree.ui;
 import com.graann.common.Destroyable;
 import com.graann.common.RxUtils;
 import com.graann.styling.ColorScheme;
-import com.graann.tree.model.RootTreeNode;
+import com.graann.tree.filter.RootTreeNode;
 import org.reactfx.util.Tuple2;
 import rx.Observable;
 import rx.Subscription;

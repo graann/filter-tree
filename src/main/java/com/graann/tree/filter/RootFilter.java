@@ -1,4 +1,4 @@
-package com.graann.tree.model;
+package com.graann.tree.filter;
 
 import com.graann.common.Reference;
 import com.graann.treeloader.TreeStructure;

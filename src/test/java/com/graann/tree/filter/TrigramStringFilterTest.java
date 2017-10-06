@@ -1,4 +1,4 @@
-package com.graann.tree.model;
+package com.graann.tree.filter;
 
 import org.junit.After;
 import org.junit.Before;
