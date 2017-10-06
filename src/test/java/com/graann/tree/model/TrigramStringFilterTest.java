@@ -8,9 +8,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -18,6 +16,9 @@ import static org.junit.Assert.assertTrue;
  */
 public class TrigramStringFilterTest {
 	private StringFilter trigramStringFilter;
+
+	private final Object lock = new Object();
+	private volatile boolean semaphore = false;
 
 	@Before
 	public void setUp() throws Exception {
@@ -28,7 +29,7 @@ public class TrigramStringFilterTest {
 
 	@After
 	public void tearDown() throws Exception {
-
+		semaphore = false;
 	}
 
 	@Test
@@ -39,7 +40,18 @@ public class TrigramStringFilterTest {
 					assertTrue(strings.contains("колбаса"));
 					assertTrue(strings.contains("полоса"));
 					assertTrue(strings.contains("самолет"));
+
+					synchronized (lock) {
+						semaphore = true;
+						lock.notifyAll();
+					}
 				});
+
+		synchronized (lock) {
+			while (!semaphore) {
+				lock.wait(10000);
+			}
+		}
 	}
 
 	@Test

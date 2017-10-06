@@ -5,8 +5,6 @@ import com.graann.common.RxUtils;
 import com.graann.treeloader.TreeStructure;
 import org.reactfx.util.Tuple2;
 import org.reactfx.util.Tuples;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
