@@ -1,4 +1,4 @@
-package com.graann.tree.components;
+package com.graann.tree.ui;
 
 import com.graann.common.RxUtils;
 import com.graann.common.Viewable;

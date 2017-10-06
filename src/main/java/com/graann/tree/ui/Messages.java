@@ -1,4 +1,4 @@
-package com.graann.components;
+package com.graann.tree.ui;
 
 public enum Messages {
 	NOTHING_FOUND("Sorry, nothing found"),

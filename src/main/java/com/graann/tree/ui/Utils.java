@@ -1,10 +1,10 @@
-package com.graann.components;
+package com.graann.tree.ui;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class Utils {
-	public static void setTooltipIfNeeded(JLabel label) {
+class Utils {
+	static void setTooltipIfNeeded(JLabel label) {
 		String labelText = label.getText();
 		if (labelText == null) {
 			label.setToolTipText(null);

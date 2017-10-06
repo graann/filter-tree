@@ -14,8 +14,8 @@ import java.util.*;
 /**
  * @author gromova on 22.09.17.
  */
-public class DictionaryLoader implements TreeLoader {
-	private static final Logger LOG = LoggerFactory.getLogger(DictionaryLoader.class);
+public class TxtLoader implements TreeLoader {
+	private static final Logger LOG = LoggerFactory.getLogger(TxtLoader.class);
 	private static final String CHARSET_NAME = "UTF8";
 
 	private BehaviorSubject<TreeStructure> treeBehaviorSubject;

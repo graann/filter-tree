@@ -1,4 +1,4 @@
-package com.graann.components;
+package com.graann.tree.ui;
 
 import com.graann.common.Viewable;
 import com.graann.styling.ColorScheme;
@@ -16,7 +16,7 @@ public class FilterBox implements Viewable<JComponent> {
 	private final JLabel label;
 	private boolean active;
 
-	public FilterBox() {
+	FilterBox() {
 		label = WidgetFactory.createIconLabel(IconFontSymbols.SEARCH);
 		label.setForeground(ColorScheme.MAINT);
 
@@ -33,15 +33,15 @@ public class FilterBox implements Viewable<JComponent> {
 		return label;
 	}
 
-	public void setText(String text) {
+	void setText(String text) {
 		label.setText(text);
 	}
 
-	public void setState(State state) {
+	void setState(State state) {
 		label.setForeground(state == State.ERROR ? ColorScheme.ERROR : ColorScheme.MAINT);
 	}
 
-	public void setActive(boolean value) {
+	void setActive(boolean value) {
 		active = value;
 		updateStatus();
 	}

@@ -1,4 +1,4 @@
-package com.graann.tree.components;
+package com.graann.tree.ui;
 
 /**
  * @author gromova on 20.09.17.

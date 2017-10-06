@@ -1,4 +1,4 @@
-package com.graann.tree.components;
+package com.graann.tree.ui;
 
 import com.graann.tree.model.TreeFilterFactory;
 

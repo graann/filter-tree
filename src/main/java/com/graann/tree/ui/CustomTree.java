@@ -1,8 +1,7 @@
-package com.graann.tree.components;
+package com.graann.tree.ui;
 
 import com.graann.common.Destroyable;
 import com.graann.common.RxUtils;
-import com.graann.components.Utils;
 import com.graann.styling.ColorScheme;
 import com.graann.tree.model.RootTreeNode;
 import org.reactfx.util.Tuple2;

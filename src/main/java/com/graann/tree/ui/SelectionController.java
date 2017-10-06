@@ -1,4 +1,4 @@
-package com.graann.tree.components;
+package com.graann.tree.ui;
 
 import javax.swing.*;
 import javax.swing.tree.*;

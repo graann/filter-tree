@@ -1,9 +1,6 @@
-package com.graann.tree.components;
+package com.graann.tree.ui;
 
 import com.graann.common.Viewable;
-import com.graann.components.FilterBox;
-import com.graann.components.Messages;
-import com.graann.components.WidgetFactory;
 import com.graann.styling.ColorScheme;
 import com.graann.styling.FontIcon;
 import com.graann.styling.IconFontSymbols;

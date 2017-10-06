@@ -2,8 +2,8 @@ package com.graann;
 
 import com.graann.common.Viewable;
 import com.graann.styling.LAFUtils;
-import com.graann.tree.components.DefaultTreePaneWidgetFactory;
-import com.graann.tree.components.TreePaneWidgetFactory;
+import com.graann.tree.ui.DefaultTreePaneWidgetFactory;
+import com.graann.tree.ui.TreePaneWidgetFactory;
 
 import javax.swing.*;
 import java.awt.*;

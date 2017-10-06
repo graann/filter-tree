@@ -1,4 +1,4 @@
-package com.graann.components;
+package com.graann.tree.ui;
 
 import com.graann.styling.ColorScheme;
 import com.graann.styling.FontIcon;
@@ -7,14 +7,14 @@ import com.graann.styling.IconFontSymbols;
 import javax.swing.*;
 import java.awt.*;
 
-public class WidgetFactory {
+class WidgetFactory {
 	private static JLabel createLabel() {
 		JLabel label = new JLabel();
 		label.setForeground(ColorScheme.MAINT);
 		return label;
 	}
 
-	public static JLabel createWarningLabel(Messages key) {
+	static JLabel createWarningLabel(Messages key) {
 		JLabel label = createLabel();
 		label.setText(key.getString());
 		label.setForeground(ColorScheme.WARNING);
