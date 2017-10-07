@@ -1,11 +1,8 @@
 package com.graann.tree.ui;
 
-import com.graann.common.RxUtils;
 import com.graann.common.Viewable;
 import com.graann.treeloader.TreeLoader;
 import net.miginfocom.swing.MigLayout;
-import rx.Subscription;
-import rx.schedulers.Schedulers;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,12 +11,9 @@ import java.awt.*;
  * @author gromova on 20.09.17.
  */
 public class TreePaneWidget implements Viewable<JComponent> {
-	private Subscription loaderSubscriber;
-
 	private TreeLoader loader;
 	private TreeWidgetFactory treeWidgetFactory;
 	private FilterTreeWidget filterTreeWidget;
-
 	private String fileName;
 
 	private JPanel panel;
@@ -32,7 +26,7 @@ public class TreePaneWidget implements Viewable<JComponent> {
 		this.treeWidgetFactory = treeWidgetFactory;
 	}
 
-	public void setFileName(String fileName) {
+	void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
 
@@ -41,21 +35,16 @@ public class TreePaneWidget implements Viewable<JComponent> {
 	}
 
 	void initialize() {
-		filterTreeWidget = treeWidgetFactory.create();
+		filterTreeWidget = treeWidgetFactory.create(loader.loadTreeStructure(fileName));
 
 		panel = new JPanel(new MigLayout("fill, flowy"));
 		panel.setPreferredSize(new Dimension(800, 600));
 
 		panel.add(filterTreeWidget.getView(), "grow, span 2");
-
-		loaderSubscriber = loader.loadTreeStructure(fileName)
-				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
-				.subscribe(filterTreeWidget::updateStructure);
 	}
 
 	@Override
 	public void destroy() {
-		RxUtils.unsubscribe(loaderSubscriber);
 		filterTreeWidget.destroy();
 	}
 }

@@ -1,7 +1,10 @@
 package com.graann.tree.filter;
 
+import com.graann.App;
 import com.graann.common.Reference;
 import com.graann.treeloader.TreeStructure;
+import org.reactfx.util.Tuple3;
+import org.reactfx.util.Tuples;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
@@ -14,8 +17,8 @@ import java.util.stream.Collectors;
 
 public class RootFilter implements TreeNodeFilter {
 
-	public Observable<TreeNode> rootObservable(TreeStructure treeStructure, Set<String> filtered) {
-		return Observable.<TreeNode>create(subscriber -> {
+	public Observable<Tuple3<TreeNode, List<DefaultMutableTreeNode>, Integer>> rootObservable(TreeStructure treeStructure, Set<String> filtered) {
+		return Observable.<Tuple3<TreeNode, List<DefaultMutableTreeNode>, Integer>>create(subscriber -> {
 			Set<TreeNode> filteredNodes = filtered
 					.stream()
 					.map(key -> treeStructure.getTreemap().get(key))
@@ -41,14 +44,12 @@ public class RootFilter implements TreeNodeFilter {
 				}
 			};
 
-			RootTreeNode node = new RootTreeNode(treeStructure.getRoot().toString());
-			node.setSelectedNodes(customTreeNodes);
-			node.setFilteredCount(counter);
-
+			DefaultMutableTreeNode node = new DefaultMutableTreeNode(treeStructure.getRoot().toString());
 			consumer.accept(treeStructure.getRoot(), node);
 
 			addChildren(treeStructure.getRoot(), node, predicate, consumer);
-			subscriber.onNext(node);
+			System.out.println("node: "+(System.currentTimeMillis()- App.timer));
+			subscriber.onNext(Tuples.t(node, customTreeNodes, counter.getValue()));
 		}).subscribeOn(Schedulers.computation());
 	}
 

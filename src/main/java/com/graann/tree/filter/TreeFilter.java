@@ -1,29 +1,33 @@
 package com.graann.tree.filter;
 
+import com.graann.App;
 import com.graann.common.Destroyable;
 import com.graann.common.RxUtils;
 import com.graann.treeloader.TreeStructure;
-import org.reactfx.util.Tuple2;
 import org.reactfx.util.Tuples;
 import rx.Observable;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
-import javax.swing.*;
-import javax.swing.tree.TreeNode;
 import java.util.concurrent.TimeUnit;
 
 public class TreeFilter implements Destroyable {
+	private Observable<TreeStructure> structureObservable;
 	private Observable<String> patternObservable;
 
 	private StringFilterFactory stringFilterFactory = new StringFilterFactory();
 	private TreeNodeFilter treeNodeFilter;
 	private StringFilter trigramStringFilter;
 
+	private Subscription subscription;
 	private Subscription filterSubscription;
 
-	private final BehaviorSubject<Tuple2<String, TreeNode>> filterObservable = BehaviorSubject.create();
+	private final BehaviorSubject<FilteredState> filterObservable = BehaviorSubject.create();
+
+	void setStructureObservable(Observable<TreeStructure> structureObservable) {
+		this.structureObservable = structureObservable;
+	}
 
 	void setStringFilterFactory(StringFilterFactory stringFilterFactory) {
 		this.stringFilterFactory = stringFilterFactory;
@@ -37,51 +41,63 @@ public class TreeFilter implements Destroyable {
 		this.patternObservable = patternObservable;
 	}
 
-	public void updateStructure(TreeStructure structure) {
-		clear();
+	void init() {
+		subscription = structureObservable
+				.subscribeOn(Schedulers.computation())
+				.subscribe(structure -> {
 
-		filterObservable.onNext(Tuples.t(null, structure.getRoot()));
-		trigramStringFilter = stringFilterFactory.create(structure.getStrings());
+					System.out.println("structure: "+(System.currentTimeMillis()- App.timer));
+					filterObservable.onNext(new FilteredState(structure.getRoot(), structure.getCount()));
 
-		filterSubscription = patternObservable
-				.debounce(200, TimeUnit.MILLISECONDS)
-				.switchMap(s -> {
-					if(s == null || s.isEmpty()) {
-						return Observable.just(null);
-					}
-					return trigramStringFilter.appropriateStringObservable(s)
-							.map(strings -> Tuples.t(s, strings));
-				})
-				.switchMap(tuple2 -> {
-					if (tuple2 == null || tuple2._2 == null) {
-						return Observable.just(Tuples.t("", structure.getRoot()));
-					}
+					trigramStringFilter = stringFilterFactory.create(structure.getStrings());
+					System.out.println("tr complete: "+(System.currentTimeMillis()- App.timer));
+					clear();
 
-					if (tuple2._2.isEmpty()) {
-						return Observable.just(Tuples.t(tuple2._1, ((TreeNode) null)));
-					}
+					filterSubscription = patternObservable
+							.debounce(200, TimeUnit.MILLISECONDS)
+							.switchMap(s -> {
+								if (s == null || s.isEmpty()) {
+									return Observable.just(null);
+								}
+								return trigramStringFilter.appropriateStringObservable(s).map(strings -> Tuples.t(s, strings));
+							})
+							.switchMap(t2 -> {
+								if (t2 == null) {
+									return Observable.just(new FilteredState(structure.getRoot(), structure.getCount()));
+								}
 
-					return treeNodeFilter.rootObservable(structure, tuple2._2)
-							.map(treeNode -> Tuples.t(tuple2._1, treeNode));
-				})
-				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
-				.subscribe(filterObservable::onNext);
+								if (t2._2 ==null || t2._2.isEmpty()) {
+									return Observable.just(new FilteredState(t2._1, structure.getCount()));
+								}
+
+								return treeNodeFilter.rootObservable(structure, t2._2)
+										.map(tuple3 -> {
+											if (tuple3 == null) {
+												return new FilteredState(t2._1, structure.getCount());
+											}
+
+
+											return new FilteredState(t2._1, tuple3._1, tuple3._2, structure.getCount(), tuple3._3);
+										});
+							})
+							.subscribe(filterObservable::onNext);
+				});
+
 	}
 
-
-	public Observable<Tuple2<String, TreeNode>> filteredStateObservable() {
+	public Observable<FilteredState> filteredStateObservable() {
 		return filterObservable;
 	}
 
-
 	@Override
 	public void destroy() {
+		RxUtils.unsubscribe(subscription);
 		clear();
 	}
 
 	private void clear() {
 		RxUtils.unsubscribe(filterSubscription);
-		if(trigramStringFilter != null) {
+		if (trigramStringFilter != null) {
 			trigramStringFilter.destroy();
 		}
 	}

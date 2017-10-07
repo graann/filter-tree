@@ -1,13 +1,19 @@
 package com.graann.tree.ui;
 
 import com.graann.tree.filter.TreeFilterFactory;
+import com.graann.treeloader.TreeStructure;
+import rx.Observable;
 
 class TreeWidgetFactory {
-	private final TreeFilterFactory treeFilterFactory = new TreeFilterFactory();
+	public FilterTreeWidget create(Observable<TreeStructure> structureObservable) {
+		TreeFilterFactory treeFilterFactory = new TreeFilterFactory();
+		treeFilterFactory.setStructureObservable(structureObservable);
 
-	public FilterTreeWidget create() {
+		CustomTreeFactory treeFactory = new CustomTreeFactory();
+		treeFactory.setTreeFilterFactory(treeFilterFactory);
+
 		FilterTreeWidget widget = new FilterTreeWidget();
-		widget.setTreeFilterFactory(treeFilterFactory);
+		widget.setCustomTreeFactory(treeFactory);
 		widget.initialize();
 		return widget;
 	}

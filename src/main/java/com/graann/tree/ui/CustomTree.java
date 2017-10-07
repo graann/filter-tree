@@ -3,10 +3,10 @@ package com.graann.tree.ui;
 import com.graann.common.Destroyable;
 import com.graann.common.RxUtils;
 import com.graann.styling.ColorScheme;
-import com.graann.tree.filter.RootTreeNode;
-import org.reactfx.util.Tuple2;
+import com.graann.tree.filter.FilteredState;
 import rx.Observable;
 import rx.Subscription;
+import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
 import javax.swing.*;
@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 /**
  * @author gromova on 26.09.17.
@@ -28,52 +28,57 @@ import java.util.function.Consumer;
 public class CustomTree extends JTree implements Destroyable {
 	private final DefaultTreeModel model;
 	private final Set<TreeNode> opened = new HashSet<>();
-	private final Subscription filterSubscriber;
+	private Subscription filterSubscriber;
 	private Subscription viewportAreaSubscription;
 
-	private String pattern;
-	private List<DefaultMutableTreeNode> suitable = Collections.emptyList();
-	private final SelectionController selectionController;
+	private FilteredState filteredState;
+	private SelectionController selectionController;
 
-	private final BehaviorSubject<Rectangle> viewportArea;
-	private final Consumer<Integer> filteredCounterConsumer;
+	private BehaviorSubject<Rectangle> viewportAreaObservable;
+	private BiConsumer<Integer, Integer> counterConsumer;
+	private Observable<FilteredState> filterObservable;
 
-	CustomTree(Observable<Tuple2<String, TreeNode>> filterObservable, BehaviorSubject<Rectangle> viewportArea, Consumer<Integer> filteredCounterConsumer) {
-		super(new DefaultTreeModel(null));
-		model = (DefaultTreeModel) getModel();
-		this.viewportArea = viewportArea;
-		selectionController = new SelectionController(this);
-		this.filteredCounterConsumer = filteredCounterConsumer;
-
-		filterSubscriber = filterObservable.subscribe(t -> updateModel(t._1, t._2));
+	void setViewportAreaObservable(BehaviorSubject<Rectangle> viewportArea) {
+		this.viewportAreaObservable = viewportArea;
 	}
 
-	private void updateModel(String pattern, TreeNode root) {
-		this.pattern = pattern;
-		boolean isRootTreeNode = root instanceof RootTreeNode;
-		suitable = isRootTreeNode ? ((RootTreeNode) root).getSelectedNodes() : Collections.emptyList();
+	void setFilterObservable(Observable<FilteredState> filterObservable) {
+		this.filterObservable = filterObservable;
+	}
 
-		opened.clear();
-		getSelectionModel().clearSelection();
-		model.setRoot(root);
-		selectionController.setSuitable(suitable);
+	void setCounterConsumer(BiConsumer<Integer, Integer> counterConsumer) {
+		this.counterConsumer = counterConsumer;
+	}
 
-		RxUtils.unsubscribe(viewportAreaSubscription);
+	CustomTree() {
+		super(new DefaultTreeModel(null));
+		model = (DefaultTreeModel) getModel();
+	}
 
-		filteredCounterConsumer.accept(isRootTreeNode ? ((RootTreeNode) root).getFilteredCount() : null);
+	void init() {
+		selectionController = new SelectionController(this);
+		filterSubscriber = filterObservable
+				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
+				.subscribe(state -> {
+					this.filteredState = state;
+					opened.clear();
+					getSelectionModel().clearSelection();
+					model.setRoot(filteredState.getRoot());
+					selectionController.setSuitable(filteredState.getFilteredNodes());
 
-		if (isRootTreeNode) {
-			updateSuitable();
-			expandVisible(viewportArea.getValue());
+					RxUtils.unsubscribe(viewportAreaSubscription);
 
-			viewportAreaSubscription = viewportArea
-					.throttleLast(80, TimeUnit.MILLISECONDS)
-					.subscribe(this::expandVisible);
-		} else if (root == null) {
-			filteredCounterConsumer.accept(0);
-		} else {
-			filteredCounterConsumer.accept(null);
-		}
+					counterConsumer.accept(filteredState.getTotal(), filteredState.getFiltered());
+
+					if (!filteredState.getFilteredNodes().isEmpty()) {
+						updateSuitable(filteredState.getFilteredNodes());
+						expandVisible(viewportAreaObservable.getValue());
+
+						viewportAreaSubscription = viewportAreaObservable
+								.throttleLast(80, TimeUnit.MILLISECONDS)
+								.subscribe(this::expandVisible);
+					}
+				});
 	}
 
 	private void expandVisible(Rectangle visibleRectangle) {
@@ -99,14 +104,13 @@ public class CustomTree extends JTree implements Destroyable {
 	/**
 	 * used instead of {@link #convertValueToText} to avoid leaks
 	 */
-	private void updateSuitable() {
+	private void updateSuitable(List<DefaultMutableTreeNode> suitable) {
 		for (DefaultMutableTreeNode next : suitable) {
 			String s = next.toString();
-			String res = Utils.replacePattern(pattern, s, ColorScheme.PATTERN);
+			String res = Utils.replacePattern(filteredState.getPattern(), s, ColorScheme.PATTERN);
 			next.setUserObject(res);
 		}
 	}
-
 
 	@Override
 	public void destroy() {

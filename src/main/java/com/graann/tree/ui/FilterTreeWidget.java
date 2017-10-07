@@ -22,8 +22,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 	private final DecimalFormat formatter = new DecimalFormat();
 	private final BehaviorSubject<String> patternObservable = BehaviorSubject.create();
 
-	private TreeFilterFactory treeFilterFactory;
-	private TreeFilter treeFilter;
+	private CustomTreeFactory customTreeFactory;
 
 	private CustomTree tree;
 	private JLabel shownLabel;
@@ -38,8 +37,8 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 	private final BehaviorSubject<Rectangle> verticalScrollObservable = BehaviorSubject.create();
 	private final AdjustmentListener verticalScrollBarListener = e -> fillScrollObservable();
 
-	void setTreeFilterFactory(TreeFilterFactory treeFilterFactory) {
-		this.treeFilterFactory = treeFilterFactory;
+	void setCustomTreeFactory(CustomTreeFactory customTreeFactory) {
+		this.customTreeFactory = customTreeFactory;
 	}
 
 	private KeyHandler getHandler() {
@@ -76,10 +75,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		panel = new JPanel(new MigLayout("flowy, ins 0, gap 0, fill, hidemode 3", "", "[min!][]"));
 		panel.add(infopane, "growx");
 
-		treeFilter = treeFilterFactory.create(patternObservable);
-
-		tree = new CustomTree(treeFilter.filteredStateObservable(), verticalScrollObservable, this::updateFilteredCounter);
-
+		tree = customTreeFactory.createTree(patternObservable, verticalScrollObservable, this::updateFilteredCounter);
 		scrollPane = new JScrollPane(tree);
 		scrollPane.getVerticalScrollBar().addAdjustmentListener(verticalScrollBarListener);
 
@@ -92,17 +88,14 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 		nothingFound.setVisible(false);
 	}
 
-	private void updateFilteredCounter(Integer count) {
-		shownLabel.setText(count != null ? formatter.format(count) : totalLabel.getText());
-		boolean empty = count != null && count == 0;
+	private void updateFilteredCounter(Integer total, Integer filtered) {
+		totalLabel.setText(formatter.format(total));
+		shownLabel.setText(filtered != null ? formatter.format(filtered) : totalLabel.getText());
+
+		boolean empty = filtered != null && filtered == 0;
 
 		nothingFound.setVisible(empty);
 		filterLabel.setState(empty ? FilterBox.State.ERROR : FilterBox.State.SUCCESS);
-	}
-
-	void updateStructure(TreeStructure structure) {
-		totalLabel.setText(formatter.format(structure.getCount()));
-		treeFilter.updateStructure(structure);
 	}
 
 	private void updatePattern(String typedString) {
@@ -116,7 +109,7 @@ public class FilterTreeWidget implements Viewable<JComponent> {
 
 	@Override
 	public void destroy() {
-		treeFilter.destroy();
+		tree.destroy();
 		scrollPane.getVerticalScrollBar().removeAdjustmentListener(verticalScrollBarListener);
 	}
 

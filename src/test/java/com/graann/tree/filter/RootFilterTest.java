@@ -66,10 +66,9 @@ public class RootFilterTest {
 
 
 		treeNodeFilter.rootObservable(treeStructure, set)
-				.subscribe(treeNode -> {
-					assertNotNull(treeNode);
-					assertTrue(treeNode instanceof RootTreeNode);
-					RootTreeNode root = (RootTreeNode) treeNode;
+				.subscribe(tuple3 -> {
+					assertNotNull(tuple3);
+					TreeNode root = tuple3._1;
 
 					assertEquals(root.toString(), root.toString());
 
@@ -92,7 +91,7 @@ public class RootFilterTest {
 					assertEquals(child110.toString(), ch120.toString());
 
 					DefaultMutableTreeNode[] treeNodes = {child0, child00, child10, child110};
-					List<DefaultMutableTreeNode> selectedNodes = root.getSelectedNodes();
+					List<DefaultMutableTreeNode> selectedNodes = tuple3._2;
 
 					Assert.assertArrayEquals(treeNodes, selectedNodes.toArray());
 
