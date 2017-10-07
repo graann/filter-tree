@@ -40,11 +40,11 @@ public class TreeFilter implements Destroyable {
 	public void updateStructure(TreeStructure structure) {
 		clear();
 
+		filterObservable.onNext(Tuples.t(null, structure.getRoot()));
 		trigramStringFilter = stringFilterFactory.create(structure.getStrings());
 
 		filterSubscription = patternObservable
 				.debounce(200, TimeUnit.MILLISECONDS)
-				.startWith("")
 				.switchMap(s -> {
 					if(s == null || s.isEmpty()) {
 						return Observable.just(null);
