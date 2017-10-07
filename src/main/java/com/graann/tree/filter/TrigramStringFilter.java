@@ -1,6 +1,5 @@
 package com.graann.tree.filter;
 
-import com.graann.App;
 import org.apache.commons.collections4.trie.PatriciaTrie;
 import rx.Observable;
 import rx.Single;
@@ -34,7 +33,6 @@ public class TrigramStringFilter implements StringFilter {
 					Set<String> nGrams = getNGrams(s, N);
 					nGrams.forEach(nGram -> add(map, nGram, s));
 				});
-			System.out.println("trigram: "+(System.currentTimeMillis()- App.timer));
 				subscriber.onSuccess(new PatriciaTrie<>(map));
 			})
 			.subscribeOn(Schedulers.computation())

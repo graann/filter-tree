@@ -12,7 +12,6 @@ import java.awt.*;
  * @author gromova on 20.09.17.
  */
 public class App {
-	public static long timer;
 	private static final String DICT = "/dict.txt";
 	private static final String BIG_FILE_STRUCTURE = "/filestreeBig.txt";
 	private static final String FILE_STRUCTURE = "/filestree.txt";
@@ -31,7 +30,6 @@ public class App {
 
 		LAFUtils.initLaf();
 		frame.setIconImage(LAFUtils.getImageIcon());
-		timer = System.currentTimeMillis();
 
 		Viewable<JComponent> newContentPane = treeFactory.create(fileName);
 		frame.setContentPane(newContentPane.getView());

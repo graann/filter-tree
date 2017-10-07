@@ -1,6 +1,5 @@
 package com.graann.tree.filter;
 
-import com.graann.App;
 import com.graann.common.Reference;
 import com.graann.treeloader.TreeStructure;
 import org.reactfx.util.Tuple3;
@@ -48,7 +47,6 @@ public class RootFilter implements TreeNodeFilter {
 			consumer.accept(treeStructure.getRoot(), node);
 
 			addChildren(treeStructure.getRoot(), node, predicate, consumer);
-			System.out.println("node: "+(System.currentTimeMillis()- App.timer));
 			subscriber.onNext(Tuples.t(node, customTreeNodes, counter.getValue()));
 		}).subscribeOn(Schedulers.computation());
 	}

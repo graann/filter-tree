@@ -46,11 +46,9 @@ public class TreeFilter implements Destroyable {
 				.subscribeOn(Schedulers.computation())
 				.subscribe(structure -> {
 
-					System.out.println("structure: "+(System.currentTimeMillis()- App.timer));
 					filterObservable.onNext(new FilteredState(structure.getRoot(), structure.getCount()));
 
 					trigramStringFilter = stringFilterFactory.create(structure.getStrings());
-					System.out.println("tr complete: "+(System.currentTimeMillis()- App.timer));
 					clear();
 
 					filterSubscription = patternObservable

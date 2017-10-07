@@ -15,7 +15,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,6 +59,7 @@ public class CustomTree extends JTree implements Destroyable {
 		filterSubscriber = filterObservable
 				.observeOn(Schedulers.from(SwingUtilities::invokeLater))
 				.subscribe(state -> {
+
 					this.filteredState = state;
 					opened.clear();
 					getSelectionModel().clearSelection();
