@@ -1,5 +1,6 @@
 package com.graann.tree.ui;
 
+import com.graann.tree.filter.TreeFilterFactory;
 import com.graann.treeloader.TxtLoader;
 import com.graann.treeloader.TreeLoader;
 
@@ -8,12 +9,18 @@ import com.graann.treeloader.TreeLoader;
  */
 public class DefaultTreePaneWidgetFactory implements TreePaneWidgetFactory {
 	private final TreeLoader loader = new TxtLoader();
-	private final TreeWidgetFactory treeWidgetFactory = new TreeWidgetFactory();
 
 	public TreePaneWidget create(String fileName) {
+		TreeFilterFactory treeFilterFactory = new TreeFilterFactory();
+		treeFilterFactory.setStructureObservable(loader.loadTreeStructure(fileName));
+
+		CustomTreeFactory treeFactory = new CustomTreeFactory();
+		treeFactory.setTreeFilterFactory(treeFilterFactory);
+
+		TreeWidgetFactory treeWidgetFactory = new TreeWidgetFactory();
+		treeWidgetFactory.setTreeFactory(treeFactory);
+
 		TreePaneWidget tree = new TreePaneWidget();
-		tree.setFileName(fileName);
-		tree.setLoader(loader);
 		tree.setTreeWidgetFactory(treeWidgetFactory);
 		tree.initialize();
 		return tree;

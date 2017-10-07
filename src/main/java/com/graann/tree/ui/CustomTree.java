@@ -25,6 +25,8 @@ import java.util.function.BiConsumer;
  * @author gromova on 26.09.17.
  */
 public class CustomTree extends JTree implements Destroyable {
+	private Destroyable destroyableTask;
+
 	private final DefaultTreeModel model;
 	private final Set<TreeNode> opened = new HashSet<>();
 	private Subscription filterSubscriber;
@@ -47,6 +49,10 @@ public class CustomTree extends JTree implements Destroyable {
 
 	void setCounterConsumer(BiConsumer<Integer, Integer> counterConsumer) {
 		this.counterConsumer = counterConsumer;
+	}
+
+	public void setDestroyableTask(Destroyable destroyableTask) {
+		this.destroyableTask = destroyableTask;
 	}
 
 	CustomTree() {
@@ -114,6 +120,10 @@ public class CustomTree extends JTree implements Destroyable {
 
 	@Override
 	public void destroy() {
+		if (destroyableTask != null) {
+			destroyableTask.destroy();
+		}
+
 		RxUtils.unsubscribe(filterSubscriber);
 		RxUtils.unsubscribe(viewportAreaSubscription);
 	}
