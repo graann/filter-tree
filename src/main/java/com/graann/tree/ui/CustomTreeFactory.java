@@ -24,7 +24,7 @@ class CustomTreeFactory {
 		tree.setViewportAreaObservable(viewportAreaObservable);
 		tree.setCounterConsumer(counterConsumer);
 		tree.setFilterObservable(treeFilter.filteredStateObservable());
-		tree.setDestroyableTask(treeFilter::destroy);
+		tree.setDestroyableTask(treeFilter);
 		tree.init();
 		return tree;
 	}

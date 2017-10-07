@@ -1,7 +1,6 @@
 package com.graann.tree.filter;
 
 import com.graann.treeloader.TreeStructure;
-import org.reactfx.util.Tuple2;
 import org.reactfx.util.Tuple3;
 import rx.Observable;
 

@@ -4,9 +4,6 @@ import com.graann.common.Viewable;
 import com.graann.styling.ColorScheme;
 import com.graann.styling.FontIcon;
 import com.graann.styling.IconFontSymbols;
-import com.graann.tree.filter.TreeFilter;
-import com.graann.tree.filter.TreeFilterFactory;
-import com.graann.treeloader.TreeStructure;
 import net.miginfocom.swing.MigLayout;
 import rx.subjects.BehaviorSubject;
 

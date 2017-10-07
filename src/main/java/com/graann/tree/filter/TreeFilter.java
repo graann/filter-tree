@@ -1,6 +1,5 @@
 package com.graann.tree.filter;
 
-import com.graann.App;
 import com.graann.common.Destroyable;
 import com.graann.common.RxUtils;
 import com.graann.treeloader.TreeStructure;
