@@ -3,17 +3,17 @@ package com.graann.tree.filter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 public class FilteredState {
-	private final List<DefaultMutableTreeNode> filteredNodes;
+	private final Set<DefaultMutableTreeNode> filteredNodes;
 	private final String pattern;
 	private final TreeNode node;
 	private final int total;
 	private final int filtered;
 
 	FilteredState(String pattern, TreeNode node,
-				  List<DefaultMutableTreeNode> filteredNodes,
+				  Set<DefaultMutableTreeNode> filteredNodes,
 				  int total, int filtered) {
 		this.filteredNodes = filteredNodes;
 		this.pattern = pattern;
@@ -26,7 +26,7 @@ public class FilteredState {
 		this.node = node;
 		this.total = total;
 		this.filtered = total;
-		filteredNodes = Collections.emptyList();
+		filteredNodes = Collections.emptySet();
 		pattern = "";
 	}
 
@@ -34,11 +34,11 @@ public class FilteredState {
 		this.node = null;
 		this.total = total;
 		this.filtered = 0;
-		filteredNodes = Collections.emptyList();
+		filteredNodes = Collections.emptySet();
 		this.pattern = pattern;
 	}
 
-	public List<DefaultMutableTreeNode> getFilteredNodes() {
+	public Set<DefaultMutableTreeNode> getFilteredNodes() {
 		return filteredNodes;
 	}
 

@@ -3,12 +3,12 @@ package com.graann.tree.ui;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 class SelectionController {
 	private final JTree tree;
 	private final TreeSelectionModel selectionModel;
-	private List<DefaultMutableTreeNode> suitable = Collections.emptyList();
+	private Set<DefaultMutableTreeNode> suitable = Collections.emptySet();
 
 	SelectionController(JTree tree) {
 		this.tree = tree;
@@ -17,7 +17,7 @@ class SelectionController {
 		selectionModel.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 	}
 
-	void setSuitable(List<DefaultMutableTreeNode> suitable) {
+	void setSuitable(Set<DefaultMutableTreeNode> suitable) {
 		this.suitable = suitable;
 		if (suitable != null && !suitable.isEmpty()) {
 			firstSuitable();
@@ -137,7 +137,7 @@ class SelectionController {
 	}
 
 	private void firstSuitable() {
-		TreePath path = getPath(suitable.get(0));
+		TreePath path = getPath(suitable.iterator().next());
 		setSelectionPath(path);
 	}
 

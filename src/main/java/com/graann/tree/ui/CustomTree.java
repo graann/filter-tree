@@ -16,7 +16,6 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
@@ -51,7 +50,7 @@ public class CustomTree extends JTree implements Destroyable {
 		this.counterConsumer = counterConsumer;
 	}
 
-	public void setDestroyableTask(Destroyable destroyableTask) {
+	void setDestroyableTask(Destroyable destroyableTask) {
 		this.destroyableTask = destroyableTask;
 	}
 
@@ -110,11 +109,11 @@ public class CustomTree extends JTree implements Destroyable {
 	/**
 	 * used instead of {@link #convertValueToText} to avoid leaks
 	 */
-	private void updateSuitable(List<DefaultMutableTreeNode> suitable) {
-		for (DefaultMutableTreeNode next : suitable) {
-			String s = next.toString();
+	private void updateSuitable(Set<DefaultMutableTreeNode> suitable) {
+		for (DefaultMutableTreeNode treeNode : suitable) {
+			String s = treeNode.toString();
 			String res = Utils.replacePattern(filteredState.getPattern(), s, ColorScheme.PATTERN);
-			next.setUserObject(res);
+			treeNode.setUserObject(res);
 		}
 	}
 

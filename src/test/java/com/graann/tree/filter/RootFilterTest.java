@@ -91,7 +91,7 @@ public class RootFilterTest {
 					assertEquals(child110.toString(), ch120.toString());
 
 					DefaultMutableTreeNode[] treeNodes = {child0, child00, child10, child110};
-					List<DefaultMutableTreeNode> selectedNodes = tuple3._2;
+					Set<DefaultMutableTreeNode> selectedNodes = tuple3._2;
 
 					Assert.assertArrayEquals(treeNodes, selectedNodes.toArray());
 
