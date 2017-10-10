@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 
 public class RootFilter implements TreeNodeFilter {
 
-	public Observable<Tuple3<TreeNode, Set<DefaultMutableTreeNode>, Integer>> rootObservable(TreeStructure treeStructure, Set<String> filtered) {
-		return Observable.<Tuple3<TreeNode, Set<DefaultMutableTreeNode>, Integer>>create(subscriber -> {
+	public Observable<Tuple3<DefaultMutableTreeNode, Set<DefaultMutableTreeNode>, Integer>> rootObservable(TreeStructure treeStructure, Set<String> filtered) {
+		return Observable.<Tuple3<DefaultMutableTreeNode, Set<DefaultMutableTreeNode>, Integer>>create(subscriber -> {
 			Set<TreeNode> filteredNodes = filtered
 					.stream()
 					.map(key -> treeStructure.getTreemap().get(key))
